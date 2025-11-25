@@ -1,0 +1,34 @@
+services:
+  server:
+    build:
+      context: ./server
+    command: npm run start:dev
+    container_name: bidboard-server
+    restart: unless-stopped
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+
+  client:
+    build:
+      context: ./client
+    command: npm run dev -- --host 0.0.0.0 --port 5173
+    container_name: bidboard-client
+    restart: unless-stopped
+    working_dir: /app
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    depends_on:
+      - server
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://server:3000
+
