@@ -1,4 +1,23 @@
 services:
+  db:
+    image: mysql:8.0
+    container_name: bidboard-db
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=taskbid
+      - MYSQL_USER=taskbid
+      - MYSQL_PASSWORD=taskbid
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   server:
     build:
       context: ./server
@@ -11,8 +30,12 @@ services:
     volumes:
       - ./server:/app
       - /app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
     environment:
       - NODE_ENV=development
+      - DATABASE_URL=mysql://taskbid:taskbid@db:3306/taskbid
 
   client:
     build:
@@ -27,8 +50,12 @@ services:
       - ./client:/app
       - /app/node_modules
     depends_on:
-      - server
+      server:
+        condition: service_started
     environment:
       - NODE_ENV=development
       - VITE_API_URL=http://server:3000
+
+volumes:
+  mysql_data:
 
