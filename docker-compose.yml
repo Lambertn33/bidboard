@@ -3,6 +3,7 @@ services:
     image: mysql:8.0
     container_name: bidboard-db
     restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
     ports:
       - "3306:3306"
     environment:
@@ -21,7 +22,9 @@ services:
   server:
     build:
       context: ./server
-    command: npm run start:dev
+    command: >
+      sh -c "
+            npx prisma generate"
     container_name: bidboard-server
     restart: unless-stopped
     working_dir: /app
