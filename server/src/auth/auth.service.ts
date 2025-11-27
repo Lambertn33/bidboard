@@ -68,14 +68,4 @@ export class AuthService {
             throw new BadRequestException('Failed to register user', error);
         }
     }
-
-    async logout(userId: string) {
-        await this.databaseService.user.update({
-            where: { id: userId },
-            data: { lastLogin: new Date() },
-        });
-        return {
-            message: 'User logged out successfully',
-        }
-    }
 }
