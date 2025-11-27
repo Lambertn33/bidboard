@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <h2>Yolla</h2>
+  <h2>Zuri n imbwa</h2>
 </template>
 
 <style scoped>

@@ -23,8 +23,8 @@ services:
     build:
       context: ./server
     command: >
-      sh -c "
-            npx prisma generate"
+      sh -c "npx prisma generate &&
+             npm run start:dev"
     container_name: bidboard-server
     restart: unless-stopped
     working_dir: /app
