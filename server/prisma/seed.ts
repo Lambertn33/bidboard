@@ -41,16 +41,19 @@ async function main() {
       name: 'Marketing Blitz',
       description: 'Launch quick marketing assets to boost client reach.',
       basePrice: 150,
+      skills: ['Design', 'Photoshop', 'Illustrator', 'Marketing'],
     },
     {
       name: 'Web Revamp',
       description: 'Frontend refresh tasks for client sites.',
       basePrice: 200,
+      skills: ['React', 'Vue', 'CSS', 'TypeScript', 'HTML'],
     },
     {
       name: 'Data Cleanup',
       description: 'Micro data tasks for admin insights.',
       basePrice: 120,
+      skills: ['Python', 'SQL', 'Data Analysis', 'Excel'],
     },
   ];
 
@@ -71,6 +74,7 @@ async function main() {
             name: `${blueprint.name} Task ${idx + 1}`,
             description: `Deliverable ${idx + 1} for ${blueprint.name}.`,
             price: blueprint.basePrice + idx * 25,
+            skills: blueprint.skills,
           })),
         },
       },

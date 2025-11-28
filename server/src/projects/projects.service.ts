@@ -77,6 +77,7 @@ export class ProjectsService {
                         description: true,
                         status: true,
                         price: true,
+                        skills: true,
                     }
                 },
                 _count: {
