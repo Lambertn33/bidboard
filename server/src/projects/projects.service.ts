@@ -1,5 +1,5 @@
 import { DatabaseService } from '@/database/database.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class ProjectsService {
@@ -59,7 +59,40 @@ export class ProjectsService {
         }
     }
 
-    async findOne(id: string) {}
+    async findOne(id: string) {
+        const project = await this.databaseService.project.findUnique({
+            where: {
+                id,
+            },
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                tasks: {
+                    select: {
+                        id: true,
+                        name: true,
+                        description: true,
+                        status: true,
+                        price: true,
+                    }
+                },
+                _count: {
+                    select: {
+                        tasks: true,
+                    },
+                },
+            },
+        });
+
+        if (!project) {
+            throw new NotFoundException('Project not found');
+        }
+
+        return {
+            data: project,
+        }
+    }
 
     async create(data: any) {}
 

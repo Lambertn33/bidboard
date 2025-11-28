@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -13,5 +13,10 @@ export class ProjectsController {
     @Query('search') search: string = '',
   ) {
     return this.projectsService.findAll(currentPage,limit,search);
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.projectsService.findOne(id);
   }
 }
