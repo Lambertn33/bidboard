@@ -1,6 +1,10 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
-import { AuthGuard } from '@nestjs/passport';
+import { CreateProjectDto } from './dto/create.dto';
+import { RolesGuard } from '@/auth/roles.guard';
+import { Roles } from '@/auth/roles.decorator';
+import { UserRole } from '@/auth/enum/role.enum';
+import { JwtGuard } from '@/auth/jwt.guard';
 
 @Controller('projects')
 export class ProjectsController {
@@ -18,5 +22,12 @@ export class ProjectsController {
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.projectsService.findOne(id);
+  }
+
+  @Post()
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async create(@Body() body: CreateProjectDto) {
+    return this.projectsService.create(body);
   }
 }

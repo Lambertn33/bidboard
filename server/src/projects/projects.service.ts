@@ -1,9 +1,11 @@
 import { DatabaseService } from '@/database/database.service';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {Prisma} from 'generated/prisma/client';
+import { ProjectsHelper } from './helpers/projects.helper';
 
 @Injectable()
 export class ProjectsService {
-    constructor(private readonly databaseService: DatabaseService) {}
+    constructor(private readonly databaseService: DatabaseService, private readonly projectsHelper: ProjectsHelper) {}
 
     async findAll(currentPage = 1, limit = 10, search: string = '') {
         const skip = (currentPage - 1) * limit;
@@ -94,7 +96,21 @@ export class ProjectsService {
         }
     }
 
-    async create(data: any) {}
+    async create(data: Prisma.ProjectCreateInput) {
+        const doesProjectTitleExist = await this.projectsHelper._doesProjectTitleExist(data.name);
+        if (doesProjectTitleExist) {
+            throw new BadRequestException('Project title already exists');
+        }
+
+        const project = await this.databaseService.project.create({
+            data,
+        });
+
+        return {
+            message: 'Project created successfully',
+            data: project,
+        }
+    }
 
     async update(id: string, data: any) {}
 
