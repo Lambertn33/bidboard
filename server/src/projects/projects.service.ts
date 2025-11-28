@@ -9,36 +9,52 @@ export class ProjectsService {
         const skip = (currentPage - 1) * limit;
         const take = +limit;
 
-        const projects = await this.databaseService.project.findMany({
-            skip,
-            take,
-            orderBy: {
-                createdAt: 'desc',
-            },
-            where: search
-                ? {
-                      OR: [
-                          {
-                              name: {
-                                  contains: search,
-                              },
+        const where = search
+            ? {
+                  OR: [
+                      {
+                          name: {
+                              contains: search,
                           },
-                          {
-                              description: {
-                                  contains: search,
-                              },
+                      },
+                      {
+                          description: {
+                              contains: search,
                           },
-                      ],
-                  }
-                : undefined,
-        });
+                      },
+                  ],
+              }
+            : undefined;
+
+        const [projects, total] = await Promise.all([
+            this.databaseService.project.findMany({
+                skip,
+                take,
+                select: {
+                    id: true,
+                    name: true,
+                    description: true,
+                    _count: {
+                        select: {
+                            tasks: true,
+                        },
+                    },
+                },
+                orderBy: {
+                    createdAt: 'desc',
+                },
+                where,
+            }),
+            this.databaseService.project.count({ where }),
+        ]);
 
         return {
             data: projects,
             meta: {
-                total: projects.length,
+                total,
                 currentPage,
                 limit,
+                totalPages: Math.ceil(total / limit),
             },
         }
     }
