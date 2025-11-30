@@ -16,4 +16,21 @@ export class ProjectsHelper {
         });
         return !!project;
     }
+
+    async _checkUniqueTitleForProject(fieldName: string, fieldValue: string, id: string) {
+        const project = await this.databaseService.project.findFirst({
+            where: {
+                [fieldName]: {
+                    equals: fieldValue,
+                },
+                NOT: {
+                    id: {
+                        equals: id,
+                    }
+                }
+            }
+        });
+
+        return !!project;
+    }
 }

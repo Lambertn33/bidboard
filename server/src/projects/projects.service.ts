@@ -113,7 +113,29 @@ export class ProjectsService {
         }
     }
 
-    async update(id: string, data: any) {}
+    async update(id: string, data: Prisma.ProjectUpdateInput) {
+        const project = await this.findOne(id);
+        if (!project) {
+            throw new NotFoundException('Project not found');
+        }
 
-    async delete(id: string) {}
+        if (data.name) {
+            const doesProjectTitleExist = await this.projectsHelper._checkUniqueTitleForProject('name', data.name as string, id);
+            if (doesProjectTitleExist) {
+                throw new BadRequestException('Project title already exists');
+            }
+        }
+
+        const updatedProject = await this.databaseService.project.update({
+            where: {
+                id,
+            },
+            data,
+        });
+        
+        return {
+            message: 'Project updated successfully',
+            data: updatedProject,
+        }
+    }
 }
