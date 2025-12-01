@@ -89,5 +89,57 @@ export class TasksHelper {
             },
         };
     }
+
+    async _fetchTaskByIdBasedOnUserRole(id: string, role?: Role) {
+        // Non-admin users can only see OPEN tasks
+        const where: any = {
+            id,
+        };
+
+        if (role !== Role.ADMIN) {
+            where.status = TaskStatus.OPEN;
+        }
+
+        const select: any = {
+            id: true,
+            name: true,
+            description: true,
+            status: true,
+            price: true,
+            skills: true,
+            createdAt: true,
+            updatedAt: true,
+            project: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
+        };
+
+        // Only admin can see freelancer info (even if null/not assigned)
+        if (role === Role.ADMIN) {
+            select.freelancer = {
+                select: {
+                    id: true,
+                    telephone: true,
+                    balance: true,
+                    user: {
+                        select: {
+                            id: true,
+                            names: true,
+                            email: true,
+                        },
+                    },
+                },
+            };
+        }
+
+        const task = await this.databaseService.task.findFirst({
+            where,
+            select,
+        });
+        return task;
+    }
 }
     
