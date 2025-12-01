@@ -3,6 +3,7 @@ import { DatabaseService } from '@/database/database.service';
 import { Prisma, Role } from 'generated/prisma/client';
 import { TasksHelper } from './helpers/tasks.helper';
 import { CreateTaskDto } from './dto/create.dto';
+import { UpdateTaskDto } from './dto/update.dto';
 
 @Injectable()
 export class TasksService {
@@ -42,6 +43,32 @@ export class TasksService {
         return {
             message: 'Task created successfully',
             data: newTask,
+        };
+    }
+
+    async update(id: string, data: UpdateTaskDto) {
+        const updatedTask = await this.databaseService.task.update({
+            where: { id },
+            data: {
+                name: data.name,
+                description: data.description,
+                price: data.price,
+                skills: data.skills,
+            },
+        });
+        return {
+            message: 'Task updated successfully',
+            data: updatedTask,
+        };
+    }
+
+    async delete(id: string) {
+        const deletedTask = await this.databaseService.task.delete({
+            where: { id },
+        });
+        return {
+            message: 'Task deleted successfully',
+            data: deletedTask,
         };
     }
 }
