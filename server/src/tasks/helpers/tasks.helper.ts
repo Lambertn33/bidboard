@@ -141,5 +141,13 @@ export class TasksHelper {
         });
         return task;
     }
+
+    async _doesProjectExist(projectId: string): Promise<boolean> {
+        const project = await this.databaseService.project.findUnique({
+            where: { id: projectId },
+            select: { id: true },
+        });
+        return !!project;
+    }
 }
     
