@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { DatabaseService } from '@/database/database.service';
-import { Role } from 'generated/prisma/client';
+import { BidStatus, Role } from 'generated/prisma/client';
 import { BidsHelper } from './helpers/bids.helper';
 import { CreateBidDto } from './dto/create.dto';
 
@@ -40,6 +40,41 @@ export class BidsService {
         return {
             message: 'Bid created successfully',
             data: bid,
+        }
+    }
+
+    async acceptOrRejectBid(id: string, status: "ACCEPTED" | "REJECTED", endDate: Date) {
+        const bid = await this.databaseService.bid.findUnique({
+            where: { id },
+            select: { id: true, taskId: true, freelancerId: true },
+        });
+        if (!bid) {
+            throw new BadRequestException('Bid does not exist');
+        }
+        
+        if (status === "ACCEPTED") {
+            await this.databaseService.bid.update({
+                where: { id },
+                data: { status: BidStatus.ACCEPTED },
+            });
+
+            // if bid accepted, Create work and reject all other bids for the task
+            await this.bidsHelper._createWork(bid.taskId, bid.freelancerId, endDate);
+            await this.bidsHelper._rejectAllOtherBidsForTask(bid.taskId, id);
+
+            return {
+                message: `${bid.freelancerId} has been accepted for task ${bid.taskId}`,
+                data: bid,
+            }
+        } else {
+            await this.databaseService.bid.update({
+                where: { id },
+                data: { status: BidStatus.REJECTED },
+            });
+            return {
+                message: `${bid.freelancerId} has been rejected for task ${bid.taskId}`,
+                data: bid,
+            }
         }
     }
 }

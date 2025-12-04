@@ -1,6 +1,6 @@
 import { DatabaseService } from "@/database/database.service";
 import { Injectable } from "@nestjs/common";
-import { Role, TaskStatus } from "generated/prisma/client";
+import { BidStatus, Role, TaskStatus } from "generated/prisma/client";
 
 @Injectable()
 export class BidsHelper {
@@ -126,4 +126,29 @@ export class BidsHelper {
         });
         return !!bid;
     }
+
+    // ADMIN HELPERS
+    async _createWork(taskId: string, freelancerId: string, endDate: Date) {
+        await this.databaseService.work.create({
+            data: {
+                taskId,
+                freelancerId,
+                endDate,
+            },
+        });
+    }
+
+    async _rejectAllOtherBidsForTask(taskId: string, bidId: string) {
+        await this.databaseService.bid.updateMany({
+            where: { 
+                taskId, 
+                id: { 
+                    not: bidId 
+                }
+            },
+            data: { status: BidStatus.REJECTED },
+        });
+    }
+
+    //FREELANCER HELPERS
 }

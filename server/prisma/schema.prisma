@@ -96,6 +96,8 @@ model Work {
   task          Task       @relation(fields: [taskId], references: [id])
   freelancerId  String
   freelancer    Freelancer @relation(fields: [freelancerId], references: [id])
+  startDate     DateTime   @default(now())
+  endDate       DateTime
   completionUrl String?
   payment       Payment?
   createdAt     DateTime   @default(now())
