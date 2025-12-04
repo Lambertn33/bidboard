@@ -6,7 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 
 import { PassportModule } from '@nestjs/passport';
-import { DatabaseService } from '../database/database.service';
+import { DatabaseModule } from '@/database/database.module';
 
 @Module({
   imports: [
@@ -15,9 +15,10 @@ import { DatabaseService } from '../database/database.service';
       secret: process.env.JWT_SECRET || 'secret',
       signOptions: { expiresIn: '1h' },
     }),
+    DatabaseModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, DatabaseService],
+  providers: [AuthService, JwtStrategy],
 })
 export class AuthModule {}
 

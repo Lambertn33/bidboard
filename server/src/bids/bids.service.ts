@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@/database/database.service';
 import { Role } from 'generated/prisma/client';
 import { BidsHelper } from './helpers/bids.helper';
+import { CreateBidDto } from './dto/create.dto';
 
 @Injectable()
 export class BidsService {
@@ -14,5 +15,16 @@ export class BidsService {
         return this.bidsHelper._fetchBidsBasedOnUserRole(userId, role, currentPage, limit, search);
     }
 
-    async
+    async create(data: CreateBidDto, freelancerId: string){
+        const bid = await this.databaseService.bid.create({
+            data: {
+                ...data,
+                freelancerId,
+            },
+        });
+        return {
+            message: 'Bid created successfully',
+            data: bid,
+        }
+    }
 }
