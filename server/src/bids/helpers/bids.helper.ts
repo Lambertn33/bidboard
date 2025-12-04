@@ -1,16 +1,15 @@
 import { DatabaseService } from "@/database/database.service";
 import { Injectable } from "@nestjs/common";
-import { Role } from "generated/prisma/client";
+import { Role, TaskStatus } from "generated/prisma/client";
 
 @Injectable()
 export class BidsHelper {
     constructor(private readonly databaseService: DatabaseService) {}
 
-    async _fetchBidsBasedOnUserRole(userId: string, role: Role, currentPage = 1, limit = 10, search: string = '') {
+    async _fetchBidsBasedOnUserRole(userId: string, role: Role, currentPage = 1, limit = 10) {
         const skip = (currentPage - 1) * limit;
         const take = +limit;
 
-        // Build base where clause
         const baseWhere: any = {};
 
         // If user is a freelancer, filter by their freelancer ID
@@ -35,42 +34,16 @@ export class BidsHelper {
                 };
             }
         }
-        // If admin, no additional filter (admin sees all bids)
-
-        // Add search filter if provided
-        const searchWhere = search
-            ? {
-                  OR: [
-                      {
-                          message: {
-                              contains: search,
-                          },
-                      },
-                  ],
-              }
-            : {};
 
         // Combine where clauses
         const where = {
             ...baseWhere,
-            ...searchWhere,
         };
 
-        const include = {
-            freelancer: {
-                select: {
-                    id: true,
-                    telephone: true,
-                    balance: true,
-                    user: {
-                        select: {
-                            id: true,
-                            names: true,
-                            email: true,
-                        },
-                    },
-                },
-            },
+        const select: any = {
+            id: true,
+            message: true,
+            status: true,
             task: {
                 select: {
                     id: true,
@@ -88,12 +61,30 @@ export class BidsHelper {
             },
         };
 
+        // Only include freelancer details for admin
+        if (role === Role.ADMIN) {
+            select.freelancer = {
+                select: {
+                    id: true,
+                    telephone: true,
+                    balance: true,
+                    user: {
+                        select: {
+                            id: true,
+                            names: true,
+                            email: true,
+                        },
+                    },
+                },
+            };
+        }
+
         const [bids, total] = await Promise.all([
             this.databaseService.bid.findMany({
                 skip,
                 take,
                 where,
-                include,
+                select,
                 orderBy: {
                     createdAt: 'desc',
                 },
@@ -110,5 +101,29 @@ export class BidsHelper {
                 totalPages: Math.ceil(total / limit),
             },
         };
+    }
+
+    async _doesTaskExist(taskId: string) {
+        const task = await this.databaseService.task.findUnique({
+            where: { id: taskId },
+            select: { id: true },
+        });
+        return !!task;
+    }
+
+    async _isTaskOpen(taskId: string) {
+        const task = await this.databaseService.task.findUnique({
+            where: { id: taskId },
+            select: { status: true },
+        });
+        return task?.status === TaskStatus.OPEN;
+    }
+
+    async _hasFreelancerBiddedOnTask(taskId: string, freelancerId: string) {
+        const bid = await this.databaseService.bid.findFirst({
+            where: { taskId, freelancerId },
+            select: { id: true },
+        });
+        return !!bid;
     }
 }

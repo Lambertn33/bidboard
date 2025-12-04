@@ -17,10 +17,9 @@ export class BidsController {
   async findAll(
     @Query('currentPage') currentPage: number = 1,
     @Query('limit') limit: number = 10,
-    @Query('search') search: string = '',
     @CurrentUser() user: { id: string; email: string; role: Role },
   ) {
-    return this.bidsService.findAll(user.id, user.role, currentPage, limit, search);
+    return this.bidsService.findAll(user.id, user.role, currentPage, limit);
   }
 
   @Post()

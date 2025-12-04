@@ -129,6 +129,13 @@ export class TasksHelper {
                     freelancer: {
                         select: {
                             id: true,
+                            user: {
+                                select: {
+                                    id: true,
+                                    names: true,
+                                    email: true,
+                                },
+                            },
                         },
                     },
                 },
