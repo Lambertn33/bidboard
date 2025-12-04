@@ -6,7 +6,7 @@ import { Injectable } from "@nestjs/common";
 export class WorksHelper {
     constructor(private readonly databaseService: DatabaseService) {}
 
-    async _fetchWorksBasedOnUserRole(currentPage = 1, limit = 10, role: Role, workStatus?: WorkStatus) {
+    async _fetchWorksBasedOnUserRole(currentPage = 1, limit = 10, role: Role, userId: string, workStatus?: WorkStatus) {
         const skip = (currentPage - 1) * limit;
         const take = +limit;
 
@@ -14,6 +14,28 @@ export class WorksHelper {
 
         if (workStatus) {
             where.status = workStatus;
+        }
+
+        if (role === Role.FREELANCER) {
+            const freelancer = await this.databaseService.freelancer.findUnique({
+                where: { userId },
+                select: { id: true },
+            });
+
+            if (freelancer) {
+                where.freelancerId = freelancer.id;
+            } else {
+                // If freelancer record doesn't exist, return empty result
+                return {
+                    data: [],
+                    meta: {
+                        total: 0,
+                        currentPage,
+                        limit,
+                        totalPages: 0,
+                    },
+                };
+            }
         }
 
         const select: any = {
@@ -87,6 +109,13 @@ export class WorksHelper {
         return await this.databaseService.work.findUnique({
             where: { id },
             select,
+        });
+    }
+
+    async _increaseFreelancerBalance(freelancerId: string, amount: number) {
+        await this.databaseService.freelancer.update({
+            where: { id: freelancerId },
+            data: { balance: { increment: amount } },
         });
     }
 }   
