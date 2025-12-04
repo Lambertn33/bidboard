@@ -48,24 +48,6 @@ export class TasksHelper {
             },
         };
 
-        // Include freelancer info for admin users
-        if (role === Role.ADMIN) {
-            include.freelancer = {
-                select: {
-                    id: true,
-                    telephone: true,
-                    balance: true,
-                    user: {
-                        select: {
-                            id: true,
-                            names: true,
-                            email: true,
-                        },
-                    },
-                },
-            };
-        }
-
         const [tasks, total] = await Promise.all([
             this.databaseService.task.findMany({
                 where,
@@ -117,18 +99,36 @@ export class TasksHelper {
             },
         };
 
-        // Only admin can see freelancer info (even if null/not assigned)
+        // For admin, include work with freelancer details
         if (role === Role.ADMIN) {
-            select.freelancer = {
+            select.work = {
                 select: {
                     id: true,
-                    telephone: true,
-                    balance: true,
-                    user: {
+                    completionUrl: true,
+                    freelancer: {
                         select: {
                             id: true,
-                            names: true,
-                            email: true,
+                            telephone: true,
+                            balance: true,
+                            user: {
+                                select: {
+                                    id: true,
+                                    names: true,
+                                    email: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            };
+            select.bids = {
+                select: {
+                    id: true,
+                    message: true,
+                    status: true,
+                    freelancer: {
+                        select: {
+                            id: true,
                         },
                     },
                 },
