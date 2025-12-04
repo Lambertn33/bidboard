@@ -103,6 +103,42 @@ export class BidsHelper {
         };
     }
 
+    async _fetchBidByIdBasedOnUserRole(id: string, role: Role) {
+        const include: any = {
+            id: true,
+            message: true,
+            status: true,
+            task: {
+                select: {
+                    id: true,
+                    name: true,
+                    description: true,
+                },
+            },
+        };
+
+        if (role === Role.ADMIN) {
+            include.freelancer = {
+                select: {
+                    id: true,
+                    telephone: true,
+                    user: {
+                        select: {
+                            id: true,
+                            names: true,
+                            email: true,
+                        },
+                    },
+                },
+            };
+        }
+
+        return this.databaseService.bid.findUnique({
+            where: { id },
+            select: include,
+        });
+    }
+
     async _doesTaskExist(taskId: string) {
         const task = await this.databaseService.task.findUnique({
             where: { id: taskId },
@@ -153,6 +189,4 @@ export class BidsHelper {
             data: { status: BidStatus.REJECTED },
         });
     }
-
-    //FREELANCER HELPERS
 }

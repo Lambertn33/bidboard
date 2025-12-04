@@ -23,6 +23,14 @@ export class BidsController {
     return this.bidsService.findAll(user.id, user.role, currentPage, limit);
   }
 
+  @Get(':id')
+  async findOne(
+    @Param('id') id: string,
+    @CurrentUser() user: { id: string; email: string; role: Role },
+  ) {
+    return this.bidsService.findOne(id, user.role);
+  }
+
   @Post()
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(UserRole.FREELANCER)

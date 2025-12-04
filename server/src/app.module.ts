@@ -6,9 +6,10 @@ import { DatabaseModule } from './database/database.module';
 import { ProjectsModule } from './projects/projects.module';
 import { TasksModule } from './tasks/tasks.module';
 import { BidsModule } from './bids/bids.module';
+import { WorksModule } from './works/works.module';
 
 @Module({
-  imports: [AuthModule, DatabaseModule, ProjectsModule, TasksModule, BidsModule],
+  imports: [AuthModule, DatabaseModule, ProjectsModule, TasksModule, BidsModule, WorksModule],
   controllers: [AppController],
   providers: [AppService],
 })

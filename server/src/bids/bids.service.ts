@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from '@/database/database.service';
 import { BidStatus, Role } from 'generated/prisma/client';
 import { BidsHelper } from './helpers/bids.helper';
@@ -12,7 +12,21 @@ export class BidsService {
     ) {}
 
     async findAll(userId: string, role: Role, currentPage = 1, limit = 10) {
-        return this.bidsHelper._fetchBidsBasedOnUserRole(userId, role, currentPage, limit);
+        const bids = await this.bidsHelper._fetchBidsBasedOnUserRole(userId, role, currentPage, limit);
+        return {
+            data: bids.data,
+            meta: bids.meta,
+        };
+    }
+
+    async findOne(id: string, role: Role) {
+        const bid = await this.bidsHelper._fetchBidByIdBasedOnUserRole(id, role);
+        if (!bid) {
+            throw new NotFoundException('Bid not found');
+        }
+        return {
+            data: bid,
+        };
     }
 
     async create(data: CreateBidDto, freelancerId: string){
