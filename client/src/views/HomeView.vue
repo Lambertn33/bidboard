@@ -1,27 +1,7 @@
-<template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-    <!-- Hero Section -->
-    <HeroSection />
-
-    <!-- Features Section -->
-    <FeaturesSection :features="features" />
-    
-    <!-- How It Works Section -->
-    <WorkSection :works="works" />
-
-    <!-- CTA Section -->
-    <JoinSection />
-  </div>
-</template>
-
 <script setup lang="ts">
-import HeroSection from '../components/home/HeroSection.vue';
-import FeaturesSection from '../components/home/FeaturesSection.vue';
-import WorkSection from '../components/home/WorkSection.vue';
-import JoinSection from '../components/home/JoinSection.vue';
+import { HeroSection, FeaturesSection, WorkSection, JoinSection } from '@/components/home';
 
-import { IFeature } from '../interfaces/home/IFeature';
-import { IWork } from '../interfaces/home/IWork';
+import { IFeature, IWork } from '@/interfaces/home';
 
 
 const features: IFeature[] = [
@@ -64,6 +44,21 @@ const works: IWork[] = [
   }
 ]
 </script>
+<template>
+  <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <!-- Hero Section -->
+    <HeroSection />
+
+    <!-- Features Section -->
+    <FeaturesSection :features="features" />
+    
+    <!-- How It Works Section -->
+    <WorkSection :works="works" />
+
+    <!-- CTA Section -->
+    <JoinSection />
+  </div>
+</template>
 
 
 

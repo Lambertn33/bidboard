@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { defineProps } from 'vue';
-
-import { IFeature } from '../../interfaces/home/IFeature';
+import { IFeature } from '@/interfaces/home/IFeature';
 
 const props = defineProps<{
   features: IFeature[];
