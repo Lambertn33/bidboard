@@ -11,7 +11,7 @@ export class BidsService {
         private readonly bidsHelper: BidsHelper,
     ) {}
 
-    async findAll(userId: string, role: Role, currentPage = 1, limit = 10, search: string = '') {
+    async findAll(userId: string, role: Role, currentPage = 1, limit = 10) {
         return this.bidsHelper._fetchBidsBasedOnUserRole(userId, role, currentPage, limit);
     }
 
@@ -43,38 +43,52 @@ export class BidsService {
         }
     }
 
-    async acceptOrRejectBid(id: string, status: "ACCEPTED" | "REJECTED", endDate: Date) {
+    async acceptBid(id: string, endDate: string) {
         const bid = await this.databaseService.bid.findUnique({
             where: { id },
             select: { id: true, taskId: true, freelancerId: true },
         });
+
         if (!bid) {
             throw new BadRequestException('Bid does not exist');
         }
-        
-        if (status === "ACCEPTED") {
-            await this.databaseService.bid.update({
-                where: { id },
-                data: { status: BidStatus.ACCEPTED },
-            });
 
-            // if bid accepted, Create work and reject all other bids for the task
-            await this.bidsHelper._createWork(bid.taskId, bid.freelancerId, endDate);
-            await this.bidsHelper._rejectAllOtherBidsForTask(bid.taskId, id);
 
-            return {
-                message: `${bid.freelancerId} has been accepted for task ${bid.taskId}`,
-                data: bid,
-            }
-        } else {
-            await this.databaseService.bid.update({
-                where: { id },
-                data: { status: BidStatus.REJECTED },
-            });
-            return {
-                message: `${bid.freelancerId} has been rejected for task ${bid.taskId}`,
-                data: bid,
-            }
+        // Update bid status to ACCEPTED
+        await this.databaseService.bid.update({
+            where: { id },
+            data: { status: BidStatus.ACCEPTED },
+        });
+
+        // Create work and reject all other bids for the task
+        await this.bidsHelper._createWork(bid.taskId, bid.freelancerId, endDate);
+        await this.bidsHelper._rejectAllOtherBidsForTask(bid.taskId, id);
+
+        return {
+            message: `Bid has been accepted for task ${bid.taskId}`,
+            data: bid,
+        };
+    }
+
+    async rejectBid(id: string) {
+        const bid = await this.databaseService.bid.findUnique({
+            where: { id },
+            select: { id: true, taskId: true, freelancerId: true },
+        });
+
+        if (!bid) {
+            throw new BadRequestException('Bid does not exist');
         }
+
+        // Update bid status to REJECTED
+        await this.databaseService.bid.update({
+            where: { id },
+            data: { status: BidStatus.REJECTED },
+        });
+
+        return {
+            message: `Bid has been rejected for task ${bid.taskId}`,
+            data: bid,
+        };
     }
 }

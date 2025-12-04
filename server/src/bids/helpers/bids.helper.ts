@@ -128,12 +128,12 @@ export class BidsHelper {
     }
 
     // ADMIN HELPERS
-    async _createWork(taskId: string, freelancerId: string, endDate: Date) {
+    async _createWork(taskId: string, freelancerId: string, endDate: string) {
         await this.databaseService.work.create({
             data: {
                 taskId,
                 freelancerId,
-                endDate,
+                endDate: new Date(endDate),
             },
         });
     }
