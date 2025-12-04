@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { WorksService } from './works.service';
 import { CurrentUser } from '@/auth/current-user.decorator';
 import { Role, WorkStatus } from 'generated/prisma/client';
@@ -17,5 +17,13 @@ export class WorksController {
     @Query('workStatus') workStatus?: WorkStatus,
   ) {
     return await this.worksService.findAll(currentPage, limit, user.role, workStatus);
+  }
+
+  @Get(':id')
+  async findOne(
+    @Param('id') id: string,
+    @CurrentUser() user: { id: string; email: string; role: Role },
+  ) {
+    return await this.worksService.findOne(id, user.role);
   }
 }
