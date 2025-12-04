@@ -6,11 +6,12 @@ import router from './router'
 import { 
     BiCheckCircleFill, 
     HiClock, 
-    RiBarChartFill 
+    RiBarChartFill,
+    HiMenu,
   } from 'oh-vue-icons/icons';      
 import { addIcons, OhVueIcon } from 'oh-vue-icons'
 
-addIcons(BiCheckCircleFill, HiClock, RiBarChartFill);
+addIcons(BiCheckCircleFill, HiClock, RiBarChartFill, HiMenu);
 
 createApp(App)
   .use(router)

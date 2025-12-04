@@ -1,9 +1,10 @@
 <script setup lang="ts">
-// Main App component
+import Navbar from '@/components/Navbar.vue';
 </script>
 
 <template>
   <div id="app">
+    <Navbar />
     <router-view />
   </div>
 </template>
