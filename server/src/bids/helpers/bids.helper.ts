@@ -128,13 +128,17 @@ export class BidsHelper {
     }
 
     // ADMIN HELPERS
-    async _createWork(taskId: string, freelancerId: string, endDate: string) {
+    async _createWorkAndUpdateTaskToAssigned(taskId: string, freelancerId: string, endDate: string) {
         await this.databaseService.work.create({
             data: {
                 taskId,
                 freelancerId,
                 endDate: new Date(endDate),
             },
+        });
+        await this.databaseService.task.update({
+            where: { id: taskId },
+            data: { status: TaskStatus.ASSIGNED },
         });
     }
 

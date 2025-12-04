@@ -100,6 +100,7 @@ model Work {
   endDate       DateTime
   completionUrl String?
   payment       Payment?
+  status        WorkStatus @default(IN_PROGRESS)
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 
@@ -113,6 +114,7 @@ model Payment {
   freelancerId String
   freelancer   Freelancer @relation(fields: [freelancerId], references: [id])
   amount       Int
+  status       PaymentStatus @default(UNPAID)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
@@ -128,7 +130,14 @@ enum BidStatus {
 enum TaskStatus {
   OPEN
   ASSIGNED
+}
+
+enum WorkStatus {
+  IN_PROGRESS
   COMPLETED
-  APPROVED
-  CANCELLED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
 }

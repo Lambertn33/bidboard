@@ -61,7 +61,7 @@ export class BidsService {
         });
 
         // Create work and reject all other bids for the task
-        await this.bidsHelper._createWork(bid.taskId, bid.freelancerId, endDate);
+        await this.bidsHelper._createWorkAndUpdateTaskToAssigned(bid.taskId, bid.freelancerId, endDate);
         await this.bidsHelper._rejectAllOtherBidsForTask(bid.taskId, id);
 
         return {
