@@ -17,6 +17,7 @@ import {
     BiFolderFill,
     HiX,
     HiArrowDown,
+    HiArrowUp,
   } from 'oh-vue-icons/icons';      
 
 
@@ -30,7 +31,8 @@ addIcons(
   BiListTask, 
   HiX, 
   BiFolderFill, 
-  HiArrowDown
+  HiArrowDown,
+  HiArrowUp,
 );
 
 createApp(App)

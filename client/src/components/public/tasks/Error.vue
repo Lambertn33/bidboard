@@ -3,6 +3,9 @@ defineProps<{
     error: string;
 }>();
 
+defineEmits<{
+    refetch: [];
+}>();
 </script>
 
 <template>

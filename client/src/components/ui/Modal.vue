@@ -1,16 +1,22 @@
 <script setup lang="ts">
 interface Props {
   isOpen: boolean;
-  closeOnBackdrop?: boolean;
   modalWidth?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  closeOnBackdrop: true,
   modalWidth: 'max-w-2xl',
 });
 
+const emit = defineEmits<{
+  close: [];
+}>();
 
+
+
+const handleClose = () => {
+  emit('close');
+};
 </script>
 
 <template>
@@ -26,6 +32,7 @@ const props = withDefaults(defineProps<Props>(), {
       <div
         v-if="isOpen"
         class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+        @click="handleBackdropClick"
       >
         <Transition
           enter-active-class="transition-all duration-300"
@@ -43,7 +50,7 @@ const props = withDefaults(defineProps<Props>(), {
           >
             <!-- Close Button -->
             <button
-              @click="$emit('close')"
+              @click="handleClose"
               class="absolute cursor-pointer top-4 right-4 z-10 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
               aria-label="Close modal"
             >

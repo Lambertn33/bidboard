@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+
 interface ITask {
     id: string;
     name: string;
@@ -15,6 +17,13 @@ interface ITask {
 defineProps<{
     task: ITask;
 }>();
+
+const isDescriptionOpen = ref(false);
+
+const toggleDescription = () => {
+    isDescriptionOpen.value = !isDescriptionOpen.value;
+};
+
 </script>
 
 <template>
@@ -30,7 +39,7 @@ defineProps<{
                             {{ task.name }}
                         </h2>
                         <span
-                            class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold uppercase tracking-wide"
+                            class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wide"
                             :class="task.status === 'OPEN' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-gray-50 text-gray-700 border border-gray-200'"
                         >
                             {{ task.status }}
@@ -44,10 +53,25 @@ defineProps<{
                 
                 <!-- Price -->
                 <div class="ml-4 text-right">
-                    <div class="text-sm text-gray-500 mb-1">Budget</div>
                     <div class="text-3xl font-bold text-gray-900">${{ task.price }}</div>
                 </div>
             </div>
+
+            <!-- Description -->
+            <Transition
+                enter-active-class="transition-all duration-300 ease-out"
+                enter-from-class="opacity-0 -translate-y-2"
+                enter-to-class="opacity-100 translate-y-0"
+                leave-active-class="transition-all duration-300 ease-in"
+                leave-from-class="opacity-100 translate-y-0"
+                leave-to-class="opacity-0 -translate-y-2"
+            >
+                <div v-if="isDescriptionOpen" class="mb-4 pt-4">
+                    <p class="text-gray-600 leading-relaxed font-bold">
+                        {{ task.description }}
+                    </p>
+                </div>
+            </Transition>
 
             <!-- Skills and Action -->
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-6 border-t border-gray-100">
@@ -62,10 +86,16 @@ defineProps<{
                 </div>
                 
                 <button
-                    class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm flex items-center gap-2 whitespace-nowrap"
+                    @click="toggleDescription"
+                    :class="isDescriptionOpen ? 'bg-blue-600 text-white' : 'bg-gray-600 text-gray-700'"
+                    class="cursor-pointer px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm flex items-center gap-2 whitespace-nowrap"
                 >
-                    <span>Read Description</span>
-                    <OhVueIcon name="hi-arrow-down" class="h-4 w-4" />
+                    <span class="font-bold">{{ isDescriptionOpen ? 'Hide Description' : 'Read Description' }}</span>
+                    <OhVueIcon 
+                        name="hi-arrow-down" 
+                        class="h-4 w-4 transition-transform duration-300"
+                        :class="{ 'rotate-180': isDescriptionOpen }"
+                    />
                 </button>
             </div>
         </div>
