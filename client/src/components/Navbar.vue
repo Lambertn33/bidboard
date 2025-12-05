@@ -24,7 +24,7 @@ const isActive = (path: string) => {
           <router-link
             to="/"
             :class="[
-              'px-3 py-2 rounded-md text-sm font-medium transition-colors',
+              'px-3 py-2 rounded-md text-sm font-bold transition-colors',
               isActive('/')
                 ? 'text-blue-600 bg-blue-50'
                 : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
@@ -35,7 +35,7 @@ const isActive = (path: string) => {
           <router-link
             to="/projects"
             :class="[
-              'px-3 py-2 rounded-md text-sm font-medium transition-colors',
+              'px-3 py-2 rounded-md text-sm font-bold transition-colors',
               isActive('/projects')
                 ? 'text-blue-600 bg-blue-50'
                 : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
@@ -46,7 +46,7 @@ const isActive = (path: string) => {
           <router-link
             to="/tasks"
             :class="[
-              'px-3 py-2 rounded-md text-sm font-medium transition-colors',
+              'px-3 py-2 rounded-md text-sm font-bold transition-colors',
               isActive('/tasks')
                 ? 'text-blue-600 bg-blue-50'
                 : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
@@ -57,7 +57,7 @@ const isActive = (path: string) => {
           <router-link
             to="/register"
             :class="[
-              'px-3 py-2 rounded-md text-sm font-medium transition-colors',
+              'px-3 py-2 rounded-md text-sm font-bold transition-colors',
               isActive('/register')
                 ? 'text-blue-600 bg-blue-50'
                 : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
@@ -68,7 +68,7 @@ const isActive = (path: string) => {
           <router-link
             to="/login"
             :class="[
-              'px-4 py-2 rounded-md text-sm font-semibold transition-colors',
+              'px-4 py-2 rounded-md text-sm font-bold transition-colors',
               isActive('/login')
                 ? 'bg-blue-600 text-white'
                 : 'bg-blue-600 text-white hover:bg-blue-700'

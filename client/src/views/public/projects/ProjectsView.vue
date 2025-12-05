@@ -36,7 +36,31 @@ const projects = [
     name: 'UI/UX Design System',
     description: 'Complete design system with component library, style guide, and design tokens for consistent branding.',
     taskCount: 9
-  }
+  },
+  {
+    id: '7',
+    name: 'AI Chatbot Development',
+    description: 'Develop a chatbot using AI to answer questions and provide information.',
+    taskCount: 12
+  },
+  {
+    id: '8',
+    name: 'Data Entry Automation',
+    description: 'Automate data entry tasks to improve efficiency and accuracy.',
+    taskCount: 15
+  },
+  {
+    id: '9',
+    name: 'Social Media Management',
+    description: 'Manage social media accounts to increase engagement and reach.',
+    taskCount: 10
+  },
+  {
+    id: '10',
+    name: 'Email Marketing Campaign',
+    description: 'Create and manage email marketing campaigns to promote products and services.',
+    taskCount: 8
+  },
 ];
 </script>
 
@@ -67,12 +91,12 @@ const projects = [
         >
           <div class="p-6">
             <!-- Project Name -->
-            <h2 class="text-xl font-semibold text-gray-900 mb-3 line-clamp-1">
+            <h2 class="text-2xl font-bold text-gray-900 mb-3 line-clamp-1">
               {{ project.name }}
             </h2>
 
             <!-- Project Description -->
-            <p class="text-gray-600 text-sm mb-4 line-clamp-3 min-h-[60px]">
+            <p class="text-gray-600 text-sm mb-4 line-clamp-3 min-h-[60px] font-medium">
               {{ project.description }}
             </p>
 

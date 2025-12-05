@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { HeroSection, FeaturesSection, WorkSection, JoinSection } from '@/components/home';
+import { HeroSection, FeaturesSection, WorkSection, JoinSection } from '@/components/public';
 
 import { IFeature, IWork } from '@/interfaces/home';
 
