@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { HomeView, NotFoundView, RegisterView, LoginView, TasksView } from '@/views';
+import { HomeView, NotFoundView, RegisterView, LoginView, TasksView, ProjectsView } from '@/views';
 
 
 const router = createRouter({
@@ -24,6 +24,11 @@ const router = createRouter({
       path: '/tasks',
       name: 'tasks',
       component: TasksView,
+    },
+    {
+      path: '/projects',
+      name: 'projects',
+      component: ProjectsView,
     },
     {
       path: '/:pathMatch(.*)*',
