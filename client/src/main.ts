@@ -13,10 +13,11 @@ import {
     HiArrowRight,
     BiFolderX,
     BiListTask,
+    HiX,
   } from 'oh-vue-icons/icons';      
 import { addIcons, OhVueIcon } from 'oh-vue-icons'
 
-addIcons(BiCheckCircleFill, HiClock, RiBarChartFill, HiMenu, HiArrowRight, BiFolderX, BiListTask);
+addIcons(BiCheckCircleFill, HiClock, RiBarChartFill, HiMenu, HiArrowRight, BiFolderX, BiListTask, HiX);
 
 createApp(App)
   .use(router)
