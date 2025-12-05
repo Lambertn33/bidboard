@@ -34,7 +34,7 @@ const toggleDescription = () => {
             <!-- Header Row -->
             <div class="flex items-start justify-between mb-4">
                 <div class="flex-1">
-                    <div class="flex items-center gap-3 mb-3">
+                    <div class="flex flex-col md:flex-row items-start md:items-center gap-3 mb-3">
                         <h2 class="text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
                             {{ task.name }}
                         </h2>
@@ -87,8 +87,7 @@ const toggleDescription = () => {
                 
                 <button
                     @click="toggleDescription"
-                    :class="isDescriptionOpen ? 'bg-blue-600 text-white' : 'bg-gray-600 text-gray-700'"
-                    class="cursor-pointer px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm flex items-center gap-2 whitespace-nowrap"
+                    class="cursor-pointer px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm flex items-center gap-2 whitespace-nowrap flex justify-center"
                 >
                     <span class="font-bold">{{ isDescriptionOpen ? 'Hide Description' : 'Read Description' }}</span>
                     <OhVueIcon 

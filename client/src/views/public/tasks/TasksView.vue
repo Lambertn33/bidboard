@@ -1,11 +1,57 @@
 <script setup lang="ts">
+import { computed, onMounted, onUnmounted } from 'vue';
 import { getTasks } from '@/api/public/tasks';
-import { useQuery } from '@tanstack/vue-query';
+import { useInfiniteQuery } from '@tanstack/vue-query';
 import { Loading, Error, List } from '@/components/public/tasks';
 
-const { isPending, isError, data, error, refetch } = useQuery({
+const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isPending,
+    isError,
+    refetch,
+} = useInfiniteQuery({
     queryKey: ['tasks'],
-    queryFn: () => getTasks(),
+    queryFn: ({ pageParam = 1 }) => getTasks(pageParam, 10),
+    getNextPageParam: (lastPage) => {
+        const { meta } = lastPage;
+        if (meta.currentPage < meta.totalPages) {
+            return meta.currentPage + 1;
+        }
+        return undefined;
+    },
+    initialPageParam: 1,
+});
+
+// Flatten all pages into a single array
+const allTasks = computed(() => {
+    if (!data.value) return [];
+    return data.value.pages.flatMap((page) => page.data || []);
+});
+
+// Scroll detection for infinite scroll
+const handleScroll = () => {
+    if (isFetchingNextPage.value || !hasNextPage.value) return;
+
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+
+    // Trigger when user is 200px from bottom
+    if (scrollTop + windowHeight >= documentHeight - 5) {
+        fetchNextPage();
+    }
+};
+
+onMounted(() => {
+    window.addEventListener('scroll', handleScroll);
+});
+
+onUnmounted(() => {
+    window.removeEventListener('scroll', handleScroll);
 });
 </script>
 
@@ -38,7 +84,22 @@ const { isPending, isError, data, error, refetch } = useQuery({
       />
 
       <!-- Data State -->
-      <List v-else-if="data?.data && data.data.length > 0" :tasks="data.data" />
+      <div v-else-if="allTasks.length > 0">
+        <List :tasks="allTasks" />
+        
+        <!-- Loading More Indicator -->
+        <div v-if="isFetchingNextPage" class="mt-6 text-center">
+          <div class="inline-flex items-center gap-2 text-gray-600">
+            <div class="h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            <span class="text-sm font-medium">Loading more tasks...</span>
+          </div>
+        </div>
+        
+        <!-- End of List Indicator -->
+        <div v-else-if="!hasNextPage && allTasks.length > 0" class="mt-6 text-center">
+          <p class="text-sm text-gray-500">You've reached the end of the list</p>
+        </div>
+      </div>
 
       <!-- Empty State -->
       <div v-else class="text-center py-20">
