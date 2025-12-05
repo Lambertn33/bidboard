@@ -2,6 +2,8 @@
 import { getProjects } from '@/api/public/projects';
 import { useQuery } from '@tanstack/vue-query';
 
+import { Loader, Error, List } from '@/components/public/projects';
+
 const { isPending, isError, data, error, refetch } = useQuery({
     queryKey: ['projects'],
     queryFn: () => getProjects(),
@@ -27,80 +29,16 @@ const { isPending, isError, data, error, refetch } = useQuery({
     <!-- Projects Grid -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <!-- Loading State -->
-      <div v-if="isPending" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div
-          v-for="n in 6"
-          :key="n"
-          class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 animate-pulse"
-        >
-          <div class="p-6">
-            <div class="h-7 bg-gray-200 rounded mb-3"></div>
-            <div class="h-4 bg-gray-200 rounded mb-2"></div>
-            <div class="h-4 bg-gray-200 rounded mb-2"></div>
-            <div class="h-4 bg-gray-200 rounded mb-4 w-3/4"></div>
-            <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-              <div class="h-5 bg-gray-200 rounded w-24"></div>
-              <div class="h-5 bg-gray-200 rounded w-20"></div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Loader v-if="isPending" :count="6" />
 
       <!-- Error State -->
-      <div v-else-if="isError" class="text-center py-12">
-        <OhVueIcon name="bi-exclamation-triangle" class="h-16 w-16 text-red-400 mx-auto mb-4" />
-        <h3 class="text-xl font-semibold text-gray-900 mb-2">Error Loading Projects</h3>
-        <p class="text-gray-600 mb-4">
-          {{ error instanceof Error ? error.message : 'Failed to load projects. Please try again later.' }}
-        </p>
-        <button
-          @click="refetch"
-          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Try Again
-        </button>
-      </div>
+      <Error
+        v-else-if="isError"
+        :error="error instanceof Error ? error.message : 'Failed to load projects. Please try again later.'" 
+        @refetch="refetch" />
 
       <!-- Data State -->
-      <div v-else-if="(data?.data || []).length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Project Card -->
-        <div
-          v-for="project in (data?.data || [])"
-          :key="project.id"
-          class="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100"
-        >
-          <div class="p-6">
-            <!-- Project Name -->
-            <h2 class="text-2xl font-bold text-gray-900 mb-3 line-clamp-1">
-              {{ project.name }}
-            </h2>
-
-            <!-- Project Description -->
-            <p class="text-gray-600 text-sm mb-4 line-clamp-3 min-h-[60px] font-medium">
-              {{ project.description }}
-            </p>
-
-            <!-- Task Count Badge -->
-            <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-              <div class="flex items-center space-x-2">
-                <OhVueIcon 
-                  name="bi-list-task" 
-                  class="h-5 w-5 text-gray-600" 
-                />
-                <span class="text-sm font-medium text-gray-700">
-                  {{ project._count?.tasks || 0 }} {{ (project._count?.tasks || 0) === 1 ? 'Task' : 'Tasks' }}
-                </span>
-              </div>
-              <button
-                class="text-blue-600 hover:text-blue-700 font-medium text-sm transition-colors flex items-center space-x-1"
-              >
-                <span>View Tasks</span>
-                <OhVueIcon name="hi-arrow-right" class="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <List v-else-if="data?.data" :projects="data?.data" />
 
       <!-- Empty State (if no projects) -->
       <div v-else class="text-center py-12">
