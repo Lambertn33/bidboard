@@ -3,6 +3,8 @@ import './style.css'
 import App from './App.vue'
 import router from './router'
 
+import { VueQueryPlugin } from '@tanstack/vue-query';
+
 import { 
     BiCheckCircleFill, 
     HiClock, 
@@ -15,5 +17,6 @@ addIcons(BiCheckCircleFill, HiClock, RiBarChartFill, HiMenu);
 
 createApp(App)
   .use(router)
+  .use(VueQueryPlugin)
   .component('OhVueIcon', OhVueIcon)
   .mount('#app')

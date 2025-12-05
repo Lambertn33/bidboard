@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { HomeView, NotFoundView, RegisterView, LoginView } from '@/views';
+import { HomeView, NotFoundView, RegisterView, LoginView, TasksView } from '@/views';
 
 
 const router = createRouter({
@@ -19,6 +19,11 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: LoginView,
+    },
+    {
+      path: '/tasks',
+      name: 'tasks',
+      component: TasksView,
     },
     {
       path: '/:pathMatch(.*)*',

@@ -16,12 +16,9 @@
             Connect talented freelancers with exciting micro-tasks. Get work done quickly, efficiently, and transparently.
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <button class="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl cursor-pointer">
-              Get Started
-            </button>
-            <button class="px-8 py-3 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors cursor-pointer">
-              Browse Tasks
-            </button>
+            <router-link to="/tasks" class="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl cursor-pointer">
+              <span class="text-white">Browse Tasks</span>
+            </router-link>
           </div>
         </div>
       </div>

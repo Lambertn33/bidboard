@@ -11,8 +11,6 @@ import { RolesGuard } from '@/auth/roles.guard';
 import { UpdateTaskDto } from './dto/update.dto';
 
 @Controller('tasks')
-@UseGuards(JwtGuard)
-
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 

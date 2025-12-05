@@ -33,6 +33,17 @@ const isActive = (path: string) => {
             Home
           </router-link>
           <router-link
+            to="/tasks"
+            :class="[
+              'px-3 py-2 rounded-md text-sm font-medium transition-colors',
+              isActive('/tasks')
+                ? 'text-blue-600 bg-blue-50'
+                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+            ]"
+          >
+            Tasks
+          </router-link>
+          <router-link
             to="/register"
             :class="[
               'px-3 py-2 rounded-md text-sm font-medium transition-colors',

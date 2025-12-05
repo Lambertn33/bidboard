@@ -10,12 +10,9 @@
           Join TaskBid today and start connecting with opportunities
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <button class="px-8 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg">
-            Sign Up as Freelancer
-          </button>
-          <button class="px-8 py-3 bg-transparent text-white border-2 border-white rounded-lg font-semibold hover:bg-white/10 transition-colors">
-            Post a Task
-          </button>
+          <router-link to="/register" class="px-8 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg">
+            <span class="text-blue-600">Sign Up as Freelancer</span>
+          </router-link>
         </div>
       </div>
     </section>
