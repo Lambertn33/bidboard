@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { IWork } from '../../interfaces/home/IWork';
+interface IWork {
+  title: string;
+  subtitle: string;
+}
 const props = defineProps<{
   works: IWork[];
 }>();

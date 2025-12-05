@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import type { IFeature } from '@/interfaces/home/IFeature';
+interface IFeature {
+  title: string;
+  description: string;
+  icon: string;
+  iconBgColor: string;
+}
 
 const props = defineProps<{
   features: IFeature[];
