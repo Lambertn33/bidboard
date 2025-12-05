@@ -39,7 +39,13 @@ export class TasksHelper {
             ...searchWhere,
         };
 
-        const include: any = {
+        const select: any = {
+            id: true,
+            name: true,
+            description: true,
+            status: true,
+            price: true,
+            skills: true,
             project: {
                 select: {
                     id: true,
@@ -51,7 +57,7 @@ export class TasksHelper {
         const [tasks, total] = await Promise.all([
             this.databaseService.task.findMany({
                 where,
-                include,
+                select,
                 skip,
                 take,
                 orderBy: {
