@@ -1,67 +1,11 @@
 <script setup lang="ts">
-// Mock data for design purposes
-const projects = [
-  {
-    id: '1',
-    name: 'E-Commerce Platform',
-    description: 'A comprehensive e-commerce solution with shopping cart, payment integration, and inventory management features.',
-    taskCount: 12
-  },
-  {
-    id: '2',
-    name: 'Mobile App Development',
-    description: 'Cross-platform mobile application for iOS and Android with real-time synchronization and offline capabilities.',
-    taskCount: 8
-  },
-  {
-    id: '3',
-    name: 'Data Analytics Dashboard',
-    description: 'Interactive dashboard for visualizing business metrics, user analytics, and performance indicators.',
-    taskCount: 15
-  },
-  {
-    id: '4',
-    name: 'Content Management System',
-    description: 'Modern CMS with rich text editing, media management, and role-based access control.',
-    taskCount: 10
-  },
-  {
-    id: '5',
-    name: 'API Integration Service',
-    description: 'RESTful API service with authentication, rate limiting, and comprehensive documentation.',
-    taskCount: 6
-  },
-  {
-    id: '6',
-    name: 'UI/UX Design System',
-    description: 'Complete design system with component library, style guide, and design tokens for consistent branding.',
-    taskCount: 9
-  },
-  {
-    id: '7',
-    name: 'AI Chatbot Development',
-    description: 'Develop a chatbot using AI to answer questions and provide information.',
-    taskCount: 12
-  },
-  {
-    id: '8',
-    name: 'Data Entry Automation',
-    description: 'Automate data entry tasks to improve efficiency and accuracy.',
-    taskCount: 15
-  },
-  {
-    id: '9',
-    name: 'Social Media Management',
-    description: 'Manage social media accounts to increase engagement and reach.',
-    taskCount: 10
-  },
-  {
-    id: '10',
-    name: 'Email Marketing Campaign',
-    description: 'Create and manage email marketing campaigns to promote products and services.',
-    taskCount: 8
-  },
-];
+import { getProjects } from '@/api/public/projects';
+import { useQuery } from '@tanstack/vue-query';
+
+const { isPending, isError, data, error, refetch } = useQuery({
+    queryKey: ['projects'],
+    queryFn: () => getProjects(),
+});
 </script>
 
 <template>
@@ -82,10 +26,46 @@ const projects = [
 
     <!-- Projects Grid -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Loading State -->
+      <div v-if="isPending" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div
+          v-for="n in 6"
+          :key="n"
+          class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 animate-pulse"
+        >
+          <div class="p-6">
+            <div class="h-7 bg-gray-200 rounded mb-3"></div>
+            <div class="h-4 bg-gray-200 rounded mb-2"></div>
+            <div class="h-4 bg-gray-200 rounded mb-2"></div>
+            <div class="h-4 bg-gray-200 rounded mb-4 w-3/4"></div>
+            <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+              <div class="h-5 bg-gray-200 rounded w-24"></div>
+              <div class="h-5 bg-gray-200 rounded w-20"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div v-else-if="isError" class="text-center py-12">
+        <OhVueIcon name="bi-exclamation-triangle" class="h-16 w-16 text-red-400 mx-auto mb-4" />
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">Error Loading Projects</h3>
+        <p class="text-gray-600 mb-4">
+          {{ error instanceof Error ? error.message : 'Failed to load projects. Please try again later.' }}
+        </p>
+        <button
+          @click="refetch"
+          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Try Again
+        </button>
+      </div>
+
+      <!-- Data State -->
+      <div v-else-if="(data?.data || []).length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Project Card -->
         <div
-          v-for="project in projects"
+          v-for="project in (data?.data || [])"
           :key="project.id"
           class="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100"
         >
@@ -105,10 +85,10 @@ const projects = [
               <div class="flex items-center space-x-2">
                 <OhVueIcon 
                   name="bi-list-task" 
-                  class="h-5 w-5" 
+                  class="h-5 w-5 text-gray-600" 
                 />
                 <span class="text-sm font-medium text-gray-700">
-                  {{ project.taskCount }} {{ project.taskCount === 1 ? 'Task' : 'Tasks' }}
+                  {{ project._count?.tasks || 0 }} {{ (project._count?.tasks || 0) === 1 ? 'Task' : 'Tasks' }}
                 </span>
               </div>
               <button
@@ -123,7 +103,7 @@ const projects = [
       </div>
 
       <!-- Empty State (if no projects) -->
-      <div v-if="projects.length === 0" class="text-center py-12">
+      <div v-else class="text-center py-12">
         <OhVueIcon name="bi-folder-x" class="h-16 w-16 text-gray-400 mx-auto mb-4" />
         <h3 class="text-xl font-semibold text-gray-900 mb-2">No Projects Available</h3>
         <p class="text-gray-600">Check back later for new projects and tasks.</p>
