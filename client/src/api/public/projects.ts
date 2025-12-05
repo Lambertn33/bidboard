@@ -13,3 +13,8 @@ export const getProjects = async (currentPage?: number, limit?: number) => {
     });
     return response.data;
 };
+
+export const getProjectTasks = async (id: string) => {
+    const response = await api.get(`/projects/${id}`);
+    return response.data;
+};

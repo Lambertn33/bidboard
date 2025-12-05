@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Modal } from '@/components/ui';
 
 interface IProject {
     id: string;
@@ -14,16 +13,6 @@ interface IProject {
 const props = defineProps<{
     project: IProject;
 }>();
-
-const isModalOpen = ref(false);
-
-const openModal = () => {
-    isModalOpen.value = true;
-};
-
-const closeModal = () => {
-    isModalOpen.value = false;
-};
 </script>
 
 <template>
@@ -52,26 +41,7 @@ const closeModal = () => {
                   {{ project._count?.tasks || 0 }} {{ (project._count?.tasks || 0) === 1 ? 'Task' : 'Tasks' }}
                 </span>
               </div>
-              <button
-                @click="openModal"
-                class="text-blue-600 cursor-pointer hover:text-blue-700 font-medium text-sm transition-colors flex items-center space-x-1"
-              >
-                <span>View Tasks</span>
-                <OhVueIcon name="hi-arrow-right" class="h-4 w-4" />
-              </button>
             </div>
           </div>
         </div>
-
-    <!-- Modal -->
-    <Modal :is-open="isModalOpen" @close="closeModal">
-      <div>
-        <h2 class="text-2xl font-bold text-gray-900 mb-4">
-          Tasks for {{ project.name }}
-        </h2>
-        <p class="text-gray-600">
-          Tasks content will go here...
-        </p>
-      </div>
-    </Modal>
 </template>

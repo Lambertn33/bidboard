@@ -2,10 +2,12 @@
 interface Props {
   isOpen: boolean;
   closeOnBackdrop?: boolean;
+  modalWidth?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   closeOnBackdrop: true,
+  modalWidth: 'max-w-2xl',
 });
 
 
@@ -35,7 +37,8 @@ const props = withDefaults(defineProps<Props>(), {
         >
           <div
             v-if="isOpen"
-            class="relative bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto"
+            :class="modalWidth"
+            class="relative bg-white rounded-lg shadow-xl w-full mx-4 max-h-[90vh] overflow-y-auto"
             @click.stop
           >
             <!-- Close Button -->
