@@ -18,6 +18,11 @@ import {
     HiX,
     HiArrowDown,
     HiArrowUp,
+    HiMail,
+    HiLockClosed,
+    HiEye,
+    HiEyeOff,
+    HiUser,
   } from 'oh-vue-icons/icons';      
 
 
@@ -33,6 +38,11 @@ addIcons(
   BiFolderFill, 
   HiArrowDown,
   HiArrowUp,
+  HiMail,
+  HiLockClosed,
+  HiEye,
+  HiEyeOff,
+  HiUser,
 );
 
 createApp(App)
