@@ -23,6 +23,18 @@ import {
     HiEye,
     HiEyeOff,
     HiUser,
+    HiHome,
+    HiChartBar,
+    HiChartPie,
+    HiUserGroup,
+    HiDocumentText,
+    HiCreditCard,
+    BiBarChart,
+    HiPlus,
+    HiClipboardList,
+    HiCheckCircle,
+    HiCurrencyDollar,
+    HiUsers,
   } from 'oh-vue-icons/icons';      
 
 
@@ -43,6 +55,18 @@ addIcons(
   HiEye,
   HiEyeOff,
   HiUser,
+  HiHome,
+  HiChartBar,
+  HiChartPie,
+  HiUserGroup,
+  HiDocumentText,
+  HiCreditCard,
+  BiBarChart,
+  HiPlus,
+  HiClipboardList,
+  HiCheckCircle,
+  HiCurrencyDollar,
+  HiUsers,
 );
 
 createApp(App)
