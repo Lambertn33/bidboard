@@ -1,12 +1,12 @@
 import axios from 'axios';
 
-interface RegisterDto {
+export interface RegisterDto {
   names: string;
   email: string;
   password: string;
 }
 
-interface LoginDto {
+export interface LoginDto {
   email: string;
   password: string;
 }

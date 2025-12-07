@@ -1,82 +1,20 @@
 <script setup lang="ts">
-import { reactive, computed } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { jwtDecode } from 'jwt-decode';
-import type { AxiosError } from 'axios';
-
-import { login } from '@/api/public/auth';
-import { useMutation } from '@tanstack/vue-query';
+import { reactive } from 'vue';
 import { Input } from '@/components/ui';
 import { AuthForm } from '@/components/public';
-import { useAuth, type UserRole } from '@/composables/useAuth';
+import { useLogin } from '@/composables/useLogin';
+import type { LoginDto } from '@/api/public/auth';
 
-const router = useRouter();
-const route = useRoute();
-const { login: setAuthToken } = useAuth();
-
-interface LoginDto {
-  email: string;
-  password: string;
-}
-
-const form = reactive({
+const form = reactive<LoginDto>({
   email: '',
   password: '',
 });
 
-const { mutate: loginMutation, isPending, isError, error } = useMutation({
-  mutationFn: (data: LoginDto) => login(data),
-  onSuccess: (data) => {
-    setAuthToken(data.access_token);
-    
-    try {
-      const decoded = jwtDecode<{ role?: UserRole }>(data.access_token);
-      const userRole = decoded.role;
-      
-      const redirectPath = route.query.redirect as string | undefined;
-      
-      if (redirectPath) {
-        router.push(redirectPath);
-      } else {
-        if (userRole === 'ADMIN') {
-          router.push('/protected/projects');
-        } else {
-          router.push('/tasks');
-        }
-      }
-    } catch (error) {
-      console.error('Failed to decode token for redirect:', error);
-      router.push('/');
-    }
-  },
-});
+const { loginMutation, isPending, isError, errorMessage } = useLogin();
 
 const handleLogin = () => {
   loginMutation(form);
 };
-
-const errorMessage = computed(() => {
-  if (!error.value) return 'Invalid email or password. Please try again.';
-  
-  const axiosError = error.value as AxiosError<{ message: string | string[] }>;
-  
-  if (axiosError.response?.data?.message) {
-    const message = axiosError.response.data.message;
-    const status = axiosError.response.status;
-    
-    if (status === 401) {
-      return typeof message === 'string' ? message : message[0];
-    }
-    
-    if (status === 400) {
-      return Array.isArray(message) ? message[0] : message;
-    }
-    
-    return Array.isArray(message) ? message[0] : message;
-  }
-  
-  return 'Invalid email or password. Please try again.';
-});
 </script>
 
 <template>
