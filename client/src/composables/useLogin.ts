@@ -1,5 +1,5 @@
 import { computed } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { jwtDecode } from 'jwt-decode';
 import type { AxiosError } from 'axios';
 import { useMutation } from '@tanstack/vue-query';
@@ -9,7 +9,6 @@ import { useAuth, type UserRole } from './useAuth';
 
 export const useLogin = () => {
   const router = useRouter();
-  const route = useRoute();
   const { login: setAuthToken } = useAuth();
 
   const { mutate: loginMutation, isPending, isError, error } = useMutation({
@@ -23,25 +22,27 @@ export const useLogin = () => {
         const decoded = jwtDecode<{ role?: UserRole }>(data.access_token);
         const userRole = decoded.role;
 
-        // Get redirect path from query params (if user was redirected from protected route)
-        const redirectPath = route.query.redirect as string | undefined;
+        // Get redirect path from sessionStorage (stored by router guard)
+        const redirectPath = sessionStorage.getItem('authRedirect');
 
         if (redirectPath) {
-          // If there's a redirect query param, use it
-          router.push(redirectPath);
+          // Clear the stored redirect path
+          sessionStorage.removeItem('authRedirect');
+          // Redirect back to where user came from
+          router.replace(redirectPath);
         } else {
           // Otherwise, redirect based on role
           if (userRole === 'ADMIN') {
-            router.push('/protected/projects');
+            router.replace('/protected/dashboard');
           } else {
             // Redirect freelancers to tasks page
-            router.push('/tasks');
+            router.replace('/tasks');
           }
         }
       } catch (error) {
         console.error('Failed to decode token for redirect:', error);
         // Fallback to home if decoding fails
-        router.push('/');
+        router.replace('/');
       }
     },
   });

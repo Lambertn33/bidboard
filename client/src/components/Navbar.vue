@@ -25,6 +25,7 @@ const navigationLinks = computed(() => {
   }
   if (isAdmin.value) {
     return [
+      { path: '/protected/dashboard', label: 'Dashboard' },
       { path: '/protected/projects', label: 'Projects' },
       { path: '/protected/tasks', label: 'Tasks' },
       { path: '/protected/bids', label: 'Bids' },

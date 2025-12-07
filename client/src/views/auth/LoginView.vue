@@ -49,7 +49,7 @@ const handleLogin = () => {
       />
 
       <!-- Error Message -->
-      <div v-if="isError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+      <div v-if="isError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm font-bold text-center">
         {{ errorMessage }}
       </div>
 

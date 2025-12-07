@@ -18,7 +18,7 @@ export const useRegister = () => {
       const accessToken = data.data?.access_token;
       
       if (!accessToken) {
-        router.push('/login');
+        router.replace('/login');
         return;
       }
       setAuthToken(accessToken);
@@ -28,13 +28,13 @@ export const useRegister = () => {
         const userRole = decoded.role;
 
         if (userRole === 'ADMIN') {
-          router.push('/protected/projects');
+          router.replace('/protected/projects');
         } else {
-          router.push('/tasks');
+          router.replace('/tasks');
         }
       } catch (error) {
         console.error('Failed to decode token for redirect:', error);
-        router.push('/');
+        router.replace('/');
       }
     },
   });
