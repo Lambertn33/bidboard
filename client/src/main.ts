@@ -35,6 +35,7 @@ import {
     HiCheckCircle,
     HiCurrencyDollar,
     HiUsers,
+    HiLink,
   } from 'oh-vue-icons/icons';      
 
 
@@ -67,6 +68,7 @@ addIcons(
   HiCheckCircle,
   HiCurrencyDollar,
   HiUsers,
+  HiLink,
 );
 
 createApp(App)

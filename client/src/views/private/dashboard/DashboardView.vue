@@ -63,38 +63,42 @@ const recentBids = [
   },
 ];
 
-const activityFeed = [
+const recentWorks = [
   {
     id: '1',
-    type: 'work_completed',
-    message: 'Work "Data Cleanup Task 1" was completed by John Doe',
-    time: '30 minutes ago',
-    icon: 'hi-check-circle',
-    color: 'text-green-600',
+    taskName: 'Data Cleanup Task 1',
+    freelancerName: 'John Doe',
+    status: 'COMPLETED',
+    completionUrl: 'https://example.com/work-1',
+    price: 120,
+    submittedAt: '1 hour ago',
   },
   {
     id: '2',
-    type: 'bid_submitted',
-    message: 'New bid submitted for "Web Revamp Task 3"',
-    time: '1 hour ago',
-    icon: 'hi-document-text',
-    color: 'text-blue-600',
+    taskName: 'Web Revamp Task 3',
+    freelancerName: 'Jane Smith',
+    status: 'COMPLETED',
+    completionUrl: 'https://example.com/work-2',
+    price: 250,
+    submittedAt: '3 hours ago',
   },
   {
     id: '3',
-    type: 'work_approved',
-    message: 'Work "Marketing Blitz Task 2" was approved',
-    time: '2 hours ago',
-    icon: 'hi-check',
-    color: 'text-purple-600',
+    taskName: 'Marketing Blitz Task 2',
+    freelancerName: 'Mike Johnson',
+    status: 'IN_PROGRESS',
+    completionUrl: null,
+    price: 200,
+    submittedAt: '1 day ago',
   },
   {
     id: '4',
-    type: 'task_created',
-    message: 'New task "Data Cleanup Task 5" was created',
-    time: '3 hours ago',
-    icon: 'hi-plus-circle',
-    color: 'text-orange-600',
+    taskName: 'Data Cleanup Task 5',
+    freelancerName: 'Sarah Williams',
+    status: 'COMPLETED',
+    completionUrl: 'https://example.com/work-4',
+    price: 220,
+    submittedAt: '2 days ago',
   },
 ];
 
@@ -103,6 +107,7 @@ const getStatusColor = (status: string) => {
     OPEN: 'bg-blue-100 text-blue-800',
     ASSIGNED: 'bg-yellow-100 text-yellow-800',
     COMPLETED: 'bg-green-100 text-green-800',
+    IN_PROGRESS: 'bg-yellow-100 text-yellow-800',
     PENDING: 'bg-gray-100 text-gray-800',
     ACCEPTED: 'bg-green-100 text-green-800',
   };
@@ -216,9 +221,9 @@ const getStatusColor = (status: string) => {
       <!-- Main Content Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Recent Tasks -->
-        <div class="lg:col-span-2">
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div class="p-6 border-b border-gray-200">
+        <div class="lg:col-span-2 max-h-[400px]">
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col h-full">
+            <div class="p-6 border-b border-gray-200 flex-shrink-0">
               <div class="flex items-center justify-between">
                 <h2 class="text-xl font-semibold text-gray-900">Recent Tasks</h2>
                 <router-link to="/protected/tasks" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
@@ -226,7 +231,7 @@ const getStatusColor = (status: string) => {
                 </router-link>
               </div>
             </div>
-            <div class="p-6">
+            <div class="p-6 flex-1 overflow-y-auto">
               <div class="space-y-4">
                 <div
                   v-for="task in recentTasks"
@@ -261,26 +266,49 @@ const getStatusColor = (status: string) => {
           </div>
         </div>
 
-        <!-- Activity Feed -->
-        <div class="lg:col-span-1">
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div class="p-6 border-b border-gray-200">
-              <h2 class="text-xl font-semibold text-gray-900">Recent Activity</h2>
+        <!-- Recent Submitted Works -->
+        <div class="lg:col-span-1 max-h-[400px] overflow-y-auto">
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col h-full">
+            <div class="p-6 border-b border-gray-200 flex-shrink-0">
+              <div class="flex items-center justify-between">
+                <h2 class="text-xl font-semibold text-gray-900">Recent Works</h2>
+                <router-link to="/protected/works" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                  View all
+                </router-link>
+              </div>
             </div>
-            <div class="p-6">
+            <div class="p-6 flex-1 overflow-y-auto">
               <div class="space-y-4">
                 <div
-                  v-for="activity in activityFeed"
-                  :key="activity.id"
-                  class="flex items-start gap-3"
+                  v-for="work in recentWorks"
+                  :key="work.id"
+                  class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                 >
-                  <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                    <OhVueIcon name="hi-clock" class="w-4 h-4 text-gray-600" />
+                  <div class="flex items-center gap-2 mb-2">
+                    <h3 class="font-medium text-gray-900 text-sm">{{ work.taskName }}</h3>
+                    <span :class="['px-2 py-1 rounded-full text-xs font-medium', getStatusColor(work.status)]">
+                      {{ work.status === 'IN_PROGRESS' ? 'In Progress' : 'Completed' }}
+                    </span>
                   </div>
-                  <div class="flex-1 min-w-0">
-                    <p class="text-sm text-gray-900">{{ activity.message }}</p>
-                    <p class="text-xs text-gray-500 mt-1">{{ activity.time }}</p>
+                  <p class="text-sm text-gray-600 mb-2">by <span class="font-medium">{{ work.freelancerName }}</span></p>
+                  <div class="flex items-center gap-4 mb-2 text-sm text-gray-500">
+                    <span class="flex items-center gap-1">
+                      <OhVueIcon name="hi-currency-dollar" class="w-4 h-4" />
+                      {{ work.price }}
+                    </span>
                   </div>
+                  <div v-if="work.completionUrl" class="mb-2">
+                    <a
+                      :href="work.completionUrl"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                    >
+                      <OhVueIcon name="hi-link" class="w-4 h-4" />
+                      View work
+                    </a>
+                  </div>
+                  <p class="text-xs text-gray-500">{{ work.submittedAt }}</p>
                 </div>
               </div>
             </div>

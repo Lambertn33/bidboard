@@ -34,9 +34,11 @@ const navigationLinks = computed(() => {
   }
   if (isFreelancer.value) {
     return [
-      { path: '/protected/tasks', label: 'Tasks' },
-      { path: '/protected/bids', label: 'Bids' },
-      { path: '/protected/works', label: 'Works' },
+     { path: '/projects', label: 'Projects' },
+      { path: '/tasks', label: 'Tasks' },
+      { path: '/protected/tasks', label: ' My Assigned Tasks' },
+      { path: '/protected/bids', label: ' My Bids' },
+      { path: '/protected/works', label: ' My Works' },
     ];
   }
   return [];
