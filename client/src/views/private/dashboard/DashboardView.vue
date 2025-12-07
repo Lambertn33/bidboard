@@ -274,8 +274,8 @@ const getStatusColor = (status: string) => {
                   :key="activity.id"
                   class="flex items-start gap-3"
                 >
-                  <div :class="['w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0', activity.color.replace('text-', 'bg-').replace('-600', '-100')]">
-                    <OhVueIcon :name="activity.icon" :class="['w-4 h-4', activity.color]" />
+                  <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                    <OhVueIcon name="hi-clock" class="w-4 h-4 text-gray-600" />
                   </div>
                   <div class="flex-1 min-w-0">
                     <p class="text-sm text-gray-900">{{ activity.message }}</p>
