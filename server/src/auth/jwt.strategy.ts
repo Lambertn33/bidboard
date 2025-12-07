@@ -15,7 +15,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: any) {
     const userId = payload.id || payload.sub;
-    const user = { id: userId, email: payload.email, role: payload.role };
+    const user = { id: userId, email: payload.email, role: payload.role, names: payload.names };
 
     // If user is a freelancer, fetch their freelancer record
     if (payload.role === 'FREELANCER') {
