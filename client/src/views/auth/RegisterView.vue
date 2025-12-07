@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
-import { useRouter } from 'vue-router';
-
 import { Input } from '@/components/ui';
 import { AuthForm } from '@/components/public';
+import { useRegister } from '@/composables/useRegister';
+import type { RegisterDto } from '@/api/public/auth';
 
-const router = useRouter();
-
-const form = reactive({
+const form = reactive<RegisterDto>({
   names: '',
   email: '',
   password: '',
 });
 
+const { registerMutation, isPending, isError, errorMessage } = useRegister();
+
 const handleRegister = () => {
-  console.log('Register clicked', form.names, form.email, form.password);
+  registerMutation(form);
 };
 </script>
 
@@ -61,12 +61,22 @@ const handleRegister = () => {
         :required="true"
       />
 
+      <!-- Error Message -->
+      <div v-if="isError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+        {{ errorMessage }}
+      </div>
+
       <!-- Submit Button -->
       <button
         type="submit"
+        :disabled="isPending"
         class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
-        Register
+        <span v-if="!isPending">Register</span>
+        <span v-else class="flex items-center gap-2">
+          <div class="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          Registering...
+        </span>
       </button>
     </form>
 
