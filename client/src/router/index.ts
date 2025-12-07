@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory, type NavigationGuardNext, type RouteLocationNormalized } from 'vue-router';
-import { HomeView, NotFoundView, RegisterView, LoginView, TasksView, ProjectsView, ProtectedProjectsView } from '@/views';
+import { HomeView,
+   NotFoundView,
+    RegisterView, LoginView, TasksView, ProjectsView, ProtectedProjectsView, ProtectedTasksView, ProtectedBidsView, ProtectedWorksView } from '@/views';
 
 // Helper functions to check auth state (for use in router guards)
 const getStoredToken = (): string | null => {
@@ -129,6 +131,18 @@ const router = createRouter({
           path: 'projects',
           component: ProtectedProjectsView,
           beforeEnter: requireAdmin,
+        },
+        {
+          path: 'tasks',
+          component: ProtectedTasksView,
+        },
+        {
+          path: 'bids',
+          component: ProtectedBidsView,
+        },
+        {
+          path: 'works',
+          component: ProtectedWorksView,
         },
       ],
     },
