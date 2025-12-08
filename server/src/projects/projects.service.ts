@@ -36,6 +36,7 @@ export class ProjectsService {
                     id: true,
                     name: true,
                     description: true,
+                    createdAt: true,
                     _count: {
                         select: {
                             tasks: true,

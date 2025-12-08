@@ -36,7 +36,12 @@ import {
     HiCurrencyDollar,
     HiUsers,
     HiLink,
-    CoReload
+    CoReload,
+    GiMagnifyingGlass,
+    HiPencil,
+    HiTrash,
+    HiChevronLeft,
+    HiChevronRight,
   } from 'oh-vue-icons/icons';      
 
 
@@ -70,7 +75,12 @@ addIcons(
   HiCurrencyDollar,
   HiUsers,
   HiLink,
-  CoReload
+  CoReload,
+  GiMagnifyingGlass,
+  HiPencil,
+  HiTrash,
+  HiChevronLeft,
+  HiChevronRight,
 );
 
 createApp(App)
