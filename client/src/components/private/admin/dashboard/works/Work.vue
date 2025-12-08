@@ -1,28 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { OhVueIcon } from 'oh-vue-icons';
-import { getStartTimeInDays } from '@/composables/useGetStartTimeInDays';
+import { getStartTimeInDays } from '@/reusables';
 
-interface IWork {
-    id: string;
-    task: {
-        id: string;
-        name: string;
-    };
-    freelancer: {
-        id: string;
-        telephone: string;
-        user: {
-            id: string;
-            names: string;
-        };
-    };
-    startDate: string;
-    endDate: string;
-    completionUrl: string | null;
-    status: "COMPLETED" | "IN_PROGRESS";
-    createdAt: string;
-}
+import { IWork } from '@/views/private/admin/dashboard/DashboardView';
 
 const props = defineProps<{
     work: IWork;

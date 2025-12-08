@@ -3,8 +3,8 @@
   import { useQuery } from "@tanstack/vue-query";
   import { OhVueIcon } from 'oh-vue-icons';
 
-  import { getDashboardOverview, getRecentTasks, getRecentWorks } from '@/api/private/common/dashboard';
-  import { AdminDashboardCards, AdminDashboardTasks, AdminDashboardWorks } from '@/components/private';
+  import { getDashboardOverview, getRecentTasks, getRecentWorks, getRecentBids } from '@/api/private/common/dashboard';
+  import { AdminDashboardCards, AdminDashboardTasks, AdminDashboardWorks, AdminDashboardBids } from '@/components/private';
 
   const { isPending: isOverviewLoading, isError: isOverviewError, data: overviewData, error: overviewError, refetch: refetchOverview } = useQuery({
     queryKey: ['dashboard-overview'],
@@ -21,10 +21,66 @@
     queryFn: () => getRecentWorks(),
   });
 
+  const { isPending: isRecentBidsLoading, data: recentBidsData, error: recentBidsError, refetch: refetchRecentBids } = useQuery({
+    queryKey: ['recent-bids'],
+    queryFn: () => getRecentBids(),
+  });
+
+  export interface IBid {
+    id: string;
+    message: string;
+    status: "PENDING" | "ACCEPTED" | "REJECTED";
+    task: {
+        id: string;
+        name: string;
+    };
+    freelancer: {
+        id: string;
+        telephone: string;
+        user: {
+            id: string;
+            names: string;
+        };
+    };
+    createdAt: string;
+  }
+
+  export interface ITask {
+    id: string;
+    name: string;
+    status: "OPEN" | "ASSIGNED" | "COMPLETED";
+    project: {
+        id: string;
+        name: string;
+    };
+    price: number;
+    bids: number;
+  }
+
+  export interface IWork {
+    id: string;
+    task: {
+        id: string;
+        name: string;
+    };
+    freelancer: {
+        id: string;
+        telephone: string;
+        user: {
+            id: string;
+            names: string;
+        };
+    };
+    startDate: string;
+    endDate: string;
+    completionUrl: string | null;
+    status: "COMPLETED" | "IN_PROGRESS";
+    createdAt: string;
+  }
   // Map API data to component format
   const recentTasks = computed(() => {
     if (!recentTasksData.value) return [];
-    return recentTasksData.value.map((task: any) => ({
+    return recentTasksData.value.map((task: ITask) => ({
       id: task.id,
       name: task.name,
       status: task.status,
@@ -40,7 +96,7 @@
   // Map API data to component format for works
   const recentWorks = computed(() => {
     if (!recentWorksData.value) return [];
-    return recentWorksData.value.map((work: any) => ({
+    return recentWorksData.value.map((work: IWork) => ({
       id: work.id,
       task: {
         id: work.task.id,
@@ -59,6 +115,29 @@
       completionUrl: work.completionUrl,
       status: work.status,
       createdAt: work.createdAt,
+    }));
+  });
+
+  // Map API data to component format for bids
+  const recentBids = computed(() => {
+    if (!recentBidsData.value) return [];
+    return recentBidsData.value.map((bid: IBid) => ({
+      id: bid.id,
+      message: bid.message,
+      status: bid.status,
+      task: {
+        id: bid.task.id,
+        name: bid.task.name,
+      },
+      freelancer: {
+        id: bid.freelancer.id,
+        telephone: bid.freelancer.telephone,
+        user: {
+          id: bid.freelancer.user.id,
+          names: bid.freelancer.user.names,
+        },
+      },
+      createdAt: bid.createdAt,
     }));
   });
 
@@ -126,32 +205,6 @@
   });
 
 
-  const recentBids = [
-    {
-      id: '1',
-      taskName: 'Data Cleanup Task 1',
-      freelancerName: 'John Doe',
-      message: 'I have extensive experience with data analysis...',
-      status: 'PENDING',
-      createdAt: '2 hours ago',
-    },
-    {
-      id: '2',
-      taskName: 'Web Revamp Task 3',
-      freelancerName: 'Jane Smith',
-      message: 'I can complete this task within 2 days...',
-      status: 'ACCEPTED',
-      createdAt: '5 hours ago',
-    },
-    {
-      id: '3',
-      taskName: 'Marketing Blitz Task 2',
-      freelancerName: 'Mike Johnson',
-      message: 'I specialize in marketing assets...',
-      status: 'PENDING',
-      createdAt: '1 day ago',
-    },
-  ];
 
 
 </script>
@@ -246,7 +299,7 @@
       </div>
 
       <!-- Recent Bids -->
-      <!-- <div class="mt-6">
+      <div class="mt-6">
         <div class="bg-white rounded-xl shadow-sm border border-gray-200">
           <div class="p-6 border-b border-gray-200">
             <div class="flex items-center justify-between">
@@ -257,44 +310,15 @@
             </div>
           </div>
           <div class="p-6">
-            <div class="space-y-4">
-              <div
-                v-for="bid in recentBids"
-                :key="bid.id"
-                class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <div class="flex items-start justify-between">
-                  <div class="flex-1">
-                    <div class="flex items-center gap-3 mb-2">
-                      <h3 class="font-medium text-gray-900">{{ bid.taskName }}</h3>
-                      <span :class="['px-2 py-1 rounded-full text-xs font-medium', getStatusColor(bid.status)]">
-                        {{ bid.status }}
-                      </span>
-                    </div>
-                    <p class="text-sm text-gray-600 mb-2">by <span class="font-medium">{{ bid.freelancerName }}</span></p>
-                    <p class="text-sm text-gray-700 line-clamp-2">{{ bid.message }}</p>
-                    <p class="text-xs text-gray-500 mt-2">{{ bid.createdAt }}</p>
-                  </div>
-                  <div class="ml-4 flex gap-2">
-                    <button
-                      v-if="bid.status === 'PENDING'"
-                      class="px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
-                    >
-                      Accept
-                    </button>
-                    <button
-                      v-if="bid.status === 'PENDING'"
-                      class="px-3 py-1.5 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
-                    >
-                      Reject
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <AdminDashboardBids
+              :bids="recentBids"
+              :loading="isRecentBidsLoading"
+              :error="recentBidsError"
+              :refetchRecentBids="() => { refetchRecentBids(); }"
+            />
           </div>
         </div>
-      </div> -->
+      </div>
     </div>
   </div>
 </template>

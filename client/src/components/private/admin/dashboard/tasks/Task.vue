@@ -1,17 +1,6 @@
 <script setup lang="ts">
 import { OhVueIcon } from 'oh-vue-icons';
-
-interface ITask {
-    id: string;
-    name: string;
-    status: "OPEN" | "ASSIGNED" | "COMPLETED";
-    project: {
-        id: string;
-        name: string;
-    };
-    price: number;
-    bids: number;
-}
+import { ITask } from '@/views/private/admin/dashboard/DashboardView';
 
 defineProps<{
     task: ITask;

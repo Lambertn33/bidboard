@@ -1,18 +1,7 @@
 <script setup lang="ts">
-import { OhVueIcon } from 'oh-vue-icons';
 import Task from './Task.vue';
 
-interface ITask {
-    id: string;
-    name: string;
-    status: "OPEN" | "ASSIGNED" | "COMPLETED";
-    project: {
-        id: string;
-        name: string;
-    };
-    price: number;
-    bids: number;
-}
+import { ITask } from '@/views/private/admin/dashboard/DashboardView';
 
 interface Props {
     tasks?: ITask[];

@@ -1,10 +1,4 @@
-/**
- * Calculates the time difference between a given start date and today,
- * and returns a human-readable string like "2 days ago", "1 week ago", etc.
- * 
- * @param startDate - The start date as a string (ISO format or any valid date string)
- * @returns A formatted string representing the time difference
- */
+
 export const getStartTimeInDays = (startDate: string): string => {
     const start = new Date(startDate);
     const today = new Date();
