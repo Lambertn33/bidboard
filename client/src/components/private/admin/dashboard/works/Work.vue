@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { OhVueIcon } from 'oh-vue-icons';
+import { getStartTimeInDays } from '@/composables/useGetStartTimeInDays';
 
 interface IWork {
     id: string;
@@ -35,37 +36,7 @@ const getStatusColor = (status: string) => {
     return colors[status] || 'bg-gray-100 text-gray-800';
 };
 
-const getStartTimeInDays = computed(() => {
-    const startDate = new Date(props.work.startDate);
-    const today = new Date();
-    
-    // Reset time to midnight for accurate day calculation
-    const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-    const end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    
-    // Calculate difference in milliseconds
-    const diffTime = end.getTime() - start.getTime();
-    
-    // Convert to days
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) {
-        return 'Today';
-    } else if (diffDays === 1) {
-        return '1 day ago';
-    } else if (diffDays < 7) {
-        return `${diffDays} days ago`;
-    } else if (diffDays < 30) {
-        const weeks = Math.floor(diffDays / 7);
-        return weeks === 1 ? '1 week ago' : `${weeks} weeks ago`;
-    } else if (diffDays < 365) {
-        const months = Math.floor(diffDays / 30);
-        return months === 1 ? '1 month ago' : `${months} months ago`;
-    } else {
-        const years = Math.floor(diffDays / 365);
-        return years === 1 ? '1 year ago' : `${years} years ago`;
-    }
-});
+const timeAgo = computed(() => getStartTimeInDays(props.work.startDate));
 
 </script>
 
@@ -89,6 +60,6 @@ const getStartTimeInDays = computed(() => {
                     View work
             </a>
         </div>
-        <p class="text-xs text-gray-500">{{ getStartTimeInDays }}</p>
+        <p class="text-xs text-gray-500">{{ timeAgo }}</p>
     </div>
 </template>
