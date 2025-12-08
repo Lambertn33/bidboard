@@ -36,6 +36,7 @@ import {
     HiCurrencyDollar,
     HiUsers,
     HiLink,
+    CoReload
   } from 'oh-vue-icons/icons';      
 
 
@@ -69,6 +70,7 @@ addIcons(
   HiCurrencyDollar,
   HiUsers,
   HiLink,
+  CoReload
 );
 
 createApp(App)

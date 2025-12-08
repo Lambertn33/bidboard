@@ -1,182 +1,174 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { getDashboardOverview } from '@/api/private/common/dashboard';
-import { useQuery } from "@tanstack/vue-query";
-import { OhVueIcon } from 'oh-vue-icons';
-import { AdminDashboardCards } from '@/components/private';
+  import { computed } from 'vue';
+  import { useQuery } from "@tanstack/vue-query";
+  import { OhVueIcon } from 'oh-vue-icons';
 
-const { isPending: isOverviewLoading, isError: isOverviewError, data: overviewData, error: overviewError, refetch: refetchOverview } = useQuery({
-  queryKey: ['dashboard-overview'],
-  queryFn: () => getDashboardOverview(),
-});
+  import { getDashboardOverview, getRecentTasks } from '@/api/private/common/dashboard';
+  import { AdminDashboardCards, AdminDashboardTasks } from '@/components/private';
 
-// Computed stats from API data or fallback to defaults
-const stats = computed(() => {
-  if (overviewData.value) {
+  const { isPending: isOverviewLoading, isError: isOverviewError, data: overviewData, error: overviewError, refetch: refetchOverview } = useQuery({
+    queryKey: ['dashboard-overview'],
+    queryFn: () => getDashboardOverview(),
+  });
+
+  const { isPending: isRecentTasksLoading, isError: isRecentTasksError, data: recentTasksData, error: recentTasksError, refetch: refetchRecentTasks } = useQuery({
+    queryKey: ['recent-tasks'],
+    queryFn: () => getRecentTasks(),
+  });
+
+  // Map API data to component format
+  const recentTasks = computed(() => {
+    if (!recentTasksData.value) return [];
+    return recentTasksData.value.map((task: any) => ({
+      id: task.id,
+      name: task.name,
+      status: task.status,
+      project: {
+        id: task.project.id,
+        name: task.project.name,
+      },
+      price: task.price,
+      bids: task._count?.bids ?? 0,
+    }));
+  });
+
+  // Computed stats from API data or fallback to defaults
+  const stats = computed(() => {
+    if (overviewData.value) {
+      return {
+        totalProjects: overviewData.value.totalProjects ?? 0,
+        activeTasks: overviewData.value.totalActiveTasks ?? 0,
+        pendingBids: overviewData.value.totalPendingBids ?? 0,
+        completedWorks: overviewData.value.totalCompletedWorks ?? 0,
+        totalPaid: overviewData.value.totalPaid ?? 0,
+        activeFreelancers: overviewData.value.totalActiveFreelancers ?? 0,
+      };
+    }
     return {
-      totalProjects: overviewData.value.totalProjects ?? 0,
-      activeTasks: overviewData.value.totalActiveTasks ?? 0,
-      pendingBids: overviewData.value.totalPendingBids ?? 0,
-      completedWorks: overviewData.value.totalCompletedWorks ?? 0,
-      totalPaid: overviewData.value.totalPaid ?? 0,
-      activeFreelancers: overviewData.value.totalActiveFreelancers ?? 0,
+      totalProjects: 0,
+      activeTasks: 0,
+      pendingBids: 0,
+      completedWorks: 0,
+      totalPaid: 0,
+      activeFreelancers: 0,
     };
-  }
-  return {
-    totalProjects: 0,
-    activeTasks: 0,
-    pendingBids: 0,
-    completedWorks: 0,
-    totalPaid: 0,
-    activeFreelancers: 0,
-  };
-});
+  });
 
-const dashboardCards = computed(() => {
-  return [
+  const dashboardCards = computed(() => {
+    return [
+      {
+        title: 'Total Projects',
+        value: stats.value.totalProjects,
+        icon: 'bi-folder-fill',
+        iconColor: 'bg-blue-100',
+      },
+      {
+        title: 'Active Tasks',
+        value: stats.value.activeTasks,
+        icon: 'hi-clipboard-list',
+        iconColor: 'bg-yellow-100',
+      },
+      {
+        title: 'Pending Bids',
+        value: stats.value.pendingBids,
+        icon: 'hi-clock',
+        iconColor: 'bg-red-100',
+      },
+      {
+        title: 'Completed Works',
+        value: stats.value.completedWorks,
+        icon: 'hi-check-circle',
+        iconColor: 'bg-green-100',
+      },
+      {
+        title: 'Total Paid',
+        value: stats.value.totalPaid,
+        icon: 'hi-currency-dollar',
+        iconColor: 'bg-purple-100',
+      },
+      {
+        title: 'Active Freelancers',
+        value: stats.value.activeFreelancers,
+        icon: 'hi-users',
+        iconColor: 'bg-pink-100',
+      },
+    ];
+  });
+
+
+  const recentBids = [
     {
-      title: 'Total Projects',
-      value: stats.value.totalProjects,
-      icon: 'bi-folder-fill',
-      iconColor: 'bg-blue-100',
+      id: '1',
+      taskName: 'Data Cleanup Task 1',
+      freelancerName: 'John Doe',
+      message: 'I have extensive experience with data analysis...',
+      status: 'PENDING',
+      createdAt: '2 hours ago',
     },
     {
-      title: 'Active Tasks',
-      value: stats.value.activeTasks,
-      icon: 'hi-clipboard-list',
-      iconColor: 'bg-yellow-100',
+      id: '2',
+      taskName: 'Web Revamp Task 3',
+      freelancerName: 'Jane Smith',
+      message: 'I can complete this task within 2 days...',
+      status: 'ACCEPTED',
+      createdAt: '5 hours ago',
     },
     {
-      title: 'Pending Bids',
-      value: stats.value.pendingBids,
-      icon: 'hi-clock',
-      iconColor: 'bg-red-100',
-    },
-    {
-      title: 'Completed Works',
-      value: stats.value.completedWorks,
-      icon: 'hi-check-circle',
-      iconColor: 'bg-green-100',
-    },
-    {
-      title: 'Total Paid',
-      value: stats.value.totalPaid,
-      icon: 'hi-currency-dollar',
-      iconColor: 'bg-purple-100',
-    },
-    {
-      title: 'Active Freelancers',
-      value: stats.value.activeFreelancers,
-      icon: 'hi-users',
-      iconColor: 'bg-pink-100',
+      id: '3',
+      taskName: 'Marketing Blitz Task 2',
+      freelancerName: 'Mike Johnson',
+      message: 'I specialize in marketing assets...',
+      status: 'PENDING',
+      createdAt: '1 day ago',
     },
   ];
-});
 
-const recentTasks = [
-  {
-    id: '1',
-    name: 'Data Cleanup Task 1',
-    project: 'Data Cleanup',
-    status: 'OPEN',
-    price: 120,
-    bids: 5,
-  },
-  {
-    id: '2',
-    name: 'Web Revamp Task 3',
-    project: 'Web Revamp',
-    status: 'ASSIGNED',
-    price: 250,
-    bids: 3,
-  },
-  {
-    id: '3',
-    name: 'Marketing Blitz Task 2',
-    project: 'Marketing Blitz',
-    status: 'COMPLETED',
-    price: 200,
-    bids: 8,
-  },
-];
+  const recentWorks = [
+    {
+      id: '1',
+      taskName: 'Data Cleanup Task 1',
+      freelancerName: 'John Doe',
+      status: 'COMPLETED',
+      completionUrl: 'https://example.com/work-1',
+      price: 120,
+      submittedAt: '1 hour ago',
+    },
+    {
+      id: '2',
+      taskName: 'Web Revamp Task 3',
+      freelancerName: 'Jane Smith',
+      status: 'COMPLETED',
+      completionUrl: 'https://example.com/work-2',
+      price: 250,
+      submittedAt: '3 hours ago',
+    },
+    {
+      id: '3',
+      taskName: 'Marketing Blitz Task 2',
+      freelancerName: 'Mike Johnson',
+      status: 'IN_PROGRESS',
+      completionUrl: null,
+      price: 200,
+      submittedAt: '1 day ago',
+    },
+    {
+      id: '4',
+      taskName: 'Data Cleanup Task 5',
+      freelancerName: 'Sarah Williams',
+      status: 'COMPLETED',
+      completionUrl: 'https://example.com/work-4',
+      price: 220,
+      submittedAt: '2 days ago',
+    },
+  ];
 
-const recentBids = [
-  {
-    id: '1',
-    taskName: 'Data Cleanup Task 1',
-    freelancerName: 'John Doe',
-    message: 'I have extensive experience with data analysis...',
-    status: 'PENDING',
-    createdAt: '2 hours ago',
-  },
-  {
-    id: '2',
-    taskName: 'Web Revamp Task 3',
-    freelancerName: 'Jane Smith',
-    message: 'I can complete this task within 2 days...',
-    status: 'ACCEPTED',
-    createdAt: '5 hours ago',
-  },
-  {
-    id: '3',
-    taskName: 'Marketing Blitz Task 2',
-    freelancerName: 'Mike Johnson',
-    message: 'I specialize in marketing assets...',
-    status: 'PENDING',
-    createdAt: '1 day ago',
-  },
-];
-
-const recentWorks = [
-  {
-    id: '1',
-    taskName: 'Data Cleanup Task 1',
-    freelancerName: 'John Doe',
-    status: 'COMPLETED',
-    completionUrl: 'https://example.com/work-1',
-    price: 120,
-    submittedAt: '1 hour ago',
-  },
-  {
-    id: '2',
-    taskName: 'Web Revamp Task 3',
-    freelancerName: 'Jane Smith',
-    status: 'COMPLETED',
-    completionUrl: 'https://example.com/work-2',
-    price: 250,
-    submittedAt: '3 hours ago',
-  },
-  {
-    id: '3',
-    taskName: 'Marketing Blitz Task 2',
-    freelancerName: 'Mike Johnson',
-    status: 'IN_PROGRESS',
-    completionUrl: null,
-    price: 200,
-    submittedAt: '1 day ago',
-  },
-  {
-    id: '4',
-    taskName: 'Data Cleanup Task 5',
-    freelancerName: 'Sarah Williams',
-    status: 'COMPLETED',
-    completionUrl: 'https://example.com/work-4',
-    price: 220,
-    submittedAt: '2 days ago',
-  },
-];
-
-const getStatusColor = (status: string) => {
-  const colors: Record<string, string> = {
-    OPEN: 'bg-blue-100 text-blue-800',
-    ASSIGNED: 'bg-yellow-100 text-yellow-800',
-    COMPLETED: 'bg-green-100 text-green-800',
-    IN_PROGRESS: 'bg-yellow-100 text-yellow-800',
-    PENDING: 'bg-gray-100 text-gray-800',
-    ACCEPTED: 'bg-green-100 text-green-800',
+  const getStatusColor = (status: string) => {
+    const colors: Record<string, string> = {
+      OPEN: 'bg-blue-100 text-blue-800',
+      ASSIGNED: 'bg-yellow-100 text-yellow-800',
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
   };
-  return colors[status] || 'bg-gray-100 text-gray-800';
-};
 </script>
 
 <template>
@@ -235,36 +227,12 @@ const getStatusColor = (status: string) => {
               </div>
             </div>
             <div class="p-6 flex-1 overflow-y-auto">
-              <div class="space-y-4">
-                <div
-                  v-for="task in recentTasks"
-                  :key="task.id"
-                  class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <div class="flex-1">
-                    <div class="flex items-center gap-3">
-                      <h3 class="font-medium text-gray-900">{{ task.name }}</h3>
-                      <span :class="['px-2 py-1 rounded-full text-xs font-medium', getStatusColor(task.status)]">
-                        {{ task.status }}
-                      </span>
-                    </div>
-                    <p class="text-sm text-gray-600 mt-1">{{ task.project }}</p>
-                    <div class="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                      <span class="flex items-center gap-1">
-                        <OhVueIcon name="hi-currency-dollar" class="w-4 h-4" />
-                        {{ task.price }}
-                      </span>
-                      <span class="flex items-center gap-1">
-                        <OhVueIcon name="hi-document-text" class="w-4 h-4" />
-                        {{ task.bids }} bids
-                      </span>
-                    </div>
-                  </div>
-                  <button class="ml-4 p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                    <OhVueIcon name="hi-chevron-right" class="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
+              <AdminDashboardTasks
+                :tasks="recentTasks"
+                :loading="isRecentTasksLoading"
+                :error="recentTasksError"
+                :refetchRecentTasks="() => { refetchRecentTasks(); }"
+              />
             </div>
           </div>
         </div>

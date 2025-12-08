@@ -130,6 +130,7 @@ enum BidStatus {
 enum TaskStatus {
   OPEN
   ASSIGNED
+  COMPLETED
 }
 
 enum WorkStatus {

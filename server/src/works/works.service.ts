@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { WorksHelper } from './helpers/works.helper';
-import { Role, WorkStatus } from 'generated/prisma/client';
+import { Role, TaskStatus, WorkStatus } from 'generated/prisma/client';
 import { DatabaseService } from '@/database/database.service';
 
 @Injectable()
@@ -38,6 +38,10 @@ export class WorksService {
         await this.databaseService.work.update({
             where: { id },
             data: { completionUrl, status: WorkStatus.COMPLETED },
+        });
+        await this.databaseService.task.update({
+            where: { id: work.taskId },
+            data: { status: TaskStatus.COMPLETED },
         });
 
         return {
