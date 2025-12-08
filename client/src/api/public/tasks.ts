@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { API_BASE_URL } from '../constants';
 
 const api = axios.create({
-    baseURL: 'http://localhost:3000/api',
+    baseURL: `${API_BASE_URL}/tasks`,
 });
 
 export const getTasks = async (currentPage?: number, limit?: number) => {

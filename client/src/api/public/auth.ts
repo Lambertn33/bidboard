@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { API_BASE_URL } from '../constants';
 
 export interface RegisterDto {
   names: string;
@@ -12,7 +13,7 @@ export interface LoginDto {
 }
 
 export const authApi = axios.create({
-  baseURL: 'http://localhost:3000/api/auth',
+  baseURL: `${API_BASE_URL}/auth`,
 });
 
 export const register = async (data: RegisterDto) => {
