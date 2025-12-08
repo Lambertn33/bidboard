@@ -6,7 +6,7 @@ const api = axios.create({
 });
 
 export const getTasks = async (currentPage?: number, limit?: number) => {
-    const response = await api.get('/tasks', {
+    const response = await api.get('/', {
         params: {
             currentPage,
             limit,

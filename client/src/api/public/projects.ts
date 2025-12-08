@@ -6,7 +6,7 @@ const api = axios.create({
 });
 
 export const getProjects = async (currentPage?: number, limit?: number) => {
-    const response = await api.get('/projects', {
+    const response = await api.get('/', {
         params: {
             currentPage,
             limit,
@@ -16,6 +16,6 @@ export const getProjects = async (currentPage?: number, limit?: number) => {
 };
 
 export const getProjectTasks = async (id: string) => {
-    const response = await api.get(`/projects/${id}`);
+    const response = await api.get(`/${id}`);
     return response.data;
 };
