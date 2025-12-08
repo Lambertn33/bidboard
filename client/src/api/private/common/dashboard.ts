@@ -42,7 +42,7 @@ export const getRecentBids = async () => {
 
 export const getRecentWorks = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/admin/dashboard/recent-works`, {
+    const response = await api.get('/recent-works', {
       headers: getAuthHeaders(),
     });
     return response.data;

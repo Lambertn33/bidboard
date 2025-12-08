@@ -3,17 +3,22 @@
   import { useQuery } from "@tanstack/vue-query";
   import { OhVueIcon } from 'oh-vue-icons';
 
-  import { getDashboardOverview, getRecentTasks } from '@/api/private/common/dashboard';
-  import { AdminDashboardCards, AdminDashboardTasks } from '@/components/private';
+  import { getDashboardOverview, getRecentTasks, getRecentWorks } from '@/api/private/common/dashboard';
+  import { AdminDashboardCards, AdminDashboardTasks, AdminDashboardWorks } from '@/components/private';
 
   const { isPending: isOverviewLoading, isError: isOverviewError, data: overviewData, error: overviewError, refetch: refetchOverview } = useQuery({
     queryKey: ['dashboard-overview'],
     queryFn: () => getDashboardOverview(),
   });
 
-  const { isPending: isRecentTasksLoading, isError: isRecentTasksError, data: recentTasksData, error: recentTasksError, refetch: refetchRecentTasks } = useQuery({
+  const { isPending: isRecentTasksLoading, data: recentTasksData, error: recentTasksError, refetch: refetchRecentTasks } = useQuery({
     queryKey: ['recent-tasks'],
     queryFn: () => getRecentTasks(),
+  });
+
+  const { isPending: isRecentWorksLoading, data: recentWorksData, error: recentWorksError, refetch: refetchRecentWorks } = useQuery({
+    queryKey: ['recent-works'],
+    queryFn: () => getRecentWorks(),
   });
 
   // Map API data to component format
@@ -29,6 +34,31 @@
       },
       price: task.price,
       bids: task._count?.bids ?? 0,
+    }));
+  });
+
+  // Map API data to component format for works
+  const recentWorks = computed(() => {
+    if (!recentWorksData.value) return [];
+    return recentWorksData.value.map((work: any) => ({
+      id: work.id,
+      task: {
+        id: work.task.id,
+        name: work.task.name,
+      },
+      freelancer: {
+        id: work.freelancer.id,
+        telephone: work.freelancer.telephone,
+        user: {
+          id: work.freelancer.user.id,
+          names: work.freelancer.user.names,
+        },
+      },
+      startDate: work.startDate,
+      endDate: work.endDate,
+      completionUrl: work.completionUrl,
+      status: work.status,
+      createdAt: work.createdAt,
     }));
   });
 
@@ -123,52 +153,7 @@
     },
   ];
 
-  const recentWorks = [
-    {
-      id: '1',
-      taskName: 'Data Cleanup Task 1',
-      freelancerName: 'John Doe',
-      status: 'COMPLETED',
-      completionUrl: 'https://example.com/work-1',
-      price: 120,
-      submittedAt: '1 hour ago',
-    },
-    {
-      id: '2',
-      taskName: 'Web Revamp Task 3',
-      freelancerName: 'Jane Smith',
-      status: 'COMPLETED',
-      completionUrl: 'https://example.com/work-2',
-      price: 250,
-      submittedAt: '3 hours ago',
-    },
-    {
-      id: '3',
-      taskName: 'Marketing Blitz Task 2',
-      freelancerName: 'Mike Johnson',
-      status: 'IN_PROGRESS',
-      completionUrl: null,
-      price: 200,
-      submittedAt: '1 day ago',
-    },
-    {
-      id: '4',
-      taskName: 'Data Cleanup Task 5',
-      freelancerName: 'Sarah Williams',
-      status: 'COMPLETED',
-      completionUrl: 'https://example.com/work-4',
-      price: 220,
-      submittedAt: '2 days ago',
-    },
-  ];
 
-  const getStatusColor = (status: string) => {
-    const colors: Record<string, string> = {
-      OPEN: 'bg-blue-100 text-blue-800',
-      ASSIGNED: 'bg-yellow-100 text-yellow-800',
-    };
-    return colors[status] || 'bg-gray-100 text-gray-800';
-  };
 </script>
 
 <template>
@@ -249,46 +234,19 @@
               </div>
             </div>
             <div class="p-6 flex-1 overflow-y-auto">
-              <div class="space-y-4">
-                <div
-                  v-for="work in recentWorks"
-                  :key="work.id"
-                  class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <div class="flex items-center gap-2 mb-2">
-                    <h3 class="font-medium text-gray-900 text-sm">{{ work.taskName }}</h3>
-                    <span :class="['px-2 py-1 rounded-full text-xs font-medium', getStatusColor(work.status)]">
-                      {{ work.status === 'IN_PROGRESS' ? 'In Progress' : 'Completed' }}
-                    </span>
-                  </div>
-                  <p class="text-sm text-gray-600 mb-2">by <span class="font-medium">{{ work.freelancerName }}</span></p>
-                  <div class="flex items-center gap-4 mb-2 text-sm text-gray-500">
-                    <span class="flex items-center gap-1">
-                      <OhVueIcon name="hi-currency-dollar" class="w-4 h-4" />
-                      {{ work.price }}
-                    </span>
-                  </div>
-                  <div v-if="work.completionUrl" class="mb-2">
-                    <a
-                      :href="work.completionUrl"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
-                    >
-                      <OhVueIcon name="hi-link" class="w-4 h-4" />
-                      View work
-                    </a>
-                  </div>
-                  <p class="text-xs text-gray-500">{{ work.submittedAt }}</p>
-                </div>
-              </div>
+              <AdminDashboardWorks
+                :works="recentWorks"
+                :loading="isRecentWorksLoading"
+                :error="recentWorksError"
+                :refetchRecentWorks="() => { refetchRecentWorks(); }"
+              />
             </div>
           </div>
         </div>
       </div>
 
       <!-- Recent Bids -->
-      <div class="mt-6">
+      <!-- <div class="mt-6">
         <div class="bg-white rounded-xl shadow-sm border border-gray-200">
           <div class="p-6 border-b border-gray-200">
             <div class="flex items-center justify-between">
@@ -336,7 +294,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
