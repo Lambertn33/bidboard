@@ -1,13 +1,36 @@
 <script setup lang="ts">
-// Hardcoded dashboard data
-const stats = {
-  totalProjects: 12,
-  activeTasks: 45,
-  pendingBids: 23,
-  completedWorks: 128,
-  totalPaid: 45230,
-  activeFreelancers: 34,
-};
+import { computed } from 'vue';
+import { getDashboardOverview } from '@/api/private/common/dashboard';
+import { useQuery } from "@tanstack/vue-query";
+import { OhVueIcon } from 'oh-vue-icons';
+
+const { isPending: isOverviewLoading, isError: isOverviewError, data: overviewData, error: overviewError, refetch: refetchOverview } = useQuery({
+  queryKey: ['dashboard-overview'],
+  queryFn: () => getDashboardOverview(),
+});
+
+// Computed stats from API data or fallback to defaults
+const stats = computed(() => {
+  if (overviewData.value) {
+    return {
+      totalProjects: overviewData.value.totalProjects ?? 0,
+      activeTasks: overviewData.value.totalActiveTasks ?? 0,
+      pendingBids: overviewData.value.totalPendingBids ?? 0,
+      completedWorks: overviewData.value.totalCompletedWorks ?? 0,
+      totalPaid: overviewData.value.totalPaid ?? 0,
+      activeFreelancers: overviewData.value.totalActiveFreelancers ?? 0,
+    };
+  }
+  // Fallback values (won't be shown if loading/error states are handled)
+  return {
+    totalProjects: 0,
+    activeTasks: 0,
+    pendingBids: 0,
+    completedWorks: 0,
+    totalPaid: 0,
+    activeFreelancers: 0,
+  };
+});
 
 const recentTasks = [
   {
@@ -125,97 +148,129 @@ const getStatusColor = (status: string) => {
             <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
             <p class="mt-1 text-sm text-gray-600">Welcome back! Here's what's happening today.</p>
           </div>
-          <div class="flex items-center space-x-4">
-            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
-              <OhVueIcon name="hi-plus" class="w-5 h-5" />
-              <span>New Task</span>
-            </button>
-          </div>
         </div>
       </div>
     </div>
 
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Error State -->
+      <div v-if="isOverviewError" class="mb-8">
+        <div class="bg-red-50 border border-red-200 rounded-xl p-6">
+          <div class="flex items-start gap-4">
+            <div class="flex-shrink-0">
+              <OhVueIcon name="hi-x-circle" class="w-6 h-6 text-red-600" />
+            </div>
+            <div class="flex-1">
+              <h3 class="text-lg font-semibold text-red-900 mb-1">Failed to Load Dashboard</h3>
+              <p class="text-sm text-red-700 mb-4">
+                {{ overviewError instanceof Error ? overviewError.message : 'An error occurred while loading dashboard data. Please try again.' }}
+              </p>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Stats Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <!-- Total Projects -->
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition-shadow">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600">Total Projects</p>
-              <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.totalProjects }}</p>
-            </div>
-            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <OhVueIcon name="bi-folder-fill" class="w-6 h-6 text-blue-600" />
+      <div v-if="!isOverviewError" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Loading State - Skeleton Loaders -->
+        <template v-if="isOverviewLoading">
+          <div
+            v-for="i in 6"
+            :key="i"
+            class="bg-white rounded-xl shadow-sm p-6 border border-gray-200"
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex-1">
+                <div class="h-4 bg-gray-200 rounded w-24 mb-3 animate-pulse"></div>
+                <div class="h-8 bg-gray-200 rounded w-16 animate-pulse"></div>
+              </div>
+              <div class="w-12 h-12 bg-gray-200 rounded-lg animate-pulse"></div>
             </div>
           </div>
-        </div>
+        </template>
 
-        <!-- Active Tasks -->
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition-shadow">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600">Active Tasks</p>
-              <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.activeTasks }}</p>
-            </div>
-            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <OhVueIcon name="hi-clipboard-list" class="w-6 h-6 text-green-600" />
+        <!-- Data State -->
+        <template v-else>
+          <!-- Total Projects -->
+          <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-600">Total Projects</p>
+                <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.totalProjects }}</p>
+              </div>
+              <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <OhVueIcon name="bi-folder-fill" class="w-6 h-6 text-blue-600" />
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Pending Bids -->
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition-shadow">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600">Pending Bids</p>
-              <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.pendingBids }}</p>
-            </div>
-            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-              <OhVueIcon name="hi-document-text" class="w-6 h-6 text-yellow-600" />
+          <!-- Active Tasks -->
+          <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-600">Active Tasks</p>
+                <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.activeTasks }}</p>
+              </div>
+              <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <OhVueIcon name="hi-clipboard-list" class="w-6 h-6 text-green-600" />
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Completed Works -->
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition-shadow">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600">Completed Works</p>
-              <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.completedWorks }}</p>
-            </div>
-            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-              <OhVueIcon name="hi-check-circle" class="w-6 h-6 text-purple-600" />
+          <!-- Pending Bids -->
+          <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-600">Pending Bids</p>
+                <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.pendingBids }}</p>
+              </div>
+              <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <OhVueIcon name="hi-document-text" class="w-6 h-6 text-yellow-600" />
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Total Revenue -->
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition-shadow">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600">Total Paid</p>
-              <p class="text-3xl font-bold text-gray-900 mt-2">KES {{ stats.totalPaid.toLocaleString() }}</p>
-            </div>
-            <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
-              <OhVueIcon name="hi-currency-dollar" class="w-6 h-6 text-indigo-600" />
+          <!-- Completed Works -->
+          <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-600">Completed Works</p>
+                <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.completedWorks }}</p>
+              </div>
+              <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <OhVueIcon name="hi-check-circle" class="w-6 h-6 text-purple-600" />
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Active Freelancers -->
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition-shadow">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600">Active Freelancers</p>
-              <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.activeFreelancers }}</p>
-            </div>
-            <div class="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center">
-              <OhVueIcon name="hi-users" class="w-6 h-6 text-pink-600" />
+          <!-- Total Paid -->
+          <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-600">Total Paid</p>
+                <p class="text-3xl font-bold text-gray-900 mt-2">KES {{ stats.totalPaid.toLocaleString() }}</p>
+              </div>
+              <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                <OhVueIcon name="hi-currency-dollar" class="w-6 h-6 text-indigo-600" />
+              </div>
             </div>
           </div>
-        </div>
+
+          <!-- Active Freelancers -->
+          <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-600">Active Freelancers</p>
+                <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.activeFreelancers }}</p>
+              </div>
+              <div class="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center">
+                <OhVueIcon name="hi-users" class="w-6 h-6 text-pink-600" />
+              </div>
+            </div>
+          </div>
+        </template>
       </div>
 
       <!-- Main Content Grid -->

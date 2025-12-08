@@ -9,7 +9,8 @@ import { HomeView,
   ProtectedTasksView, 
   ProtectedBidsView, 
   ProtectedWorksView,
-  ProtectedDashboardView }
+  AdminProtectedDashboardView
+ }
 from '@/views';
 
 // Helper functions to check auth state (for use in router guards)
@@ -201,7 +202,7 @@ const router = createRouter({
         },
         {
           path: 'dashboard',
-          component: ProtectedDashboardView,
+          component: AdminProtectedDashboardView,
           beforeEnter: requireAdmin,
         },
       ],
