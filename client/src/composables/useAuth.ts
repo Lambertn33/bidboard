@@ -23,12 +23,32 @@ interface JwtPayload {
 const TOKEN_KEY = 'token';
 const USER_KEY = 'user';
 
+// Check if token is expired
+const isTokenExpired = (token: string): boolean => {
+  try {
+    const decoded = jwtDecode<JwtPayload>(token);
+    if (!decoded.exp) {
+      return true;
+    }
+    const expirationTime = decoded.exp * 1000;
+    const currentTime = Date.now();
+    return currentTime >= expirationTime - 60000;
+  } catch (error) {
+    console.error('Failed to decode token:', error);
+    return true;
+  }
+};
+
 // Decode JWT token to extract user info
 const decodeToken = (token: string): User | null => {
   try {
     const decoded = jwtDecode<JwtPayload>(token);
 
     if (!decoded || typeof decoded !== 'object') return null;
+
+    if (isTokenExpired(token)) {
+      return null;
+    }
 
     return {
       id: decoded.id || decoded.sub || '',
@@ -42,14 +62,12 @@ const decodeToken = (token: string): User | null => {
   }
 };
 
-// Load initial state from localStorage
 const loadStoredAuth = () => {
   const token = localStorage.getItem(TOKEN_KEY);
   if (!token) return null;
 
   const user = decodeToken(token);
   if (!user) {
-    // Invalid token, clear it
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     return null;
@@ -58,18 +76,15 @@ const loadStoredAuth = () => {
   return { token, user };
 };
 
-// Reactive state
 const token = ref<string | null>(null);
 const user = ref<User | null>(null);
 
-// Initialize from localStorage
 const stored = loadStoredAuth();
 if (stored) {
   token.value = stored.token;
   user.value = stored.user;
 }
 
-// Watch for token changes and sync to localStorage
 watch(token, (newToken) => {
   if (newToken) {
     localStorage.setItem(TOKEN_KEY, newToken);
@@ -86,15 +101,26 @@ watch(token, (newToken) => {
 });
 
 export const useAuth = () => {
-  // Computed properties
-  const isAuthenticated = computed(() => !!token.value && !!user.value);
+  const checkTokenExpiration = () => {
+    if (token.value && isTokenExpired(token.value)) {
+      logout();
+      return true;
+    }
+    return false;
+  };
+
+  const isAuthenticated = computed(() => {
+    if (token.value && isTokenExpired(token.value)) {
+      logout();
+      return false;
+    }
+    return !!token.value && !!user.value;
+  });
   const isAdmin = computed(() => user.value?.role === 'ADMIN');
   const isFreelancer = computed(() => user.value?.role === 'FREELANCER');
 
-  // Methods
   const login = (accessToken: string) => {
     token.value = accessToken;
-    // user will be updated via watch
   };
 
   const logout = () => {
@@ -107,19 +133,17 @@ export const useAuth = () => {
   };
 
   return {
-    // State
     token: computed(() => token.value),
     user: computed(() => user.value),
     
-    // Computed
     isAuthenticated,
     isAdmin,
     isFreelancer,
     
-    // Methods
     login,
     logout,
     setUser,
+    checkTokenExpiration,
   };
 };
 

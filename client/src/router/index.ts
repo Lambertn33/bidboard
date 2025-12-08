@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, type NavigationGuardNext, type RouteLocationNormalized } from 'vue-router';
+import { jwtDecode } from 'jwt-decode';
 import { HomeView,
   NotFoundView,
   RegisterView, 
@@ -29,7 +30,27 @@ const getStoredUser = (): { role: string } | null => {
 };
 
 const isAuthenticated = (): boolean => {
-  return !!getStoredToken();
+  const token = getStoredToken();
+  if (!token) return false;
+  
+  // Check if token is expired
+  try {
+    const decoded = jwtDecode<{ exp?: number }>(token);
+    if (!decoded.exp) return false;
+    
+    // Check if token has expired (with 1 minute buffer)
+    const expirationTime = decoded.exp * 1000;
+    const currentTime = Date.now();
+    if (currentTime >= expirationTime - 60000) {
+      // Token expired, clear it
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 const isAdmin = (): boolean => {
