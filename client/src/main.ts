@@ -6,7 +6,7 @@ import router from './router'
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { addIcons, OhVueIcon } from 'oh-vue-icons'
 
-import Vue3Toastify, { type ToastContainerOptions } from 'vue3-toastify';
+import Vue3Toastify from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 
 import { 
