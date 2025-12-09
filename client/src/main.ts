@@ -6,6 +6,9 @@ import router from './router'
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { addIcons, OhVueIcon } from 'oh-vue-icons'
 
+import Vue3Toastify, { type ToastContainerOptions } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+
 import { 
     BiCheckCircleFill, 
     HiClock, 
@@ -84,6 +87,15 @@ addIcons(
 );
 
 createApp(App)
+  .use(Vue3Toastify, {
+    autoClose: 3000,
+    theme: 'colored',
+    transition: 'slide',
+    position: 'top-right',
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+  })
   .use(router)
   .use(VueQueryPlugin)
   .component('OhVueIcon', OhVueIcon)

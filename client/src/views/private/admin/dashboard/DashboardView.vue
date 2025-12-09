@@ -3,10 +3,10 @@
   import { useQuery } from "@tanstack/vue-query";
   import { OhVueIcon } from 'oh-vue-icons';
 
-  import { getDashboardOverview, getRecentTasks, getRecentWorks, getRecentBids } from '@/api/private/common/dashboard';
+  import { getDashboardOverview, getRecentTasks, getRecentWorks, getRecentBids } from '@/api/private/admin/dashboard';
   import { AdminDashboardCards, AdminDashboardTasks, AdminDashboardWorks, AdminDashboardBids } from '@/components/private';
 
-  const { isPending: isOverviewLoading, isError: isOverviewError, data: overviewData, error: overviewError, refetch: refetchOverview } = useQuery({
+  const { isPending: isOverviewLoading, isError: isOverviewError, data: overviewData, error: overviewError} = useQuery({
     queryKey: ['dashboard-overview'],
     queryFn: () => getDashboardOverview(),
   });

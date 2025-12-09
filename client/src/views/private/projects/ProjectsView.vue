@@ -1,10 +1,18 @@
 <script setup lang="ts">
-import { ref, computed, watch, reactive } from 'vue';
+import { ref, computed, watch } from 'vue';
+import { OhVueIcon } from 'oh-vue-icons';
 import { getProjects } from '@/api/public/projects';
-import { useQuery } from '@tanstack/vue-query';
-import { Create, Table, Search, Pagination } from '@/components/private/admin/projects';
+import { createProject } from '@/api/private/admin/projects';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
+import { Create, Table, Search } from '@/components/private/admin/projects';
 import { Modal } from '@/components/ui';
 import { getStartTimeInDays } from '@/reusables';
+import { useToast } from '@/composables/useToast';
+import type { AxiosError } from 'axios';
+
+const { success: showSuccessToast, error: showErrorToast } = useToast();
+const queryClient = useQueryClient();
+
 
 interface IProject {
   id: string;
@@ -103,8 +111,20 @@ const closeCreatingProjectModal = () => {
   isCreatingProjectModalOpen.value = false;
 };
 
+const { mutate: createProjectMutation, isPending: isCreatingProjectPending } = useMutation({
+  mutationFn: (payload: { name: string; description: string }) => createProject(payload),
+  onSuccess: (response) => {
+    closeCreatingProjectModal();
+    queryClient.invalidateQueries({ queryKey: ['projects'] });
+    showSuccessToast(response?.message || 'Project created successfully');
+  },
+  onError: (error) => {
+    showErrorToast(error?.message || 'Failed to create project. Please try again.');
+  }  
+});
+
 const handleCreateProject = (payload: { name: string; description: string }) => {
-  console.log(payload);
+  createProjectMutation(payload);
 };
 
 </script>
@@ -154,7 +174,9 @@ const handleCreateProject = (payload: { name: string; description: string }) => 
   >
     <Create 
     @create-task="handleCreateProject"
+    :isCreatingProjectPending="isCreatingProjectPending"
     />
   </Modal>
+  
 
 </template>
