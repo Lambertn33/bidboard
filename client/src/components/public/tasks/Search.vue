@@ -33,12 +33,6 @@ const triggerSearch = () => emits('search');
           class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
         />
       </div>
-      <button
-        class="px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors sm:w-auto w-full"
-        @click="triggerSearch"
-      >
-        Search
-      </button>
     </div>
   </div>
 </template>
