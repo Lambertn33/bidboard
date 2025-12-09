@@ -5,11 +5,12 @@ const api = axios.create({
     baseURL: `${API_BASE_URL}/projects`,
 });
 
-export const getProjects = async (currentPage?: number, limit?: number) => {
+export const getProjects = async (currentPage?: number, limit?: number, search?: string) => {
     const response = await api.get('/', {
         params: {
             currentPage,
             limit,
+            search,
         },
     });
     return response.data;
