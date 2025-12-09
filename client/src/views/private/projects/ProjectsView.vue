@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, reactive } from 'vue';
 import { getProjects } from '@/api/public/projects';
 import { useQuery } from '@tanstack/vue-query';
-import Pagination from '@/components/private/admin/projects/Pagination.vue';
-import Table from '@/components/private/admin/projects/Table.vue';
-import Search from '@/components/private/admin/projects/Search.vue';
+import { Create, Table, Search, Pagination } from '@/components/private/admin/projects';
+import { Modal } from '@/components/ui';
+import { getStartTimeInDays } from '@/reusables';
 
 interface IProject {
   id: string;
@@ -92,27 +92,21 @@ const goToNextPage = () => {
   }
 };
 
-// Format date nicely
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffTime = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-  
-  if (diffDays === 0) {
-    return 'Today';
-  } else if (diffDays === 1) {
-    return 'Yesterday';
-  } else if (diffDays < 7) {
-    return `${diffDays} days ago`;
-  } else {
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  }
+// CREATE NEW PROJECT MODAL
+const isCreatingProjectModalOpen = ref(false);
+
+const openCreatingProjectModal = () => {
+  isCreatingProjectModalOpen.value = true;
 };
+
+const closeCreatingProjectModal = () => {
+  isCreatingProjectModalOpen.value = false;
+};
+
+const handleCreateProject = (payload: { name: string; description: string }) => {
+  console.log(payload);
+};
+
 </script>
 
 <template>
@@ -125,7 +119,7 @@ const formatDate = (dateString: string) => {
             <h1 class="text-3xl font-bold text-gray-900">Projects</h1>
             <p class="mt-1 text-sm text-gray-600">Manage and view all your projects</p>
           </div>
-          <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
+          <button @click="openCreatingProjectModal" class="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
             <OhVueIcon name="hi-plus" class="w-5 h-5" />
             <span>New Project</span>
           </button>
@@ -145,7 +139,7 @@ const formatDate = (dateString: string) => {
         :has-previous-page="hasPreviousPage"
         :has-next-page="hasNextPage"
         :limit="limit"
-        :format-date="formatDate"
+        :format-date="getStartTimeInDays"
         @goToPage="goToPage"
         @goToPreviousPage="goToPreviousPage"
         @goToNextPage="goToNextPage"
@@ -153,4 +147,14 @@ const formatDate = (dateString: string) => {
       />
     </div>
   </div>
+
+  <Modal
+    :isOpen="isCreatingProjectModalOpen"
+    @close="closeCreatingProjectModal"
+  >
+    <Create 
+    @create-task="handleCreateProject"
+    />
+  </Modal>
+
 </template>

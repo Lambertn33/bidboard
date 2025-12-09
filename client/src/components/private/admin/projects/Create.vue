@@ -1,0 +1,79 @@
+<script setup lang="ts">
+import { computed, ref } from 'vue';
+import Input from '@/components/ui/Input.vue';
+import TextArea from '@/components/ui/TextArea.vue';
+
+const emit = defineEmits<{
+  (e: 'createTask', payload: { name: string; description: string }): void;
+}>();
+
+const form = ref({
+  name: '',
+  description: '',
+});
+
+const isSubmitDisabled = computed(() => !form.value.name.trim() || !form.value.description.trim());
+
+const handleSubmit = () => {
+  emit('createTask', {
+    name: form.value.name.trim(),
+    description: form.value.description.trim(),
+  });
+
+  handleReset();
+};
+
+const handleReset = () => {
+  form.value = { name: '', description: '' };
+};
+</script>
+
+<template>
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Projects</p>
+        <h2 class="text-xl font-bold text-gray-900">Create Project</h2>
+      </div>
+    </div>
+
+    <form class="space-y-5" @submit.prevent="handleSubmit">
+      <Input
+        id="project-name"
+        label="Project Name"
+        type="text"
+        placeholder="Enter project name"
+        :modelValue="form.name"
+        :required="true"
+        :hasPreIcon="false"
+        @update:modelValue="value => (form.name = value)"
+      />
+
+      <TextArea
+        id="project-description"
+        label="Description"
+        placeholder="Write a short description..."
+        :modelValue="form.description"
+        :required="false"
+        @update:modelValue="value => (form.description = value)"
+      />
+
+      <div class="flex items-center gap-3 pt-2">
+        <button
+          type="submit"
+          :disabled="isSubmitDisabled"
+          class="inline-flex justify-center px-5 py-3 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+        >
+          Create Project
+        </button>
+        <button
+          type="button"
+          class="inline-flex justify-center px-4 py-3 rounded-lg text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+          @click="handleReset"
+        >
+          Clear
+        </button>
+      </div>
+    </form>
+  </div>
+</template>
