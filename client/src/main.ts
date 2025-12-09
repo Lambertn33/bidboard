@@ -45,6 +45,7 @@ import {
     HiTrash,
     HiChevronLeft,
     HiChevronRight,
+    HiArrowLeft,
   } from 'oh-vue-icons/icons';      
 
 
@@ -84,6 +85,7 @@ addIcons(
   HiTrash,
   HiChevronLeft,
   HiChevronRight,
+  HiArrowLeft,
 );
 
 createApp(App)

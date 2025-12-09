@@ -6,6 +6,8 @@ export {default as LoginView} from './auth/LoginView.vue';
 export {default as TasksView} from './public/tasks/TasksView.vue';
 
 export {default as ProtectedProjectsView} from './private/projects/ProjectsView.vue';
+export {default as ProtectedProjectDetailsView} from './private/projects/ProjectDetails.vue';
+
 export {default as ProtectedTasksView} from './private/tasks/TasksView.vue';
 export {default as ProtectedBidsView} from './private/bids/BidsView.vue';
 export {default as ProtectedWorksView} from './private/works/WorksView.vue';

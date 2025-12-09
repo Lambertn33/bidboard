@@ -9,7 +9,8 @@ import { HomeView,
   ProtectedTasksView, 
   ProtectedBidsView, 
   ProtectedWorksView,
-  AdminProtectedDashboardView
+  AdminProtectedDashboardView,
+  ProtectedProjectDetailsView
  }
 from '@/views';
 
@@ -201,6 +202,11 @@ const router = createRouter({
         {
           path: 'projects',
           component: ProtectedProjectsView,
+          beforeEnter: requireAdmin,
+        },
+        {
+          path: 'projects/:id',
+          component: ProtectedProjectDetailsView,
           beforeEnter: requireAdmin,
         },
         {

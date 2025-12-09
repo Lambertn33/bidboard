@@ -8,7 +8,6 @@ import { Create, Table, Search } from '@/components/private/admin/projects';
 import { Modal } from '@/components/ui';
 import { getStartTimeInDays } from '@/reusables';
 import { useToast } from '@/composables/useToast';
-import type { AxiosError } from 'axios';
 
 const { success: showSuccessToast, error: showErrorToast } = useToast();
 const queryClient = useQueryClient();
@@ -56,21 +55,15 @@ watch(limit, () => {
 });
 
 // Fetch projects from API with pagination and search
-const {
-  isPending,
-  isError,
-  data,
-  error,
-  refetch,
-} = useQuery<IProjectsResponse>({
+const { data } = useQuery<IProjectsResponse>({
   queryKey: computed(() => ['projects', currentPage.value, limit.value, debouncedSearch.value]),
   queryFn: () => getProjects(currentPage.value, limit.value, debouncedSearch.value),
-  keepPreviousData: true,
+  placeholderData: (previousData) => previousData,
 });
 
 // Computed properties from API response
-const projects = computed(() => data.value?.data ?? []);
-const meta = computed(() => data.value?.meta ?? {
+const projects = computed(() => (data.value as IProjectsResponse | undefined)?.data ?? []);
+const meta = computed(() => (data.value as IProjectsResponse | undefined)?.meta ?? {
   total: 0,
   currentPage: currentPage.value,
   limit: limit.value,
@@ -163,7 +156,7 @@ const handleCreateProject = (payload: { name: string; description: string }) => 
         @goToPage="goToPage"
         @goToPreviousPage="goToPreviousPage"
         @goToNextPage="goToNextPage"
-        @update:limit="value => limit = value"
+        @update:limit="(value: number) => limit = value"
       />
     </div>
   </div>

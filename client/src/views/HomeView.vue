@@ -1,8 +1,17 @@
 <script setup lang="ts">
 import { HeroSection, FeaturesSection, WorkSection, JoinSection } from '@/components/public';
 
-import { IFeature, IWork } from '@/interfaces/home';
+interface IFeature {
+  title: string,
+  description: string,
+  icon: string,
+  iconBgColor: string
+}
 
+interface IWork {
+  title: string,
+  subtitle: string
+}
 
 const features: IFeature[] = [
   {
