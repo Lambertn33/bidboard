@@ -17,7 +17,6 @@ const navigationLinks = computed(() => {
   if (!isAuthenticated.value) {
     return [
       { path: '/', label: 'Home' },
-      { path: '/projects', label: 'Projects' },
       { path: '/tasks', label: 'Tasks' },
       { path: '/register', label: 'Register' },
       { path: '/login', label: 'Login' },
@@ -34,7 +33,6 @@ const navigationLinks = computed(() => {
   }
   if (isFreelancer.value) {
     return [
-     { path: '/projects', label: 'Projects' },
       { path: '/tasks', label: 'Tasks' },
       { path: '/protected/tasks', label: ' My Assigned Tasks' },
       { path: '/protected/bids', label: ' My Bids' },

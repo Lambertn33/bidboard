@@ -5,7 +5,6 @@ import { HomeView,
   RegisterView, 
   LoginView, 
   TasksView, 
-  ProjectsView, 
   ProtectedProjectsView, 
   ProtectedTasksView, 
   ProtectedBidsView, 
@@ -192,11 +191,6 @@ const router = createRouter({
       path: '/tasks',
       name: 'tasks',
       component: TasksView,
-    },
-    {
-      path: '/projects',
-      name: 'projects',
-      component: ProjectsView,
     },
 
     // Protected Routes
