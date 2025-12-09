@@ -95,9 +95,9 @@ const updateLimit = (value: number) => emits('update:limit', value);
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div class="flex items-center justify-end gap-3">
-                    <button class="text-blue-600 hover:text-blue-900 transition-colors">
+                    <router-link :to="`/protected/projects/${project.id}`" class="text-blue-600 hover:text-blue-900 transition-colors">
                       <OhVueIcon name="hi-eye" class="h-5 w-5" />
-                    </button>
+                    </router-link>
                     <button class="text-gray-600 hover:text-gray-900 transition-colors">
                       <OhVueIcon name="hi-pencil" class="h-5 w-5" />
                     </button>

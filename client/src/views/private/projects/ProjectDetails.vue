@@ -1,60 +1,65 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed } from 'vue';
 import { OhVueIcon } from 'oh-vue-icons';
-import { useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
+import { useQuery } from '@tanstack/vue-query';
+import type { AxiosError } from 'axios';
+import { getProjectTasks } from '@/api/public/projects';
 
-const router = useRouter();
+const route = useRoute();
 
-// Mock data matching API response structure
-const projectData = ref({
-  id: 'f55a32ca-a68f-4ce6-aeb5-30b62096dd4a',
-  name: 'Marketing Blitz',
-  description: 'Launch quick marketing assets to boost client reach.',
-  tasks: [
-    {
-      id: '0daa2846-ede3-4280-a5d3-14f84aca9dbc',
-      name: 'Marketing Blitz Task 5',
-      description: 'Deliverable 5 for Marketing Blitz.',
-      status: 'OPEN',
-      price: 250,
-      skills: ['Design', 'Photoshop', 'Illustrator', 'Marketing'],
-    },
-    {
-      id: '1b3d2968-1611-44c3-8533-46fea9e17f4c',
-      name: 'Marketing Blitz Task 2',
-      description: 'Deliverable 2 for Marketing Blitz.',
-      status: 'OPEN',
-      price: 175,
-      skills: ['Design', 'Photoshop', 'Illustrator', 'Marketing'],
-    },
-    {
-      id: '61516a4b-e756-47a3-aff7-c8b8cdcef6f6',
-      name: 'Marketing Blitz Task 3',
-      description: 'Deliverable 3 for Marketing Blitz.',
-      status: 'OPEN',
-      price: 200,
-      skills: ['Design', 'Photoshop', 'Illustrator', 'Marketing'],
-    },
-    {
-      id: 'adce2e0c-a64a-46d2-bd14-53edbd1f38a3',
-      name: 'Marketing Blitz Task 4',
-      description: 'Deliverable 4 for Marketing Blitz.',
-      status: 'OPEN',
-      price: 225,
-      skills: ['Design', 'Photoshop', 'Illustrator', 'Marketing'],
-    },
-    {
-      id: 'fbcefa69-38cd-4545-af70-a6b79f610db9',
-      name: 'Marketing Blitz Task 1',
-      description: 'Deliverable 1 for Marketing Blitz.',
-      status: 'OPEN',
-      price: 150,
-      skills: ['Design', 'Photoshop', 'Illustrator', 'Marketing'],
-    },
-  ],
+interface IProjectTask {
+  id: string;
+  name: string;
+  description: string;
+  status: string;
+  price: number;
+  skills: string[];
+}
+
+interface IProjectData {
+  id: string;
+  name: string;
+  description: string;
+  tasks: IProjectTask[];
   _count: {
-    tasks: 5,
-  },
+    tasks: number;
+  };
+}
+
+interface IProjectResponse {
+  data: IProjectData;
+}
+
+const { isPending, isError, data, error, refetch } = useQuery<IProjectResponse>({
+  queryKey: ['project', route.params.id],
+  queryFn: () => getProjectTasks(route.params.id as string) as Promise<IProjectResponse>,
+});
+
+// Extract project data from API response
+const projectData = computed(() => (data.value as IProjectResponse | undefined)?.data);
+
+// Computed properties for easier access
+const projectName = computed(() => projectData.value?.name || '');
+const projectDescription = computed(() => projectData.value?.description || '');
+const tasks = computed(() => projectData.value?.tasks || []);
+const tasksCount = computed(() => projectData.value?._count?.tasks || 0);
+
+// Error message
+const errorMessage = computed(() => {
+  if (!error.value) return 'Failed to load project details. Please try again.';
+
+  const axiosError = error.value as AxiosError<{ message?: string }>;
+
+  if (axiosError.response?.data?.message) {
+    return axiosError.response.data.message;
+  }
+
+  if (error.value instanceof Error) {
+    return error.value.message;
+  }
+
+  return 'Failed to load project details. Please try again.';
 });
 
 </script>
@@ -73,24 +78,51 @@ const projectData = ref({
           <span class="text-sm font-medium">Back to Projects</span>
         </router-link>
         
-        <div class="flex items-start justify-between mt-8">
+        <!-- Loading State -->
+        <div v-if="isPending" class="py-8">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="h-12 w-12 flex items-center justify-center rounded-xl bg-gray-100 animate-pulse"></div>
+            <div class="h-8 w-64 bg-gray-100 rounded animate-pulse"></div>
+          </div>
+          <div class="h-4 w-96 bg-gray-100 rounded animate-pulse mt-3"></div>
+        </div>
+
+        <!-- Error State -->
+        <div v-else-if="isError" class="py-8">
+          <div class="bg-red-50 border border-red-200 rounded-xl p-6">
+            <div class="flex items-center gap-3 mb-2">
+              <OhVueIcon name="hi-exclamation-circle" class="h-6 w-6 text-red-600" />
+              <h3 class="text-lg font-semibold text-red-900">Error Loading Project</h3>
+            </div>
+            <p class="text-red-700 mb-4">{{ errorMessage }}</p>
+            <button
+              @click="() => refetch()"
+              class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+
+        <!-- Data State -->
+        <div v-else-if="projectData" class="flex items-start justify-between mt-8">
           <div class="flex-1">
             <div class="flex items-center gap-3 mb-2">
               <div class="h-12 w-12 flex items-center justify-center rounded-xl bg-blue-100">
                 <OhVueIcon name="bi-folder-fill" class="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <h1 class="text-3xl font-bold text-gray-900">{{ projectData.name }}</h1>
+                <h1 class="text-3xl font-bold text-gray-900">{{ projectName }}</h1>
               </div>
             </div>
-            <p class="mt-3 text-gray-700 max-w-3xl">{{ projectData.description }}</p>
+            <p class="mt-3 text-gray-700 max-w-3xl">{{ projectDescription }}</p>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div v-if="!isPending && !isError && projectData" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Stats Card -->
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
         <div class="flex items-center gap-6">
@@ -100,7 +132,7 @@ const projectData = ref({
             </div>
             <div>
               <p class="text-sm text-gray-600">Total Tasks</p>
-              <p class="text-2xl font-bold text-gray-900">{{ projectData._count.tasks }}</p>
+              <p class="text-2xl font-bold text-gray-900">{{ tasksCount }}</p>
             </div>
           </div>
         </div>
@@ -115,13 +147,29 @@ const projectData = ref({
           </div>
         </div>
 
+        <!-- Loading State for Tasks -->
+        <div v-if="isPending" class="space-y-4">
+          <div
+            v-for="i in 3"
+            :key="i"
+            class="bg-gray-50 rounded-xl border border-gray-200 p-6 animate-pulse"
+          >
+            <div class="h-6 bg-gray-200 rounded w-3/4 mb-3"></div>
+            <div class="h-4 bg-gray-200 rounded w-full mb-4"></div>
+            <div class="flex gap-2">
+              <div class="h-6 bg-gray-200 rounded w-20"></div>
+              <div class="h-6 bg-gray-200 rounded w-24"></div>
+            </div>
+          </div>
+        </div>
+
         <!-- Tasks List (Scrollable) -->
         <div
-          v-if="projectData.tasks.length > 0"
+          v-else-if="tasks.length > 0"
           class="space-y-4 max-h-[calc(100vh-400px)] overflow-y-auto pr-2"
         >
           <div
-            v-for="task in projectData.tasks"
+            v-for="task in tasks"
             :key="task.id"
             class="group bg-gray-50 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 p-6"
           >

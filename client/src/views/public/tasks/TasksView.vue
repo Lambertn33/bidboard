@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
-import { useInfiniteQuery, useQuery } from '@tanstack/vue-query';
+import { OhVueIcon } from 'oh-vue-icons';
+import { useInfiniteQuery, useQuery, type InfiniteData } from '@tanstack/vue-query';
 
 import { getTasks } from '@/api/public/tasks';
 import { getProjects, getProjectTasks } from '@/api/public/projects';
@@ -17,7 +18,6 @@ const {
   isPending: isProjectsLoading,
   isError: isProjectsError,
   data: projectsData,
-  error: projectsError,
   refetch: refetchProjects,
 } = useQuery({
   queryKey: ['projects'],
@@ -47,6 +47,29 @@ const {
   enabled: isProjectTasksEnabled,
 });
 
+interface ITask {
+  id: string;
+  name: string;
+  description: string;
+  status: string;
+  price: number;
+  skills: string[];
+  project: {
+    id: string;
+    name: string;
+  };
+}
+
+interface ITasksResponse {
+  data: ITask[];
+  meta: {
+    total: number;
+    currentPage: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
 // Infinite tasks query with filters (only when no project is selected)
 const {
   data,
@@ -57,11 +80,11 @@ const {
   isPending,
   isError,
   refetch,
-} = useInfiniteQuery({
+} = useInfiniteQuery<ITasksResponse, Error, InfiniteData<ITasksResponse>, readonly unknown[], number>({
   queryKey: computed(() => ['tasks', debouncedSearch.value]),
-  queryFn: ({ pageParam = 1 }) =>
-    getTasks(pageParam, 10, debouncedSearch.value),
-  getNextPageParam: (lastPage) => {
+  queryFn: ({ pageParam }: { pageParam: number }) =>
+    getTasks(pageParam, 10, debouncedSearch.value) as Promise<ITasksResponse>,
+  getNextPageParam: (lastPage: ITasksResponse) => {
     const { meta } = lastPage;
     if (meta.currentPage < meta.totalPages) {
       return meta.currentPage + 1;
@@ -69,14 +92,14 @@ const {
     return undefined;
   },
   initialPageParam: 1,
-  keepPreviousData: true,
+  placeholderData: (previousData) => previousData,
   enabled: computed(() => !selectedProjectId.value),
 });
 
 // Flatten all pages into a single array
 const allTasks = computed(() => {
   if (!data.value) return [];
-  return data.value.pages.flatMap((page) => page.data || []);
+  return data.value.pages.flatMap((page) => (page as ITasksResponse).data || []);
 });
 
 const displayTasks = computed(() => {
