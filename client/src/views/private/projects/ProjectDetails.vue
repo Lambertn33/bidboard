@@ -1,70 +1,28 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import { OhVueIcon } from 'oh-vue-icons';
 import { useRoute } from 'vue-router';
-import { useQuery } from '@tanstack/vue-query';
-import type { AxiosError } from 'axios';
-import { getProjectTasks } from '@/api/public/projects';
-
-import { DetailsCard, DetailsLoading, DetailsTasksLoading, DetailsTasksList, DetailsError } from '@/components/private/admin/projects';
-
+import {
+  DetailsCard,
+  DetailsLoading,
+  DetailsTasksLoading,
+  DetailsTasksList,
+  DetailsError,
+} from '@/components/private/admin/projects';
+import { useFetchProject } from '@/composables/useFetchProject';
 
 const route = useRoute();
 
-interface IProjectTask {
-  id: string;
-  name: string;
-  description: string;
-  status: string;
-  price: number;
-  skills: string[];
-}
-
-interface IProjectData {
-  id: string;
-  name: string;
-  description: string;
-  tasks: IProjectTask[];
-  _count: {
-    tasks: number;
-  };
-}
-
-interface IProjectResponse {
-  data: IProjectData;
-}
-
-const { isPending, isError, data, error, refetch } = useQuery<IProjectResponse>({
-  queryKey: ['project', route.params.id],
-  queryFn: () => getProjectTasks(route.params.id as string) as Promise<IProjectResponse>,
-});
-
-// Extract project data from API response
-const projectData = computed(() => (data.value as IProjectResponse | undefined)?.data);
-
-// Computed properties for easier access
-const projectName = computed(() => projectData.value?.name || '');
-const projectDescription = computed(() => projectData.value?.description || '');
-const tasks = computed(() => projectData.value?.tasks || []);
-const tasksCount = computed(() => projectData.value?._count?.tasks || 0);
-
-// Error message
-const errorMessage = computed(() => {
-  if (!error.value) return 'Failed to load project details. Please try again.';
-
-  const axiosError = error.value as AxiosError<{ message?: string }>;
-
-  if (axiosError.response?.data?.message) {
-    return axiosError.response.data.message;
-  }
-
-  if (error.value instanceof Error) {
-    return error.value.message;
-  }
-
-  return 'Failed to load project details. Please try again.';
-});
-
+const {
+  isPending,
+  isError,
+  projectData,
+  projectName,
+  projectDescription,
+  tasks,
+  tasksCount,
+  errorMessage,
+  refetch,
+} = useFetchProject(route.params.id as string);
 </script>
 
 <template>

@@ -31,12 +31,14 @@ const emits = defineEmits<{
   (e: 'goToPreviousPage'): void;
   (e: 'goToNextPage'): void;
   (e: 'update:limit', value: number): void;
+  (e: 'open-editing-modal', projectId: string): void;
 }>();
 
 const goToPage = (page: number) => emits('goToPage', page);
 const goToPreviousPage = () => emits('goToPreviousPage');
 const goToNextPage = () => emits('goToNextPage');
 const updateLimit = (value: number) => emits('update:limit', value);
+const openEditingModal = (projectId: string) => emits('open-editing-modal', projectId as string);
 </script>
 
 <template>
@@ -98,7 +100,7 @@ const updateLimit = (value: number) => emits('update:limit', value);
                     <router-link :to="`/protected/projects/${project.id}`" class="text-blue-600 hover:text-blue-900 transition-colors">
                       <OhVueIcon name="hi-eye" class="h-5 w-5" />
                     </router-link>
-                    <button class="text-gray-600 hover:text-gray-900 transition-colors">
+                    <button class="text-gray-600 hover:text-gray-900 transition-colors" @click="openEditingModal(project.id)">
                       <OhVueIcon name="hi-pencil" class="h-5 w-5" />
                     </button>
                   </div>

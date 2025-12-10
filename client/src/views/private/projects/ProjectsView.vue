@@ -93,8 +93,20 @@ const goToNextPage = () => {
   }
 };
 
-// CREATE NEW PROJECT MODAL
+// CREATE NEW PROJECT MODAL AND EDIT PROJECT MODAL
 const isCreatingProjectModalOpen = ref(false);
+const isEditingProjectModalOpen = ref(false);
+const selectedProjectId = ref<string | null>(null);
+
+const openEditingProjectModal = (projectId: string) => {
+  // isEditingProjectModalOpen.value = true;
+  // selectedProjectId.value = projectId;
+  console.log(projectId);
+};
+
+const closeEditingProjectModal = () => {
+  isEditingProjectModalOpen.value = false;
+};
 
 const openCreatingProjectModal = () => {
   isCreatingProjectModalOpen.value = true;
@@ -157,6 +169,7 @@ const handleCreateProject = (payload: { name: string; description: string }) => 
         @goToPreviousPage="goToPreviousPage"
         @goToNextPage="goToNextPage"
         @update:limit="(value: number) => limit = value"
+        @open-editing-modal="(projectId: string) => openEditingProjectModal(projectId as string)"
       />
     </div>
   </div>
@@ -169,6 +182,17 @@ const handleCreateProject = (payload: { name: string; description: string }) => 
     @create-task="handleCreateProject"
     :isCreatingProjectPending="isCreatingProjectPending"
     />
+  </Modal>
+
+  <Modal
+    :isOpen="isEditingProjectModalOpen"
+    @close="closeEditingProjectModal"
+  >
+    <!-- <Edit 
+    :project="selectedProject"
+    :isEditingProjectPending="isEditingProjectPending"
+    @edit-project="handleEditProject"
+    /> -->
   </Modal>
   
 
