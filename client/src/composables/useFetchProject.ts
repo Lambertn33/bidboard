@@ -1,4 +1,4 @@
-import { computed } from 'vue';
+import { computed, type MaybeRef, unref } from 'vue';
 import { useQuery } from '@tanstack/vue-query';
 import type { AxiosError } from 'axios';
 import { getProjectTasks } from '@/api/public/projects';
@@ -26,11 +26,13 @@ export interface IProjectResponse {
   data: IProjectData;
 }
 
-export const useFetchProject = (projectId: string) => {
+export const useFetchProject = (projectId: MaybeRef<string | null>) => {
+  const projectIdValue = computed(() => unref(projectId) || '');
+  
   const { isPending, isError, data, error, refetch } = useQuery<IProjectResponse>({
-    queryKey: computed(() => ['project', projectId]),
-    queryFn: () => getProjectTasks(projectId) as Promise<IProjectResponse>,
-    enabled: computed(() => Boolean(projectId)),
+    queryKey: computed(() => ['project', projectIdValue.value]),
+    queryFn: () => getProjectTasks(projectIdValue.value) as Promise<IProjectResponse>,
+    enabled: computed(() => Boolean(projectIdValue.value)),
   });
 
   const projectData = computed(() => (data.value as IProjectResponse | undefined)?.data);

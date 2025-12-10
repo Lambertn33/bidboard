@@ -4,10 +4,11 @@ import { OhVueIcon } from 'oh-vue-icons';
 import { getProjects } from '@/api/public/projects';
 import { createProject } from '@/api/private/admin/projects';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
-import { Create, Table, Search } from '@/components/private/admin/projects';
+import { Create, Table, Search, Edit } from '@/components/private/admin/projects';
 import { Modal } from '@/components/ui';
 import { getStartTimeInDays } from '@/reusables';
 import { useToast } from '@/composables/useToast';
+import { useFetchProject } from '@/composables/useFetchProject';
 
 const { success: showSuccessToast, error: showErrorToast } = useToast();
 const queryClient = useQueryClient();
@@ -98,14 +99,24 @@ const isCreatingProjectModalOpen = ref(false);
 const isEditingProjectModalOpen = ref(false);
 const selectedProjectId = ref<string | null>(null);
 
+// Fetch project data when editing (reactive to selectedProjectId)
+const {
+  isPending: isFetchingProject,
+  isError: isFetchProjectError,
+  projectData,
+  errorMessage: fetchProjectErrorMessage,
+  refetch: refetchProject,
+} = useFetchProject(selectedProjectId);
+
+
 const openEditingProjectModal = (projectId: string) => {
-  // isEditingProjectModalOpen.value = true;
-  // selectedProjectId.value = projectId;
-  console.log(projectId);
+  selectedProjectId.value = projectId;
+  isEditingProjectModalOpen.value = true;
 };
 
 const closeEditingProjectModal = () => {
   isEditingProjectModalOpen.value = false;
+  selectedProjectId.value = null;
 };
 
 const openCreatingProjectModal = () => {
@@ -130,6 +141,10 @@ const { mutate: createProjectMutation, isPending: isCreatingProjectPending } = u
 
 const handleCreateProject = (payload: { name: string; description: string }) => {
   createProjectMutation(payload);
+};
+
+const handleEditProject = (payload: { name: string; description: string }) => {
+  console.log('payload', payload);
 };
 
 </script>
@@ -188,11 +203,22 @@ const handleCreateProject = (payload: { name: string; description: string }) => 
     :isOpen="isEditingProjectModalOpen"
     @close="closeEditingProjectModal"
   >
-    <!-- <Edit 
-    :project="selectedProject"
-    :isEditingProjectPending="isEditingProjectPending"
-    @edit-project="handleEditProject"
-    /> -->
+    <div class="space-y-3">
+      <div v-if="isFetchingProject" class="text-sm text-gray-500">Loading project...</div>
+      <div v-else-if="isFetchProjectError" class="text-sm text-red-600">
+        {{ fetchProjectErrorMessage }}
+        <button class="ml-2 text-blue-600 underline" @click="() => refetchProject()">Retry</button>
+      </div>
+      <div v-else-if="projectData">
+      <Edit
+        :project="projectData"
+        :isEditingProjectPending="isFetchingProject"
+        @edit-project="handleEditProject"
+       />
+        <!-- Placeholder for future Edit form -->
+      </div>
+      <div v-else class="text-sm text-gray-500">Select a project to edit.</div>
+    </div>
   </Modal>
   
 

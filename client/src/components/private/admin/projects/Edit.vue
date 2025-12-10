@@ -3,23 +3,30 @@
     import Input from '@/components/ui/Input.vue';
     import TextArea from '@/components/ui/TextArea.vue';
     
+
+    interface IProjectData {
+      id: string;
+      name: string;
+      description: string;
+    }
     const emit = defineEmits<{
-      (e: 'createTask', payload: { name: string; description: string }): void;
+      (e: 'editProject', payload: { name: string; description: string }): void;
     }>();
     
     const props = defineProps<{
-      isCreatingProjectPending: boolean;
+      project: IProjectData;
+      isEditingProjectPending: boolean;
     }>();
     
     const form = ref({
-      name: '',
-      description: '',
+      name: props.project.name,
+      description: props.project.description,
     });
     
     const isSubmitDisabled = computed(() => !form.value.name.trim() || !form.value.description.trim());
     
     const handleSubmit = () => {
-      emit('createTask', {
+      emit('editProject', {
         name: form.value.name.trim(),
         description: form.value.description.trim(),
       });
@@ -27,7 +34,7 @@
     };
     
     const handleReset = () => {
-      form.value = { name: '', description: '' };
+      form.value = { name: props.project.name, description: props.project.description };
     };
     
     // Expose reset method to parent component
@@ -41,7 +48,7 @@
         <div class="flex items-center justify-between mb-6">
           <div>
             <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Projects</p>
-            <h2 class="text-xl font-bold text-gray-900">Create Project</h2>
+            <h2 class="text-xl font-bold text-gray-900">Edit Project</h2>
           </div>
         </div>
     
@@ -50,7 +57,7 @@
             id="project-name"
             label="Project Name"
             type="text"
-            placeholder="Enter project name"
+            placeholder="Enter new project name"
             :modelValue="form.name"
             :required="true"
             :hasPreIcon="false"
@@ -60,7 +67,7 @@
           <TextArea
             id="project-description"
             label="Description"
-            placeholder="Write a short description..."
+            placeholder="Write a new short description..."
             :modelValue="form.description"
             :required="false"
             @update:modelValue="(value: string) => (form.description = value)"
@@ -69,17 +76,10 @@
           <div class="flex items-center gap-3 pt-2">
             <button
               type="submit"
-              :disabled="isSubmitDisabled || isCreatingProjectPending"
-              class="inline-flex justify-center px-5 py-3 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+              :disabled="isSubmitDisabled || isEditingProjectPending"
+              class="inline-flex justify-center px-5 py-3 rounded-lg text-sm font-semibold text-white bg-green-600 hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
             >
-              {{ isCreatingProjectPending ? 'Please wait...' : 'Create Project' }}
-            </button>
-            <button
-              type="button"
-              class="inline-flex justify-center px-4 py-3 rounded-lg text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
-              @click="handleReset"
-            >
-              Clear
+              {{ isEditingProjectPending ? 'Please wait...' : 'Update Project' }}
             </button>
           </div>
         </form>
