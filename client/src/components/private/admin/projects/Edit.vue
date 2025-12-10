@@ -15,7 +15,7 @@
     
     const props = defineProps<{
       project: IProjectData;
-      isEditingProjectPending: boolean;
+      isUpdatingProjectPending: boolean;
     }>();
     
     const form = ref({
@@ -76,10 +76,10 @@
           <div class="flex items-center gap-3 pt-2">
             <button
               type="submit"
-              :disabled="isSubmitDisabled || isEditingProjectPending"
+              :disabled="isSubmitDisabled || isUpdatingProjectPending"
               class="inline-flex justify-center px-5 py-3 rounded-lg text-sm font-semibold text-white bg-green-600 hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
             >
-              {{ isEditingProjectPending ? 'Please wait...' : 'Update Project' }}
+              {{ isUpdatingProjectPending ? 'Please wait...' : 'Update Project' }}
             </button>
           </div>
         </form>

@@ -2,7 +2,7 @@
 import { ref, computed, watch } from 'vue';
 import { OhVueIcon } from 'oh-vue-icons';
 import { getProjects } from '@/api/public/projects';
-import { createProject } from '@/api/private/admin/projects';
+import { createProject, updateProject } from '@/api/private/admin/projects';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
 import { Create, Table, Search, Edit } from '@/components/private/admin/projects';
 import { Modal } from '@/components/ui';
@@ -139,12 +139,24 @@ const { mutate: createProjectMutation, isPending: isCreatingProjectPending } = u
   }  
 });
 
+const { mutate: updateProjectMutation, isPending: isUpdatingProjectPending } = useMutation({
+  mutationFn: (payload: { name: string; description: string }) => updateProject(selectedProjectId.value as string, payload),
+  onSuccess: (response) => {
+    closeEditingProjectModal();
+    queryClient.invalidateQueries({ queryKey: ['projects'] });
+    showSuccessToast(response?.message || 'Project updated successfully');
+  },
+  onError: (error) => {
+    showErrorToast(error?.message || 'Failed to update project. Please try again.');
+  }
+});
+
 const handleCreateProject = (payload: { name: string; description: string }) => {
   createProjectMutation(payload);
 };
 
 const handleEditProject = (payload: { name: string; description: string }) => {
-  console.log('payload', payload);
+  updateProjectMutation(payload);
 };
 
 </script>
@@ -212,7 +224,7 @@ const handleEditProject = (payload: { name: string; description: string }) => {
       <div v-else-if="projectData">
       <Edit
         :project="projectData"
-        :isEditingProjectPending="isFetchingProject"
+        :isUpdatingProjectPending="isUpdatingProjectPending"
         @edit-project="handleEditProject"
        />
         <!-- Placeholder for future Edit form -->
