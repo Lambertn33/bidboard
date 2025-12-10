@@ -102,6 +102,7 @@ const selectedProjectId = ref<string | null>(null);
 // Fetch project data when editing (reactive to selectedProjectId)
 const {
   isPending: isFetchingProject,
+  isFetching: isProjectRefetching,
   isError: isFetchProjectError,
   projectData,
   errorMessage: fetchProjectErrorMessage,
@@ -142,9 +143,13 @@ const { mutate: createProjectMutation, isPending: isCreatingProjectPending } = u
 const { mutate: updateProjectMutation, isPending: isUpdatingProjectPending } = useMutation({
   mutationFn: (payload: { name: string; description: string }) => updateProject(selectedProjectId.value as string, payload),
   onSuccess: (response) => {
-    closeEditingProjectModal();
-    queryClient.invalidateQueries({ queryKey: ['projects'] });
     showSuccessToast(response?.message || 'Project updated successfully');
+    queryClient.invalidateQueries({ queryKey: ['projects'] });
+    if (selectedProjectId.value) {
+      queryClient.invalidateQueries({ queryKey: ['project', selectedProjectId.value] });
+      refetchProject();
+    }
+    closeEditingProjectModal();
   },
   onError: (error) => {
     showErrorToast(error?.message || 'Failed to update project. Please try again.');
@@ -216,7 +221,7 @@ const handleEditProject = (payload: { name: string; description: string }) => {
     @close="closeEditingProjectModal"
   >
     <div class="space-y-3">
-      <div v-if="isFetchingProject" class="text-sm text-gray-500">Loading project...</div>
+      <div v-if="isFetchingProject || isProjectRefetching" class="text-sm text-gray-500">Loading project...</div>
       <div v-else-if="isFetchProjectError" class="text-sm text-red-600">
         {{ fetchProjectErrorMessage }}
         <button class="ml-2 text-blue-600 underline" @click="() => refetchProject()">Retry</button>

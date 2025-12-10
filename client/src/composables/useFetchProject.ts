@@ -29,10 +29,19 @@ export interface IProjectResponse {
 export const useFetchProject = (projectId: MaybeRef<string | null>) => {
   const projectIdValue = computed(() => unref(projectId) || '');
   
-  const { isPending, isError, data, error, refetch } = useQuery<IProjectResponse>({
+  const {
+    isPending,
+    isError,
+    isFetching,
+    data,
+    error,
+    refetch,
+  } = useQuery<IProjectResponse>({
     queryKey: computed(() => ['project', projectIdValue.value]),
     queryFn: () => getProjectTasks(projectIdValue.value) as Promise<IProjectResponse>,
     enabled: computed(() => Boolean(projectIdValue.value)),
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 
   const projectData = computed(() => (data.value as IProjectResponse | undefined)?.data);
@@ -60,6 +69,7 @@ export const useFetchProject = (projectId: MaybeRef<string | null>) => {
   return {
     isPending,
     isError,
+    isFetching,
     data,
     error,
     refetch,

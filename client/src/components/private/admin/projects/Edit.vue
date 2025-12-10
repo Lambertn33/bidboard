@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { computed, ref } from 'vue';
+    import { computed, ref, watch } from 'vue';
     import Input from '@/components/ui/Input.vue';
     import TextArea from '@/components/ui/TextArea.vue';
     
@@ -10,23 +10,37 @@
       description: string;
     }
     const emit = defineEmits<{
-      (e: 'editProject', payload: { name: string; description: string }): void;
+      (e: 'edit-project', payload: { name: string; description: string }): void;
     }>();
-    
-    const props = defineProps<{
-      project: IProjectData;
-      isUpdatingProjectPending: boolean;
-    }>();
-    
+        
+        const props = defineProps<{
+          project: IProjectData;
+          isUpdatingProjectPending: boolean;
+        }>();
+        
     const form = ref({
       name: props.project.name,
       description: props.project.description,
     });
+
+// Sync form when incoming project changes
+      watch(
+        () => props.project,
+        (project) => {
+          if (project) {
+            form.value = {
+              name: project.name ?? '',
+              description: project.description ?? '',
+            };
+          }
+        },
+        { immediate: true },
+      );
     
     const isSubmitDisabled = computed(() => !form.value.name.trim() || !form.value.description.trim());
     
     const handleSubmit = () => {
-      emit('editProject', {
+  emit('edit-project', {
         name: form.value.name.trim(),
         description: form.value.description.trim(),
       });
