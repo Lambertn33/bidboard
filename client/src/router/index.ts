@@ -5,12 +5,12 @@ import { HomeView,
   RegisterView, 
   LoginView, 
   TasksView, 
-  ProtectedProjectsView, 
-  ProtectedTasksView, 
-  ProtectedBidsView, 
-  ProtectedWorksView,
+  AdminProtectedProjectsView, 
+  AdminProtectedTasksView, 
+  AdminProtectedBidsView, 
+  AdminProtectedWorksView,
   AdminProtectedDashboardView,
-  ProtectedProjectDetailsView
+  AdminProtectedProjectDetailsView
  }
 from '@/views';
 
@@ -196,30 +196,30 @@ const router = createRouter({
 
     // Protected Routes
     {
-      path: '/protected',
+      path: '/admin',
       beforeEnter: requireAuth,
       children: [
         {
           path: 'projects',
-          component: ProtectedProjectsView,
+          component: AdminProtectedProjectsView,
           beforeEnter: requireAdmin,
         },
         {
           path: 'projects/:id',
-          component: ProtectedProjectDetailsView,
+          component: AdminProtectedProjectDetailsView,
           beforeEnter: requireAdmin,
         },
         {
           path: 'tasks',
-          component: ProtectedTasksView,
+          component: AdminProtectedTasksView,
         },
         {
           path: 'bids',
-          component: ProtectedBidsView,
+          component: AdminProtectedBidsView,
         },
         {
           path: 'works',
-          component: ProtectedWorksView,
+          component: AdminProtectedWorksView,
         },
         {
           path: 'dashboard',

@@ -28,7 +28,7 @@ export const useRegister = () => {
         const userRole = decoded.role;
 
         if (userRole === 'ADMIN') {
-          router.replace('/protected/projects');
+          router.replace('/admin/projects');
         } else {
           router.replace('/tasks');
         }

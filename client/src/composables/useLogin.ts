@@ -33,7 +33,7 @@ export const useLogin = () => {
         } else {
           // Otherwise, redirect based on role
           if (userRole === 'ADMIN') {
-            router.replace('/protected/dashboard');
+            router.replace('/admin/dashboard');
           } else {
             // Redirect freelancers to tasks page
             router.replace('/tasks');

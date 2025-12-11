@@ -54,7 +54,9 @@
         name: string;
     };
     price: number;
-    bids: number;
+    _count: {
+      bids: number;
+    };
   }
 
   export interface IWork {
@@ -259,7 +261,7 @@
             <div class="p-6 border-b border-gray-200 flex-shrink-0">
               <div class="flex items-center justify-between">
                 <h2 class="text-xl font-semibold text-gray-900">Recent Tasks</h2>
-                <router-link to="/protected/tasks" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                <router-link to="/admin/tasks" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
                   View all
                 </router-link>
               </div>
@@ -281,7 +283,7 @@
             <div class="p-6 border-b border-gray-200 flex-shrink-0">
               <div class="flex items-center justify-between">
                 <h2 class="text-xl font-semibold text-gray-900">Recent Works</h2>
-                <router-link to="/protected/works" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                <router-link to="/admin/works" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
                   View all
                 </router-link>
               </div>
@@ -304,7 +306,7 @@
           <div class="p-6 border-b border-gray-200">
             <div class="flex items-center justify-between">
               <h2 class="text-xl font-semibold text-gray-900">Recent Bids</h2>
-              <router-link to="/protected/bids" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+              <router-link to="/admin/bids" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
                 View all
               </router-link>
             </div>

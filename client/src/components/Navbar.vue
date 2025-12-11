@@ -24,19 +24,19 @@ const navigationLinks = computed(() => {
   }
   if (isAdmin.value) {
     return [
-      { path: '/protected/dashboard', label: 'Dashboard' },
-      { path: '/protected/projects', label: 'Projects' },
-      { path: '/protected/tasks', label: 'Tasks' },
-      { path: '/protected/bids', label: 'Bids' },
-      { path: '/protected/works', label: 'Works' },
+      { path: '/admin/dashboard', label: 'Dashboard' },
+      { path: '/admin/projects', label: 'Projects' },
+      { path: '/admin/tasks', label: 'Tasks' },
+      { path: '/admin/bids', label: 'Bids' },
+      { path: '/admin/works', label: 'Works' },
     ];
   }
   if (isFreelancer.value) {
     return [
       { path: '/tasks', label: 'Tasks' },
-      { path: '/protected/tasks', label: ' My Assigned Tasks' },
-      { path: '/protected/bids', label: ' My Bids' },
-      { path: '/protected/works', label: ' My Works' },
+      { path: '/freelancer/tasks', label: ' My Assigned Tasks' },
+      { path: '/freelancer/bids', label: ' My Bids' },
+      { path: '/freelancer/works', label: ' My Works' },
     ];
   }
   return [];

@@ -31,7 +31,7 @@ const {
     <div class="bg-white border-b border-gray-200">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <router-link
-          to="/protected/projects"
+          to="/admin/projects"
           class="flex items-center gap-2 text-gray-600 mb-4 transition-colors cursor-pointer
           hover:text-blue-600"
         >
