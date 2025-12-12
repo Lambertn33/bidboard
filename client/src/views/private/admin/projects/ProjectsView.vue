@@ -1,40 +1,19 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { OhVueIcon } from 'oh-vue-icons';
-import { getProjects } from '@/api/public/projects';
 import { createProject, updateProject } from '@/api/private/admin/projects';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { Create, Table, Search, Edit } from '@/components/private/admin/projects';
 import { Modal } from '@/components/ui';
 import { getStartTimeInDays } from '@/reusables';
 import { useToast } from '@/composables/useToast';
 import { useFetchProject } from '@/composables/useFetchProject';
+import { useFetchProjects } from '@/composables/useFetchProjects';
 
 const { success: showSuccessToast, error: showErrorToast } = useToast();
 const queryClient = useQueryClient();
 
-
-interface IProject {
-  id: string;
-  name: string;
-  description: string;
-  _count: {
-    tasks: number;
-  };
-  createdAt: string;
-}
-
-interface IProjectsResponse {
-  data: IProject[];
-  meta: {
-    total: number;
-    currentPage: number;
-    limit: number;
-    totalPages: number;
-  };
-}
-
-// Pagination and search state (used for API calls)
+// Pagination and search state
 const currentPage = ref(1);
 const limit = ref(10);
 const searchQuery = ref('');
@@ -55,20 +34,14 @@ watch(limit, () => {
   currentPage.value = 1;
 });
 
-// Fetch projects from API with pagination and search
-const { data } = useQuery<IProjectsResponse>({
-  queryKey: computed(() => ['projects', currentPage.value, limit.value, debouncedSearch.value]),
-  queryFn: () => getProjects(currentPage.value, limit.value, debouncedSearch.value),
-  placeholderData: (previousData) => previousData,
-});
-
-// Computed properties from API response
-const projects = computed(() => (data.value as IProjectsResponse | undefined)?.data ?? []);
-const meta = computed(() => (data.value as IProjectsResponse | undefined)?.meta ?? {
-  total: 0,
-  currentPage: currentPage.value,
-  limit: limit.value,
-  totalPages: 1,
+// Fetch projects using composable
+const {
+  projects,
+  meta,
+} = useFetchProjects({
+  currentPage,
+  limit,
+  search: debouncedSearch,
 });
 
 // Pagination helpers
@@ -97,6 +70,8 @@ const goToNextPage = () => {
 // CREATE NEW PROJECT MODAL AND EDIT PROJECT MODAL
 const isCreatingProjectModalOpen = ref(false);
 const isEditingProjectModalOpen = ref(false);
+
+// Selected project id for editing
 const selectedProjectId = ref<string | null>(null);
 
 // Fetch project data when editing (reactive to selectedProjectId)
@@ -211,7 +186,7 @@ const handleEditProject = (payload: { name: string; description: string }) => {
     @close="closeCreatingProjectModal"
   >
     <Create 
-    @create-task="handleCreateProject"
+    @create-project="handleCreateProject"
     :isCreatingProjectPending="isCreatingProjectPending"
     />
   </Modal>

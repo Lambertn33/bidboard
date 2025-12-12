@@ -4,7 +4,7 @@ import Input from '@/components/ui/Input.vue';
 import TextArea from '@/components/ui/TextArea.vue';
 
 const emit = defineEmits<{
-  (e: 'createTask', payload: { name: string; description: string }): void;
+  (e: 'createProject', payload: { name: string; description: string }): void;
 }>();
 
 const props = defineProps<{
@@ -19,7 +19,7 @@ const form = ref({
 const isSubmitDisabled = computed(() => !form.value.name.trim() || !form.value.description.trim());
 
 const handleSubmit = () => {
-  emit('createTask', {
+  emit('createProject', {
     name: form.value.name.trim(),
     description: form.value.description.trim(),
   });

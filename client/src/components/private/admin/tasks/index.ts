@@ -8,3 +8,5 @@ export {default as DetailsInfo} from './details/Info.vue';
 export {default as DetailsBids} from './details/Bids.vue';
 export {default as DetailsWork} from './details/Work.vue';
 export {default as DetailsStats} from './details/Stats.vue';
+
+export {default as Create} from './Create.vue';

@@ -2,7 +2,9 @@
 import { computed, ref, watch } from 'vue';
 import { useQuery } from '@tanstack/vue-query';
 import { getTasks } from '@/api/private/common/tasks';
-import { Table, Search } from '@/components/private/admin/tasks';
+import { Table, Search, Create } from '@/components/private/admin/tasks';
+import { Modal } from '@/components/ui';
+import { useFetchProjects } from '@/composables/useFetchProjects';
 
   interface ITask {
     id: string;
@@ -86,6 +88,26 @@ const goToNextPage = () => {
     currentPage.value++;
   }
 };
+
+// CREATE NEW TASK MODAL AND EDIT TASK MODAL
+const isCreatingTaskModalOpen = ref(false);
+
+const openCreatingTaskModal = () => {
+  isCreatingTaskModalOpen.value = true;
+};
+
+const closeCreatingTaskModal = () => {
+  isCreatingTaskModalOpen.value = false;
+};
+
+// Fetch projects from API for dropdown (only when modal is open)
+const { projects } = useFetchProjects({
+  enabled: isCreatingTaskModalOpen,
+});
+
+const handleCreateTask = (payload: { name: string; description: string; project_id: string | null; price: number; skills: string[] }) => {
+  console.log(payload);
+};
 </script>
 
 <template>
@@ -98,7 +120,7 @@ const goToNextPage = () => {
             <h1 class="text-3xl font-bold text-gray-900">Tasks</h1>
             <p class="mt-1 text-sm text-gray-600">Manage and view all your tasks</p>
           </div>
-          <button  class="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
+          <button @click="openCreatingTaskModal" class="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
             <OhVueIcon name="hi-plus" class="w-5 h-5" />
             <span>New Task</span>
           </button>
@@ -126,4 +148,15 @@ const goToNextPage = () => {
       />
     </div>
   </div>
+
+  <Modal
+    :isOpen="isCreatingTaskModalOpen"
+    @close="closeCreatingTaskModal"
+  >
+    <Create 
+      @create-task="handleCreateTask"
+      :isCreatingTaskPending="false"
+      :projects="projects"
+    />
+  </Modal>
 </template>
