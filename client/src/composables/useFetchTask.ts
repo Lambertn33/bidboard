@@ -1,12 +1,11 @@
 import { computed, type MaybeRef, unref } from 'vue';
 import { useQuery } from '@tanstack/vue-query';
 import type { AxiosError } from 'axios';
-import { getProjectTasks } from '@/api/public/projects';
 import { getTaskDetails } from '@/api/private/common/tasks';
 
 
 
-interface TaskFreelancer {
+  export interface TaskFreelancer {
     id: string;
     telephone: string;
     user: {
@@ -16,21 +15,21 @@ interface TaskFreelancer {
     };
   }
   
-  interface TaskWork {
+  export interface TaskWork {
     id: string;
     completionUrl: string;
     freelancer: TaskFreelancer;
     status: 'IN_PROGRESS' | 'COMPLETED';
   }
   
-  interface TaskBid {
+  export interface TaskBid {
     id: string;
     message: string;
     status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
     freelancer: TaskFreelancer;
   }
   
-  interface TaskData {
+  export interface TaskData {
     id: string;
     name: string;
     description: string;
