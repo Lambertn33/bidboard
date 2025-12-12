@@ -9,6 +9,8 @@ export {default as AdminProtectedProjectsView} from './private/admin/projects/Pr
 export {default as AdminProtectedProjectDetailsView} from './private/admin/projects/ProjectDetails.vue';
 
 export {default as AdminProtectedTasksView} from './private/admin/tasks/TasksView.vue';
+export {default as AdminProtectedTaskDetailsView} from './private/admin/tasks/TaskDetails.vue';
+
 export {default as AdminProtectedBidsView} from './private/admin/bids/BidsView.vue';
 export {default as AdminProtectedWorksView} from './private/admin/works/WorksView.vue';
 export {default as AdminProtectedDashboardView} from './private/admin/dashboard/DashboardView.vue';

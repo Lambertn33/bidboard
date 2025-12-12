@@ -7,10 +7,11 @@ import { HomeView,
   TasksView, 
   AdminProtectedProjectsView, 
   AdminProtectedTasksView, 
+  AdminProtectedTaskDetailsView,
   AdminProtectedBidsView, 
   AdminProtectedWorksView,
   AdminProtectedDashboardView,
-  AdminProtectedProjectDetailsView
+  AdminProtectedProjectDetailsView,
  }
 from '@/views';
 
@@ -212,6 +213,11 @@ const router = createRouter({
         {
           path: 'tasks',
           component: AdminProtectedTasksView,
+        },
+        {
+          path: 'tasks/:id',
+          component: AdminProtectedTaskDetailsView,
+          beforeEnter: requireAdmin,
         },
         {
           path: 'bids',
