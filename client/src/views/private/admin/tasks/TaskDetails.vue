@@ -2,107 +2,14 @@
 import { computed } from 'vue';
 import { OhVueIcon } from 'oh-vue-icons';
 import { getStartTimeInDays } from '@/reusables';
+import { useFetchTask } from '@/composables/useFetchTask';
+import { useRoute } from 'vue-router';
 
-interface TaskFreelancer {
-  id: string;
-  telephone: string;
-  user: {
-    id: string;
-    names: string;
-    email: string;
-  };
-}
+const route = useRoute();
 
-interface TaskWork {
-  id: string;
-  completionUrl: string;
-  freelancer: TaskFreelancer;
-  status: 'IN_PROGRESS' | 'COMPLETED';
-}
+const { isPending, isError, taskData, errorMessage, refetch } = useFetchTask(route.params.id as string);
 
-interface TaskBid {
-  id: string;
-  message: string;
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
-  freelancer: TaskFreelancer;
-}
-
-interface TaskData {
-  id: string;
-  name: string;
-  description: string;
-  status: 'OPEN' | 'ASSIGNED' | 'COMPLETED';
-  price: number;
-  skills: string[];
-  createdAt: string;
-  updatedAt: string;
-  project: {
-    id: string;
-    name: string;
-  };
-  work: TaskWork | null;
-  bids: TaskBid[];
-}
-
-// Mock data - will be replaced with API call later
-const taskData: TaskData = {
-  id: '84328931-ff62-44a9-b8d7-6ad5b0926deb',
-  name: 'Data Cleanup Task 3',
-  description: 'Deliverable 3 for Data Cleanup.',
-  status: 'ASSIGNED',
-  price: 170,
-  skills: ['Python', 'SQL', 'Data Analysis', 'Excel'],
-  createdAt: '2025-12-04T14:50:38.296Z',
-  updatedAt: '2025-12-04T14:50:38.296Z',
-  project: {
-    id: '11e94fe7-1bc7-4d00-880f-12d92888fd1f',
-    name: 'Data Cleanup',
-  },
-  work: {
-    id: 'work-123-456-789',
-    completionUrl: 'https://github.com/demo-freelancer/data-cleanup-task-3',
-    freelancer: {
-      id: 'f4132f14-a5bd-4e60-a73b-543da59ebdf1',
-      telephone: '+250788123456',
-      user: {
-        id: 'd0326108-b845-4bf7-9546-5daac56e082f',
-        names: 'Demo Freelancer',
-        email: 'freelancer@taskbid.com',
-      },
-    },
-    status: 'COMPLETED',
-  },
-  bids: [
-    {
-      id: 'f2a323aa-cb95-4b8c-b8fb-19c45c351e4a',
-      message: 'I am good for this task, I know the required skills. including Python and excel',
-      status: 'ACCEPTED',
-      freelancer: {
-        id: 'f4132f14-a5bd-4e60-a73b-543da59ebdf1',
-        telephone: '+250788123456',
-        user: {
-          id: 'd0326108-b845-4bf7-9546-5daac56e082f',
-          names: 'Demo Freelancer',
-          email: 'freelancer@taskbid.com',
-        },
-      },
-    },
-    {
-      id: 'f2a323aa-cb95-4b8c-b8fb-19c45c351e4a',
-      message: 'I am good for this task, I know the required skills. including Python and excel',
-      status: 'REJECTED',
-      freelancer: {
-        id: 'f4132f14-a5bd-4e60-a73b-543da59ebdf1',
-        telephone: '+250788123456',
-        user: {
-          id: 'd0326108-b845-4bf7-9546-5daac56e082f',
-          names: 'Demo Freelancer',
-          email: 'freelancer@taskbid.com',
-        },
-      },
-    },
-  ],
-};
+const task = computed(() => taskData.value);
 
 const getStatusColor = (status: string) => {
   const colors: Record<string, string> = {
@@ -122,14 +29,19 @@ const getBidStatusColor = (status: string) => {
   return colors[status] || 'bg-gray-50 text-gray-700 border border-gray-200';
 };
 
-const createdAtAgo = computed(() => getStartTimeInDays(taskData.createdAt));
-const updatedAtAgo = computed(() => getStartTimeInDays(taskData.updatedAt));
+const createdAtAgo = computed(() => getStartTimeInDays(task.value?.createdAt || ''));
+const updatedAtAgo = computed(() => getStartTimeInDays(task.value?.updatedAt || ''));
+
+const totalBids = computed(() => task.value?.bids.length ?? 0);
+const pendingBidsCount = computed(
+  () => task.value?.bids.filter((b) => b.status === 'PENDING').length ?? 0,
+);
 </script>
 
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Header -->
-    <div class="bg-white border-b border-gray-200">
+    <div class="bg-white border-b border-gray-200 sticky top-16 z-10">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <router-link
           to="/admin/tasks"
@@ -146,16 +58,21 @@ const updatedAtAgo = computed(() => getStartTimeInDays(taskData.updatedAt));
                 <OhVueIcon name="bi-list-task" class="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <h1 class="text-3xl font-bold text-gray-900">{{ taskData.name }}</h1>
+                <div v-if="isPending" class="h-8 w-48 rounded-md bg-gray-200 animate-pulse"></div>
+                <h1 v-else class="text-3xl font-bold text-gray-900">{{ task?.name }}</h1>
               </div>
               <span
+                v-if="!isPending && task?.status"
                 class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wide"
-                :class="getStatusColor(taskData.status)"
+                :class="getStatusColor(task?.status || '')"
               >
-                {{ taskData.status }}
+                {{ task?.status }}
               </span>
             </div>
-            <p class="mt-3 text-gray-700 max-w-3xl">{{ taskData.description }}</p>
+            <p class="mt-3 text-gray-700 max-w-3xl">
+              <span v-if="isPending" class="inline-block h-4 w-80 bg-gray-200 rounded animate-pulse"></span>
+              <span v-else>{{ task?.description }}</span>
+            </p>
           </div>
         </div>
       </div>
@@ -163,7 +80,42 @@ const updatedAtAgo = computed(() => getStartTimeInDays(taskData.updatedAt));
 
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Loading State -->
+      <div v-if="isPending" class="space-y-4">
+        <div class="h-10 w-48 bg-gray-200 rounded animate-pulse"></div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 space-y-4">
+            <div class="h-64 bg-white border border-gray-200 rounded-xl animate-pulse"></div>
+            <div class="h-48 bg-white border border-gray-200 rounded-xl animate-pulse"></div>
+            <div class="h-64 bg-white border border-gray-200 rounded-xl animate-pulse"></div>
+          </div>
+          <div class="space-y-4">
+            <div class="h-48 bg-white border border-gray-200 rounded-xl animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div
+        v-else-if="isError"
+        class="bg-red-50 border border-red-200 rounded-xl p-6 flex items-start gap-3 max-w-3xl"
+      >
+        <OhVueIcon name="hi-exclamation-circle" class="h-6 w-6 text-red-600 flex-shrink-0" />
+        <div class="flex-1">
+          <h3 class="text-base font-semibold text-red-900 mb-1">Failed to load task</h3>
+          <p class="text-sm text-red-700 mb-3">{{ errorMessage }}</p>
+          <button
+            class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
+            @click="() => refetch()"
+          >
+            <OhVueIcon name="co-reload" class="h-4 w-4" />
+            Retry
+          </button>
+        </div>
+      </div>
+
+      <!-- Data State -->
+      <div v-else-if="task" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Left Column: Task Details -->
         <div class="lg:col-span-2 space-y-6">
           <!-- Task Information Card -->
@@ -172,14 +124,14 @@ const updatedAtAgo = computed(() => getStartTimeInDays(taskData.updatedAt));
             <div class="space-y-4">
               <div>
                 <p class="text-sm font-medium text-gray-500 mb-1">Price</p>
-                <p class="text-3xl font-bold text-gray-900">${{ taskData.price }}</p>
+                <p class="text-3xl font-bold text-gray-900">${{ task.price }}</p>
               </div>
 
               <div>
                 <p class="text-sm font-medium text-gray-500 mb-2">Skills Required</p>
                 <div class="flex flex-wrap gap-2">
                   <span
-                    v-for="skill in taskData.skills"
+                    v-for="skill in task.skills"
                     :key="skill"
                     class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200"
                   >
@@ -191,11 +143,11 @@ const updatedAtAgo = computed(() => getStartTimeInDays(taskData.updatedAt));
               <div>
                 <p class="text-sm font-medium text-gray-500 mb-1">Project</p>
                 <router-link
-                  :to="`/admin/projects/${taskData.project.id}`"
+                  :to="`/admin/projects/${task.project.id}`"
                   class="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
                 >
                   <OhVueIcon name="bi-folder-fill" class="h-4 w-4" />
-                  <span class="font-medium">{{ taskData.project.name }}</span>
+                  <span class="font-medium">{{ task.project.name }}</span>
                 </router-link>
               </div>
 
@@ -213,35 +165,36 @@ const updatedAtAgo = computed(() => getStartTimeInDays(taskData.updatedAt));
           </div>
 
           <!-- Work Assignment Card (if work exists) -->
-          <div v-if="taskData.work" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div v-if="task.work" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-bold text-gray-900 mb-6">Assigned Work</h2>
-                <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wide"
-                  :class="getStatusColor(taskData.work.status)"
-                >
-                  {{ taskData.work.status }}
-                </span>
+              <h2 class="text-xl font-bold text-gray-900 mb-6">Assigned Work</h2>
+              <span
+                class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wide"
+                :class="getStatusColor(task.work.status)"
+              >
+                {{ task.work.status }}
+              </span>
             </div>
             <div class="space-y-4">
               <div>
                 <p class="text-sm font-medium text-gray-500 mb-1">Freelancer</p>
                 <div class="mt-2 space-y-2">
-                  <p class="text-sm font-semibold text-gray-900">{{ taskData.work.freelancer.user.names }}</p>
-                  <p class="text-sm text-gray-600">{{ taskData.work.freelancer.user.email }}</p>
-                  <p class="text-sm text-gray-600">{{ taskData.work.freelancer.telephone }}</p>
+                  <p class="text-sm font-semibold text-gray-900">{{ task.work.freelancer.user.names }}</p>
+                  <p class="text-sm text-gray-600">{{ task.work.freelancer.user.email }}</p>
+                  <p class="text-sm text-gray-600">{{ task.work.freelancer.telephone }}</p>
                 </div>
               </div>
 
-              <div v-if="taskData.work.completionUrl">
+              <div v-if="task.work.completionUrl">
                 <p class="text-sm font-medium text-gray-500 mb-2">Completion URL</p>
                 <a
-                  :href="taskData.work.completionUrl"
+                  :href="task.work.completionUrl"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors break-all"
                 >
                   <OhVueIcon name="hi-link" class="h-4 w-4 flex-shrink-0" />
-                  <span class="text-sm">{{ taskData.work.completionUrl }}</span>
+                  <span class="text-sm">{{ task.work.completionUrl }}</span>
                 </a>
               </div>
             </div>
@@ -251,10 +204,10 @@ const updatedAtAgo = computed(() => getStartTimeInDays(taskData.updatedAt));
           <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-6">
               <h2 class="text-xl font-bold text-gray-900">Bids</h2>
-              <span class="text-sm text-gray-600">{{ taskData.bids.length }} bid(s)</span>
+              <span class="text-sm text-gray-600">{{ totalBids }} bid(s)</span>
             </div>
 
-            <div v-if="taskData.bids.length === 0" class="text-center py-12">
+            <div v-if="task.bids.length === 0" class="text-center py-12">
               <OhVueIcon name="bi-folder-x" class="h-12 w-12 text-gray-400 mx-auto mb-3" />
               <h3 class="text-sm font-semibold text-gray-900 mb-1">No Bids Yet</h3>
               <p class="text-sm text-gray-600">No freelancers have submitted bids for this task.</p>
@@ -262,7 +215,7 @@ const updatedAtAgo = computed(() => getStartTimeInDays(taskData.updatedAt));
 
             <div v-else class="space-y-4">
               <div
-                v-for="bid in taskData.bids"
+                v-for="bid in task.bids"
                 :key="bid.id"
                 class="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors"
               >
@@ -309,37 +262,37 @@ const updatedAtAgo = computed(() => getStartTimeInDays(taskData.updatedAt));
           </div>
         </div>
 
-        <!-- Right Column: Quick Actions -->
+        <!-- Right Column: Stats -->
         <div class="space-y-6">
-
-          <!-- Stats Card -->
           <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 class="text-lg font-bold text-gray-900 mb-4">Statistics</h3>
             <div class="space-y-4">
               <div>
                 <p class="text-sm text-gray-500 mb-1">Total Bids</p>
-                <p class="text-2xl font-bold text-gray-900">{{ taskData.bids.length }}</p>
+                <p class="text-2xl font-bold text-gray-900">{{ totalBids }}</p>
               </div>
               <div>
                 <p class="text-sm text-gray-500 mb-1">Pending Bids</p>
                 <p class="text-2xl font-bold text-yellow-600">
-                  {{ taskData.bids.filter((b) => b.status === 'PENDING').length }}
+                  {{ pendingBidsCount }}
                 </p>
               </div>
               <div>
                 <p class="text-sm text-gray-500 mb-1">Status</p>
                 <span
                   class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wide"
-                  :class="getStatusColor(taskData.status)"
+                  :class="getStatusColor(task.status)"
                 >
-                  {{ taskData.status }}
+                  {{ task.status }}
                 </span>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Fallback for no data -->
+      <div v-else class="text-center text-gray-600">No task data available.</div>
     </div>
   </div>
 </template>
-

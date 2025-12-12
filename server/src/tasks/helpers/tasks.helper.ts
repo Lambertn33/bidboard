@@ -96,6 +96,7 @@ export class TasksHelper {
             price: true,
             skills: true,
             createdAt: true,
+            updatedAt: true,
             project: {
                 select: {
                     id: true,
