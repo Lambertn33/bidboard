@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useQuery } from '@tanstack/vue-query';
-import { getTasks } from '@/api/public/tasks';
+import { getTasks } from '@/api/private/common/tasks';
 import { Table, Search } from '@/components/private/admin/tasks';
 
   interface ITask {
