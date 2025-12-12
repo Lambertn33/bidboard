@@ -41,6 +41,15 @@ const goToPreviousPage = () => emits('goToPreviousPage');
 const goToNextPage = () => emits('goToNextPage');
 const updateLimit = (value: number) => emits('update:limit', value);
 const openEditingModal = (taskId: string) => emits('open-editing-modal', taskId as string);
+
+const getTaskStatusColor = (status: string) => {
+  const colors: Record<string, string> = {
+    OPEN: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+    ASSIGNED: 'bg-blue-50 text-blue-700 border border-blue-200',
+    COMPLETED: 'bg-gray-50 text-gray-700 border border-gray-200',
+  };
+  return colors[status as keyof typeof colors] || 'bg-gray-50 text-gray-700 border border-gray-200';
+};
 </script>
 
 <template>
@@ -57,6 +66,10 @@ const openEditingModal = (taskId: string) => emits('open-editing-modal', taskId 
                 </th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Task Price
+                </th>
+
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Task Status
                 </th>
 
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -88,6 +101,11 @@ const openEditingModal = (taskId: string) => emits('open-editing-modal', taskId 
                     {{ task.description }}
                   </div>
                 </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <span class="px-2 py-1 rounded-full text-xs font-medium" :class="getTaskStatusColor(task.status)">
+                    {{ task.status }}
+                  </span>
+                </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center text-sm text-gray-900">
                     <span class="font-medium">${{ task.price }}</span>
@@ -103,8 +121,11 @@ const openEditingModal = (taskId: string) => emits('open-editing-modal', taskId 
                     <router-link :to="`/admin/tasks/${task.id}`" class="text-blue-600 hover:text-blue-900 transition-colors">
                       <OhVueIcon name="hi-eye" class="h-5 w-5" />
                     </router-link>
-                    <button class="text-gray-600 hover:text-gray-900 transition-colors" @click="openEditingModal(task.id)">
+                    <button v-if="task.status === 'OPEN'" class="text-gray-600 hover:text-gray-900 transition-colors" @click="openEditingModal(task.id)">
                       <OhVueIcon name="hi-pencil" class="h-5 w-5" />
+                    </button>
+                    <button v-if="task.status === 'OPEN'" class="text-gray-600 hover:text-gray-900 transition-colors">
+                      <OhVueIcon name="hi-trash" class="h-5 w-5 text-red-600" />
                     </button>
                   </div>
                 </td>

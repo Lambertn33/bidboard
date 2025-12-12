@@ -149,6 +149,8 @@
       return {
         totalProjects: overviewData.value.totalProjects ?? 0,
         activeTasks: overviewData.value.totalActiveTasks ?? 0,
+        assignedTasks: overviewData.value.totalAssignedTasks ?? 0,
+        completedTasks: overviewData.value.totalCompletedTasks ?? 0,
         pendingBids: overviewData.value.totalPendingBids ?? 0,
         completedWorks: overviewData.value.totalCompletedWorks ?? 0,
         totalPaid: overviewData.value.totalPaid ?? 0,
@@ -158,6 +160,8 @@
     return {
       totalProjects: 0,
       activeTasks: 0,
+      assignedTasks: 0,
+      completedTasks: 0,
       pendingBids: 0,
       completedWorks: 0,
       totalPaid: 0,
@@ -178,6 +182,18 @@
         value: stats.value.activeTasks,
         icon: 'hi-clipboard-list',
         iconColor: 'bg-yellow-100',
+      },
+      {
+        title: 'Assigned Tasks',
+        value: stats.value.assignedTasks,
+        icon: 'hi-clipboard-list',
+        iconColor: 'bg-green-100',
+      },
+      {
+        title: 'Completed Tasks',
+        value: stats.value.completedTasks,
+        icon: 'hi-check-circle',
+        iconColor: 'bg-green-100',
       },
       {
         title: 'Pending Bids',

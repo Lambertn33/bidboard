@@ -9,6 +9,8 @@ export class DashboardService {
   async getDashboardOverview() {
     const totalProjects = await this.databaseService.project.count();
     const totalActiveTasks = await this.databaseService.task.count({ where: { status: TaskStatus.OPEN } });
+    const totalAssignedTasks = await this.databaseService.task.count({ where: { status: TaskStatus.ASSIGNED } });
+    const totalCompletedTasks = await this.databaseService.task.count({ where: { status: TaskStatus.COMPLETED } });
     const totalPendingBids = await this.databaseService.bid.count({ where: { status: BidStatus.PENDING } });
     const totalCompletedWorks = await this.databaseService.work.count({ where: { status: WorkStatus.COMPLETED } });  
     const totalPaidResult = await this.databaseService.payment.findMany({
@@ -22,6 +24,8 @@ export class DashboardService {
     return {
       totalProjects,
       totalActiveTasks,
+      totalAssignedTasks,
+      totalCompletedTasks,
       totalPendingBids,
       totalCompletedWorks,
       totalPaid,
