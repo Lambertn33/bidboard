@@ -33,3 +33,12 @@ export const updateTask = async (taskId: string, payload: IUpdateTaskPayload) =>
     handleAxiosError(error, 'Failed to edit task. Please try again.');
   }
 };
+
+export const deleteTask = async (taskId: string) => {
+  try {
+    const response = await protectedApi.delete(`/tasks/${taskId}`);
+    return response.data;
+  } catch (error) {
+    handleAxiosError(error, 'Failed to delete task. Please try again.');
+  }
+}

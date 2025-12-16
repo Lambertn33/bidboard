@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
+import { OhVueIcon } from 'oh-vue-icons';
 import { getTasks } from '@/api/private/common/tasks';
 import { Table, Search, Create, Edit } from '@/components/private/admin/tasks';
 import { Modal } from '@/components/ui';
 import { useFetchProjects } from '@/composables/useFetchProjects';
-import { createTask, updateTask } from '@/api/private/admin/tasks';
+import { createTask, updateTask, deleteTask } from '@/api/private/admin/tasks';
 import { useToast } from '@/composables/useToast';
 import { useFetchTask } from '@/composables/useFetchTask';
 
@@ -72,7 +73,13 @@ watch(limit, () => {
 });
 
 // Fetch tasks from API with pagination and search
-const { data } = useQuery<ITaskResponse>({
+const { 
+  data, 
+  isPending: isFetchingTasks, 
+  isError: isFetchingTasksError, 
+  error: fetchTasksError,
+  refetch: refetchTasks 
+} = useQuery<ITaskResponse>({
   queryKey: computed(() => ['tasks', currentPage.value, limit.value, debouncedSearch.value]),
   queryFn: () => getTasks(currentPage.value, limit.value, debouncedSearch.value),
   placeholderData: (previousData) => previousData,
@@ -189,6 +196,22 @@ const handleCreateTask = (payload: ICreateTaskPayload) => {
   const handleEditTask = (payload: IUpdateTaskPayload) => {
     updateTaskMutation(payload);
   };
+
+  // DELETE TASK
+  const { mutate: deleteTaskMutation, isPending: isDeletingTaskPending } = useMutation({
+    mutationFn: (taskId: string) => deleteTask(taskId),
+    onSuccess: (response) => {
+      showSuccessToast(response?.message || 'Task deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    },
+    onError: (error) => {
+      showErrorToast(error?.message || 'Failed to delete task. Please try again.');
+    },
+  });
+
+  const handleDeleteTask = (taskId: string) => {
+    deleteTaskMutation(taskId);
+  };
 </script>
 
 <template>
@@ -214,8 +237,35 @@ const handleCreateTask = (payload: ICreateTaskPayload) => {
       <!-- Search Bar -->
       <Search v-model:searchQuery="searchQuery" />
 
+      <!-- Loading State -->
+      <div v-if="isFetchingTasks || isDeletingTaskPending" class="bg-white rounded-xl shadow-sm border border-gray-200 p-12">
+        <div class="text-center">
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p class="text-sm text-gray-600">Loading tasks...</p>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div v-else-if="isFetchingTasksError" class="bg-white rounded-xl shadow-sm border border-gray-200 p-12">
+        <div class="text-center">
+          <OhVueIcon name="hi-exclamation-circle" class="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h3 class="text-sm font-semibold text-gray-900 mb-1">Failed to load tasks</h3>
+          <p class="text-sm text-gray-600 mb-4">
+            {{ (fetchTasksError as Error)?.message || 'An error occurred while fetching tasks.' }}
+          </p>
+          <button
+            @click="refetchTasks()"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+          >
+            <OhVueIcon name="hi-refresh" class="h-4 w-4 mr-2" />
+            Retry
+          </button>
+        </div>
+      </div>
+
       <!-- Table -->
       <Table
+        v-else
         :tasks="tasks"
         :meta="meta"
         :has-previous-page="hasPreviousPage"
@@ -226,6 +276,7 @@ const handleCreateTask = (payload: ICreateTaskPayload) => {
         @goToNextPage="goToNextPage"
         @update:limit="(value: number) => limit = value"
         @open-editing-modal="openEditingTaskModal"
+        @delete-task="handleDeleteTask"
       />
     </div>
   </div>

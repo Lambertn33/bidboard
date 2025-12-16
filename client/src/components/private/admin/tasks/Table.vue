@@ -34,6 +34,7 @@ const emits = defineEmits<{
   (e: 'goToNextPage'): void;
   (e: 'update:limit', value: number): void;
   (e: 'open-editing-modal', taskId: string): void;
+  (e: 'delete-task', taskId: string): void;
 }>();
 
 const goToPage = (page: number) => emits('goToPage', page);
@@ -41,6 +42,7 @@ const goToPreviousPage = () => emits('goToPreviousPage');
 const goToNextPage = () => emits('goToNextPage');
 const updateLimit = (value: number) => emits('update:limit', value);
 const openEditingModal = (taskId: string) => emits('open-editing-modal', taskId as string);
+const deleteTask = (taskId: string) => emits('delete-task', taskId as string);
 
 const getTaskStatusColor = (status: string) => {
   const colors: Record<string, string> = {
@@ -121,11 +123,11 @@ const getTaskStatusColor = (status: string) => {
                     <router-link :to="`/admin/tasks/${task.id}`" class="text-blue-600 hover:text-blue-900 transition-colors">
                       <OhVueIcon name="hi-eye" class="h-5 w-5" />
                     </router-link>
-                    <button v-if="task.status === 'OPEN'" class="text-gray-600 hover:text-gray-900 transition-colors" @click="openEditingModal(task.id)">
+                    <button v-if="task.status === 'OPEN'" class="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer" @click="openEditingModal(task.id)">
                       <OhVueIcon name="hi-pencil" class="h-5 w-5" />
                     </button>
-                    <button v-if="task.status === 'OPEN'" class="text-gray-600 hover:text-gray-900 transition-colors">
-                      <OhVueIcon name="hi-trash" class="h-5 w-5 text-red-600" />
+                    <button v-if="task.status === 'OPEN'" class="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer">
+                      <OhVueIcon name="hi-trash" class="h-5 w-5 text-red-600" @click="deleteTask(task.id)" />
                     </button>
                   </div>
                 </td>
