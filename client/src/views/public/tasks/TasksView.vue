@@ -12,7 +12,7 @@ import { useFetchBids } from '@/composables/useFetchBids';
 import { Loading, Error, List, Search, Sidebar } from '@/components/public/tasks';
 import { Modal } from '@/components/ui';
 import Bid from '@/components/private/freelancer/bids/Bid.vue';
-
+  
 const { user } = useAuth();
 
 const isAuthenticated = computed(() => !!user.value);

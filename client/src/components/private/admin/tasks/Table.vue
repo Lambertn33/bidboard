@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { OhVueIcon } from 'oh-vue-icons';
-import Pagination from './Pagination.vue';
+import { Pagination } from '@/components/ui';
 
 interface ITask {
   id: string;

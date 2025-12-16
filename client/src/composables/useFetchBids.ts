@@ -27,8 +27,9 @@ export interface IBid {
       id: string;
       name: string;
     };
-    freelancer?: IBidFreelancer | null;
   };
+  // For admin tables we display bid owner here
+  freelancer: IBidFreelancer | null;
 }
 
 export interface IBidsResponse {
@@ -44,7 +45,6 @@ export interface IBidsResponse {
 interface UseFetchBidsParams {
   currentPage?: MaybeRef<number>;
   limit?: MaybeRef<number>;
-  search?: MaybeRef<string>;
   enabled?: MaybeRef<boolean>;
 }
 
@@ -57,10 +57,6 @@ export const useFetchBids = (params: UseFetchBidsParams = {}) => {
     const value = unref(params.limit);
     return value !== undefined ? value : undefined;
   });
-  const searchValue = computed(() => {
-    const value = unref(params.search);
-    return value && value.trim() ? value.trim() : undefined;
-  });
   const enabledValue = computed(() => unref(params.enabled) ?? true);
 
   // Fetch projects from API with pagination and search
@@ -72,7 +68,7 @@ export const useFetchBids = (params: UseFetchBidsParams = {}) => {
     error,
     refetch,
   } = useQuery<IBidsResponse>({
-    queryKey: computed(() => ['bids', currentPageValue.value, limitValue.value, searchValue.value]),
+    queryKey: computed(() => ['bids', currentPageValue.value, limitValue.value]),
     queryFn: () => getBids(currentPageValue.value, limitValue.value),
     enabled: enabledValue,
     placeholderData: (previousData) => previousData,

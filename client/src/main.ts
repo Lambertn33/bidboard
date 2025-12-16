@@ -48,6 +48,8 @@ import {
     HiArrowLeft,
     HiExclamationCircle,
     IoClose,
+    IoShieldCheckmarkSharp,
+    IoCloseCircleOutline
   } from 'oh-vue-icons/icons';      
 
 
@@ -90,6 +92,8 @@ addIcons(
   HiArrowLeft,
   HiExclamationCircle,
   IoClose,
+  IoShieldCheckmarkSharp,
+  IoCloseCircleOutline
 );
 
 createApp(App)
