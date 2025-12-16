@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { computed, ref } from 'vue';
+    import { computed, ref, watch } from 'vue';
     import { OhVueIcon } from 'oh-vue-icons';
     import {Input, TextArea, Select} from "@/components/ui";
 
@@ -30,6 +30,8 @@
       taskToEdit: ITask;
     }>();
 
+    console.log(props.projects)
+
     const skillInput = ref('');
     
     const form = ref<{
@@ -39,16 +41,30 @@
       price: number;
       skills: string[];
     }>({
-      name: props.taskToEdit.name,
-      description: props.taskToEdit.description,
-      project_id: props.taskToEdit.project.id,
-      price: props.taskToEdit.price,
-      skills: props.taskToEdit.skills,
+      name: props.taskToEdit?.name || '',
+      description: props.taskToEdit?.description || '',
+      project_id: props.taskToEdit?.project?.id || null,
+      price: props.taskToEdit?.price || 0,
+      skills: props.taskToEdit?.skills ? [...props.taskToEdit.skills] : [],
     });
+
+    // Watch for changes to taskToEdit and update form
+    watch(() => props.taskToEdit, (newTask) => {
+      if (newTask) {
+        form.value = {
+          name: newTask.name,
+          description: newTask.description,
+          project_id: newTask.project.id,
+          price: newTask.price,
+          skills: [...newTask.skills], // Create a new array to ensure reactivity
+        };
+        skillInput.value = '';
+      }
+    }, { immediate: true, deep: true });
     
     const addSkillToList = (skill: string) => {
-      if (skill.trim()) {
-        form.value.skills.push(skill.trim());
+      if (skill.trim() && !form.value.skills.includes(skill.trim())) {
+        form.value.skills = [...form.value.skills, skill.trim()];
         skillInput.value = '';
       }
     };

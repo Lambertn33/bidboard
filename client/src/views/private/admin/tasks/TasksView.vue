@@ -120,6 +120,8 @@ const goToNextPage = () => {
 // CREATE NEW TASK MODAL AND EDIT TASK MODAL
 const isCreatingTaskModalOpen = ref(false);
 
+const isEditingTaskModalOpen = ref(false);
+
 const openCreatingTaskModal = () => {
   isCreatingTaskModalOpen.value = true;
 };
@@ -129,8 +131,14 @@ const closeCreatingTaskModal = () => {
 };
 
 // Fetch projects from API for dropdown (only when modal is open)
-const { projects } = useFetchProjects({
-  enabled: isCreatingTaskModalOpen,
+const { 
+  projects, 
+  isPending: isFetchingProjects, 
+  isError: isFetchingProjectsError,
+  errorMessage: fetchProjectsErrorMessage,
+  refetch: refetchProjects 
+} = useFetchProjects({
+  enabled: computed(() => isCreatingTaskModalOpen.value || isEditingTaskModalOpen.value),
 });
 
 
@@ -148,8 +156,6 @@ const { mutate: createTaskMutation, isPending: isCreatingTaskPending } = useMuta
 });
 
 // EDIT TASK
-const isEditingTaskModalOpen = ref(false);
-
 const selectedTaskId = ref<string | null>(null);
 
 const openEditingTaskModal = (taskId: string) => {
@@ -285,7 +291,30 @@ const handleCreateTask = (payload: ICreateTaskPayload) => {
     :isOpen="isCreatingTaskModalOpen"
     @close="closeCreatingTaskModal"
   >
+    <div v-if="isFetchingProjects" class="p-6">
+      <div class="text-center">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p class="text-sm text-gray-600">Loading projects...</p>
+      </div>
+    </div>
+    <div v-else-if="isFetchingProjectsError" class="p-6">
+      <div class="text-center">
+        <OhVueIcon name="hi-exclamation-circle" class="h-12 w-12 text-red-500 mx-auto mb-4" />
+        <h3 class="text-sm font-semibold text-gray-900 mb-1">Failed to load projects</h3>
+        <p class="text-sm text-gray-600 mb-4">
+          {{ fetchProjectsErrorMessage }}
+        </p>
+        <button
+          @click="refetchProjects()"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+        >
+          <OhVueIcon name="hi-refresh" class="h-4 w-4 mr-2" />
+          Retry
+        </button>
+      </div>
+    </div>
     <Create 
+      v-else
       @create-task="handleCreateTask"
       :isCreatingTaskPending="isCreatingTaskPending"
       :projects="projects"
@@ -300,6 +329,11 @@ const handleCreateTask = (payload: ICreateTaskPayload) => {
       <div v-else-if="isFetchingTaskError" class="text-sm text-red-600">
         {{ fetchTaskErrorMessage }}
         <button class="ml-2 text-blue-600 underline" @click="() => refetchTask()">Retry</button>
+      </div>
+      <div v-else-if="isFetchingProjects" class="text-sm text-gray-500">Loading projects...</div>
+      <div v-else-if="isFetchingProjectsError" class="text-sm text-red-600">
+        {{ fetchProjectsErrorMessage }}
+        <button class="ml-2 text-blue-600 underline" @click="() => refetchProjects()">Retry</button>
       </div>
       <div v-else-if="taskToEdit">
       <Edit

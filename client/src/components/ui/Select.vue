@@ -33,9 +33,10 @@ const selectClass = computed(() => {
     'py-3 border border-gray-300 rounded-lg',
     'focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
     'outline-none transition-colors',
-    'text-gray-900 bg-white',
-    'appearance-none cursor-pointer',
-    props.disabled ? 'bg-gray-50 cursor-not-allowed opacity-60' : '',
+    'appearance-none',
+    props.disabled 
+      ? 'bg-gray-50 cursor-not-allowed text-gray-700' 
+      : 'bg-white cursor-pointer text-gray-900',
   ];
 });
 
@@ -76,19 +77,19 @@ const handleChange = (event: Event) => {
     <div class="relative">
       <select
         :id="id"
-        :value="modelValue ?? ''"
+        :value="modelValue !== null && modelValue !== undefined ? String(modelValue) : ''"
         @change="handleChange"
         :required="required"
         :disabled="disabled"
         :class="selectClass"
       >
-        <option disabled selected value="">
+        <option v-if="modelValue === null || modelValue === undefined || modelValue === ''" disabled value="">
           {{ placeholder }}
         </option>
         <option
           v-for="option in normalizedOptions"
           :key="String(option.value)"
-          :value="option.value"
+          :value="String(option.value)"
         >
           {{ option.label }}
         </option>
