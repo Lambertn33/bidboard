@@ -1,20 +1,50 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, computed } from 'vue';
 import { Input } from '@/components/ui';
 import { AuthForm } from '@/components/public';
 import { useRegister } from '@/composables/useRegister';
 import type { RegisterDto } from '@/api/public/auth';
 
-const form = reactive<RegisterDto>({
+const form = reactive<RegisterDto & { password_confirmation: string }>({
   names: '',
   email: '',
   password: '',
+  password_confirmation: '',
 });
 
 const { registerMutation, isPending, isError, errorMessage } = useRegister();
 
+const passwordsMatch = computed(() => {
+  return form.password === form.password_confirmation;
+});
+
+const passwordMismatchError = computed(() => {
+  if (form.password_confirmation && !passwordsMatch.value) {
+    return 'Passwords do not match';
+  }
+  return '';
+});
+
+const isFormValid = computed(() => {
+  return form.names.trim() && 
+         form.email.trim() && 
+         form.password && 
+         passwordsMatch.value;
+});
+
 const handleRegister = () => {
-  registerMutation(form);
+  if (!isFormValid.value) {
+    return;
+  }
+  
+  // Only send the fields that the server expects (exclude password_confirmation)
+  const registerData: RegisterDto = {
+    names: form.names,
+    email: form.email,
+    password: form.password,
+  };
+  
+  registerMutation(registerData);
 };
 </script>
 
@@ -60,7 +90,24 @@ const handleRegister = () => {
         :hasPreIcon="true"
         :required="true"
       />
-
+      <!-- Password Confirmation Field -->
+      <div>
+        <Input
+          id="password_confirmation"
+          label="Password Confirmation"
+          preIcon="hi-lock-closed"
+          type="password"
+          placeholder="Confirm your password"
+          :modelValue="form.password_confirmation"
+          @update:modelValue="form.password_confirmation = $event"
+          :hasPreIcon="true"
+          :required="true"
+        />
+        <!-- Password Mismatch Error -->
+        <p v-if="passwordMismatchError" class="mt-1 text-sm text-red-600">
+          {{ passwordMismatchError }}
+        </p>
+      </div>
       <!-- Error Message -->
       <div v-if="isError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm font-bold text-center">
         {{ errorMessage }}
@@ -69,7 +116,7 @@ const handleRegister = () => {
       <!-- Submit Button -->
       <button
         type="submit"
-        :disabled="isPending"
+        :disabled="isPending || !isFormValid"
         class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         <span v-if="!isPending">Register</span>
