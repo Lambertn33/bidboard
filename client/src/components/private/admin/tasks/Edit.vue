@@ -21,7 +21,7 @@
     }
     
     const emit = defineEmits<{
-      (e: 'editTask', payload: { name: string; description: string; project_id: string | null; price: number; skills: string[] }): void;
+      (e: 'editTask', payload: { name: string; description: string; price: number; skills: string[] }): void;
     }>();
     
     const props = defineProps<{
@@ -79,7 +79,6 @@
       emit('editTask', {
         name: form.value.name.trim(),
         description: form.value.description.trim(),
-        project_id: form.value.project_id,
         price: form.value.price,
         skills: form.value.skills,
       });
@@ -139,6 +138,7 @@
             :modelValue="form.project_id"
             :required="true"
             :placeholder="'Select a project'"
+            :disabled="true"
             @update:modelValue="(value: string | number | null) => (form.project_id = value as string | null)"
           />
     

@@ -5,7 +5,7 @@ import { getTasks } from '@/api/private/common/tasks';
 import { Table, Search, Create, Edit } from '@/components/private/admin/tasks';
 import { Modal } from '@/components/ui';
 import { useFetchProjects } from '@/composables/useFetchProjects';
-import { createTask } from '@/api/private/admin/tasks';
+import { createTask, updateTask } from '@/api/private/admin/tasks';
 import { useToast } from '@/composables/useToast';
 import { useFetchTask } from '@/composables/useFetchTask';
 
@@ -35,10 +35,17 @@ const queryClient = useQueryClient();
     };
   }
 
-  interface ITaskPayload {
+  interface ICreateTaskPayload {
     name: string;
     description: string;
     project_id: string | null;
+    price: number;
+    skills: string[];
+  }
+
+  interface IUpdateTaskPayload {
+    name: string;
+    description: string;
     price: number;
     skills: string[];
   }
@@ -122,7 +129,7 @@ const { projects } = useFetchProjects({
 
 // CREATE TASK MUTATION
 const { mutate: createTaskMutation, isPending: isCreatingTaskPending } = useMutation({
-  mutationFn: (payload: ITaskPayload) => createTask(payload),
+  mutationFn: (payload: ICreateTaskPayload) => createTask(payload),
   onSuccess: (response) => {
     queryClient.invalidateQueries({ queryKey: ['tasks'] });
     closeCreatingTaskModal();
@@ -157,15 +164,31 @@ const {
   refetch: refetchTask,
  } = useFetchTask(selectedTaskId);
 
+ const { mutate: updateTaskMutation, isPending: isUpdatingTaskPending } = useMutation({
+  mutationFn: (payload: IUpdateTaskPayload) => updateTask(selectedTaskId.value as string, payload),
+  onSuccess: (response) => {
+    showSuccessToast(response?.message || 'Task updated successfully');
+    queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    if (selectedTaskId.value) {
+      queryClient.invalidateQueries({ queryKey: ['task', selectedTaskId.value] });
+      refetchTask();
+    }
+    closeEditingTaskModal();
+  },
+  onError: (error) => {
+    showErrorToast(error?.message || 'Failed to update task. Please try again.');
+  }
+});
 
 
-const handleCreateTask = (payload: ITaskPayload) => {
+
+const handleCreateTask = (payload: ICreateTaskPayload) => {
   createTaskMutation(payload);
 };
 
-const handleEditTask = (payload: ITaskPayload) => {
-  console.log(payload);
-};
+  const handleEditTask = (payload: IUpdateTaskPayload) => {
+    updateTaskMutation(payload);
+  };
 </script>
 
 <template>
@@ -230,7 +253,7 @@ const handleEditTask = (payload: ITaskPayload) => {
       <div v-else-if="taskToEdit">
       <Edit
         :taskToEdit="taskToEdit"
-        :isEditingTaskPending="isFetchingTask"
+        :isEditingTaskPending="isUpdatingTaskPending"
         :projects="projects"
         @edit-task="handleEditTask"
        />
