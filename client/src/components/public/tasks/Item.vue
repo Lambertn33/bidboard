@@ -16,6 +16,7 @@ interface ITask {
 
 defineProps<{
     task: ITask;
+    isAllowedToBid: boolean;
 }>();
 
 const isDescriptionOpen = ref(false);
@@ -85,7 +86,8 @@ const toggleDescription = () => {
                     </span>
                 </div>
                 
-                <button
+                <div class="flex items-center gap-2">
+                    <button
                     @click="toggleDescription"
                     class="cursor-pointer px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm flex items-center gap-2 whitespace-nowrap flex justify-center"
                 >
@@ -96,6 +98,14 @@ const toggleDescription = () => {
                         :class="{ 'rotate-180': isDescriptionOpen }"
                     />
                 </button>
+                <button
+                    v-if="isAllowedToBid"
+                    class="cursor-pointer px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm flex items-center gap-2 whitespace-nowrap flex justify-center"
+                >
+                    <span class="font-bold">Bid on Task</span>
+                    <OhVueIcon name="hi-arrow-right" class="h-4 w-4" />
+                </button>
+                </div>
             </div>
         </div>
     </div>
