@@ -2,11 +2,12 @@
 import { computed, ref, watch } from 'vue';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
 import { getTasks } from '@/api/private/common/tasks';
-import { Table, Search, Create } from '@/components/private/admin/tasks';
+import { Table, Search, Create, Edit } from '@/components/private/admin/tasks';
 import { Modal } from '@/components/ui';
 import { useFetchProjects } from '@/composables/useFetchProjects';
 import { createTask } from '@/api/private/admin/tasks';
 import { useToast } from '@/composables/useToast';
+import { useFetchTask } from '@/composables/useFetchTask';
 
 const { success: showSuccessToast, error: showErrorToast } = useToast();
 const queryClient = useQueryClient();
@@ -34,7 +35,7 @@ const queryClient = useQueryClient();
     };
   }
 
-  interface ICreateTaskPayload {
+  interface ITaskPayload {
     name: string;
     description: string;
     project_id: string | null;
@@ -118,8 +119,10 @@ const { projects } = useFetchProjects({
   enabled: isCreatingTaskModalOpen,
 });
 
+
+// CREATE TASK MUTATION
 const { mutate: createTaskMutation, isPending: isCreatingTaskPending } = useMutation({
-  mutationFn: (payload: ICreateTaskPayload) => createTask(payload),
+  mutationFn: (payload: ITaskPayload) => createTask(payload),
   onSuccess: (response) => {
     queryClient.invalidateQueries({ queryKey: ['tasks'] });
     closeCreatingTaskModal();
@@ -130,8 +133,38 @@ const { mutate: createTaskMutation, isPending: isCreatingTaskPending } = useMuta
   },
 });
 
-const handleCreateTask = (payload: { name: string; description: string; project_id: string | null; price: number; skills: string[] }) => {
+// EDIT TASK
+const isEditingTaskModalOpen = ref(false);
+
+const selectedTaskId = ref<string | null>(null);
+
+const openEditingTaskModal = (taskId: string) => {
+  selectedTaskId.value = taskId;
+  isEditingTaskModalOpen.value = true;
+};
+
+const closeEditingTaskModal = () => {
+  isEditingTaskModalOpen.value = false;
+  selectedTaskId.value = null;
+};
+
+const { 
+  isPending: isFetchingTask,
+  isFetching: isTaskRefetching,
+  isError: isFetchingTaskError,
+  taskData: taskToEdit,
+  errorMessage: fetchTaskErrorMessage,
+  refetch: refetchTask,
+ } = useFetchTask(selectedTaskId);
+
+
+
+const handleCreateTask = (payload: ITaskPayload) => {
   createTaskMutation(payload);
+};
+
+const handleEditTask = (payload: ITaskPayload) => {
+  console.log(payload);
 };
 </script>
 
@@ -169,7 +202,7 @@ const handleCreateTask = (payload: { name: string; description: string; project_
         @goToPreviousPage="goToPreviousPage"
         @goToNextPage="goToNextPage"
         @update:limit="(value: number) => limit = value"
-        @open-editing-modal="() => {}"
+        @open-editing-modal="openEditingTaskModal"
       />
     </div>
   </div>
@@ -183,5 +216,27 @@ const handleCreateTask = (payload: { name: string; description: string; project_
       :isCreatingTaskPending="isCreatingTaskPending"
       :projects="projects"
     />
+  </Modal>
+  <Modal
+    :isOpen="isEditingTaskModalOpen"
+    @close="closeEditingTaskModal"
+  >
+    <div class="space-y-3">
+      <div v-if="isFetchingTask || isTaskRefetching" class="text-sm text-gray-500">Loading task...</div>
+      <div v-else-if="isFetchingTaskError" class="text-sm text-red-600">
+        {{ fetchTaskErrorMessage }}
+        <button class="ml-2 text-blue-600 underline" @click="() => refetchTask()">Retry</button>
+      </div>
+      <div v-else-if="taskToEdit">
+      <Edit
+        :taskToEdit="taskToEdit"
+        :isEditingTaskPending="isFetchingTask"
+        :projects="projects"
+        @edit-task="handleEditTask"
+       />
+        <!-- Placeholder for future Edit form -->
+      </div>
+      <div v-else class="text-sm text-gray-500">Select a task to edit.</div>
+    </div>
   </Modal>
 </template>

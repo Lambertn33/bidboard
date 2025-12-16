@@ -10,3 +10,4 @@ export {default as DetailsWork} from './details/Work.vue';
 export {default as DetailsStats} from './details/Stats.vue';
 
 export {default as Create} from './Create.vue';
+export {default as Edit} from './Edit.vue';
