@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch, provide } from 'vue';
 import { OhVueIcon } from 'oh-vue-icons';
-import { useInfiniteQuery, useQuery, type InfiniteData } from '@tanstack/vue-query';
+import { useInfiniteQuery, useMutation, useQuery, type InfiniteData } from '@tanstack/vue-query';
 import { useAuth } from '@/composables/useAuth';
-
+import { useToast } from '@/composables/useToast';
 import { getTasks } from '@/api/public/tasks';
+
 import { getProjects, getProjectTasks } from '@/api/public/projects';
+import { makeBid } from '@/api/private/freelancer/bids';
 import { Loading, Error, List, Search, Sidebar } from '@/components/public/tasks';
 import { Modal } from '@/components/ui';
 import Bid from '@/components/private/freelancer/bids/Bid.vue';
@@ -21,6 +23,8 @@ const isBiddingModalOpen = ref(false);
 const searchQuery = ref('');
 const debouncedSearch = ref('');
 const selectedProjectId = ref<string | null>(null);
+
+  const { success: showSuccessToast, error: showErrorToast } = useToast();
 
 
 // Fetch projects for filtering
@@ -186,7 +190,6 @@ const selectedTaskIdForBid = ref<string | null>(null);
     return allTasks.value.find((task: ITask) => task.id === selectedTaskIdForBid.value);
   });
 
-  console.log(selectedTaskInfo.value);
 
 const openBiddingModal = (taskId: string) => {
   selectedTaskIdForBid.value = taskId;
@@ -204,6 +207,23 @@ provide('biddingInfo', {
   openBiddingModal,
   closeBiddingModal,
 });
+
+const { mutate: makeBidMutation, isPending: isMakingBidPending } = useMutation({
+  mutationFn: (message: string) => makeBid(selectedTaskIdForBid.value as string, message),
+  onSuccess: (response: any) => {
+    showSuccessToast(response?.message || 'Bid made successfully');
+    closeBiddingModal();
+
+    // (TODO): REVALIDATE THE BIDS AND TASKS
+  },
+  onError: (error) => {
+    showErrorToast(error?.message || 'Failed to make bid. Please try again.');
+  },
+});
+
+const handleMakeBid = (message: string) => {
+  makeBidMutation(message);
+};
 
 </script>
 
@@ -287,8 +307,8 @@ provide('biddingInfo', {
     >
       <Bid 
         v-if="selectedTaskIdForBid"
-        @make-bid="(message: string) => console.log('Bid for task:', selectedTaskIdForBid, message)"
-        :isMakingBidPending="false" 
+        @make-bid="handleMakeBid"
+        :isMakingBidPending="isMakingBidPending" 
         :task="{
           name: selectedTaskInfo?.name,
           skills: selectedTaskInfo?.skills,
