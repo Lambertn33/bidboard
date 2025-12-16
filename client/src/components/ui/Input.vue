@@ -2,6 +2,10 @@
 import { computed } from 'vue';
 import { OhVueIcon } from 'oh-vue-icons';
 
+defineOptions({
+  inheritAttrs: false,
+});
+
 interface InputProps {
   label: string;
   type: string;
@@ -42,6 +46,7 @@ const handleInput = (event: Event) => {
             <OhVueIcon :name="preIcon" class="h-5 w-5 text-gray-400" />
             </div>
             <input
+                v-bind="$attrs"
                 :id="id"
                 :value="modelValue"
                 @input="handleInput"

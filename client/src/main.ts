@@ -47,6 +47,7 @@ import {
     HiChevronRight,
     HiArrowLeft,
     HiExclamationCircle,
+    IoClose,
   } from 'oh-vue-icons/icons';      
 
 
@@ -88,6 +89,7 @@ addIcons(
   HiChevronRight,
   HiArrowLeft,
   HiExclamationCircle,
+  IoClose,
 );
 
 createApp(App)

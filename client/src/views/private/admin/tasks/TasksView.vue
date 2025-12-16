@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { useQuery } from '@tanstack/vue-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
 import { getTasks } from '@/api/private/common/tasks';
 import { Table, Search, Create } from '@/components/private/admin/tasks';
 import { Modal } from '@/components/ui';
 import { useFetchProjects } from '@/composables/useFetchProjects';
+import { createTask } from '@/api/private/admin/tasks';
+import { useToast } from '@/composables/useToast';
+
+const { success: showSuccessToast, error: showErrorToast } = useToast();
+const queryClient = useQueryClient();
 
   interface ITask {
     id: string;
@@ -27,6 +32,14 @@ import { useFetchProjects } from '@/composables/useFetchProjects';
       limit: number;
       totalPages: number;
     };
+  }
+
+  interface ICreateTaskPayload {
+    name: string;
+    description: string;
+    project_id: string | null;
+    price: number;
+    skills: string[];
   }
 
   // Pagination and search state (used for API calls)
@@ -105,8 +118,20 @@ const { projects } = useFetchProjects({
   enabled: isCreatingTaskModalOpen,
 });
 
+const { mutate: createTaskMutation, isPending: isCreatingTaskPending } = useMutation({
+  mutationFn: (payload: ICreateTaskPayload) => createTask(payload),
+  onSuccess: (response) => {
+    queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    closeCreatingTaskModal();
+    showSuccessToast(response?.message || 'Task created successfully');
+  },
+  onError: (error) => {
+    showErrorToast(error?.message || 'Failed to create task. Please try again.');
+  },
+});
+
 const handleCreateTask = (payload: { name: string; description: string; project_id: string | null; price: number; skills: string[] }) => {
-  console.log(payload);
+  createTaskMutation(payload);
 };
 </script>
 
@@ -155,7 +180,7 @@ const handleCreateTask = (payload: { name: string; description: string; project_
   >
     <Create 
       @create-task="handleCreateTask"
-      :isCreatingTaskPending="false"
+      :isCreatingTaskPending="isCreatingTaskPending"
       :projects="projects"
     />
   </Modal>
