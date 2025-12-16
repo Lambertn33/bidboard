@@ -8,6 +8,7 @@ import { getTasks } from '@/api/public/tasks';
 
 import { getProjects, getProjectTasks } from '@/api/public/projects';
 import { makeBid } from '@/api/private/freelancer/bids';
+import { useFetchBids } from '@/composables/useFetchBids';
 import { Loading, Error, List, Search, Sidebar } from '@/components/public/tasks';
 import { Modal } from '@/components/ui';
 import Bid from '@/components/private/freelancer/bids/Bid.vue';
@@ -185,10 +186,23 @@ const clearFilters = () => {
 };
 
 // BIDDING
+// Fetch bids (ONLY when authenticated)
+const {
+  bids,
+  refetch: refetchBids,
+} = useFetchBids({
+  enabled: computed(() => isAuthenticated.value),
+});
+
 const selectedTaskIdForBid = ref<string | null>(null);
   const selectedTaskInfo = computed(() => {
     return allTasks.value.find((task: ITask) => task.id === selectedTaskIdForBid.value);
   });
+
+const existingBidForSelectedTask = computed(() => {
+  if (!selectedTaskIdForBid.value) return null;
+  return bids.value.find((b) => b.task.id === selectedTaskIdForBid.value) ?? null;
+});
 
 
 const openBiddingModal = (taskId: string) => {
@@ -214,7 +228,10 @@ const { mutate: makeBidMutation, isPending: isMakingBidPending } = useMutation({
     showSuccessToast(response?.message || 'Bid made successfully');
     closeBiddingModal();
 
-    // (TODO): REVALIDATE THE BIDS AND TASKS
+    // Revalidate bids after making a bid (only if authenticated + bids query enabled)
+    if (isAuthenticated.value) {
+      refetchBids();
+    }
   },
   onError: (error) => {
     showErrorToast(error?.message || 'Failed to make bid. Please try again.');
@@ -305,14 +322,15 @@ const handleMakeBid = (message: string) => {
       :isOpen="isBiddingModalOpen"
       @close="closeBiddingModal"
     >
-      <Bid 
+      <Bid
         v-if="selectedTaskIdForBid"
         @make-bid="handleMakeBid"
-        :isMakingBidPending="isMakingBidPending" 
+        :isMakingBidPending="isMakingBidPending"
+        :disabled="!!existingBidForSelectedTask"
+        :disabledReason="existingBidForSelectedTask ? `You already bid on this task (status: ${existingBidForSelectedTask.status}).` : undefined"
         :task="{
           name: selectedTaskInfo?.name,
           skills: selectedTaskInfo?.skills,
-
         }"
       />
     </Modal>

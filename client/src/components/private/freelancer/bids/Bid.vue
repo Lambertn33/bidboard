@@ -12,6 +12,8 @@
         name: string | undefined;
         skills: string[] | undefined;
       };
+      disabled?: boolean;
+      disabledReason?: string;
     }>();
 
     const form = ref<{
@@ -20,7 +22,7 @@
       message: '',
     });
     
-    const isSubmitDisabled = computed(() => !form.value.message.trim());
+    const isSubmitDisabled = computed(() => !form.value.message.trim() || !!props.disabled);
     
     const handleSubmit = () => {
       emit('makeBid', form.value.message.trim());
@@ -45,7 +47,11 @@
               <span>{{ skill }}</span>
             </div>
         </div>
-        <form class="space-y-5 mt-4" @submit.prevent="handleSubmit">
+        <div v-if="disabled" class="mt-4 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+          {{ disabledReason || 'You cannot make a bid for this task.' }}
+        </div>
+
+        <form class="space-y-5 mt-4" @submit.prevent="handleSubmit" v-if="!disabled">
           <TextArea
             id="message"
             label="Message"
