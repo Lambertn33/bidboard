@@ -1,17 +1,27 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch, provide } from 'vue';
 import { OhVueIcon } from 'oh-vue-icons';
 import { useInfiniteQuery, useQuery, type InfiniteData } from '@tanstack/vue-query';
+import { useAuth } from '@/composables/useAuth';
 
 import { getTasks } from '@/api/public/tasks';
 import { getProjects, getProjectTasks } from '@/api/public/projects';
-import { Loading, Error, List } from '@/components/public/tasks';
-import Search from '@/components/public/tasks/Search.vue';
-import Sidebar from '@/components/public/tasks/Sidebar.vue';
+import { Loading, Error, List, Search, Sidebar } from '@/components/public/tasks';
+import { Modal } from '@/components/ui';
+import Bid from '@/components/private/freelancer/bids/Bid.vue';
+
+const { user } = useAuth();
+
+const isAuthenticated = computed(() => !!user.value);
+const isFreelancer = computed(() => user.value?.role === 'FREELANCER');
+
+const isAllowedToBid = computed(() => isAuthenticated.value && isFreelancer.value);
+const isBiddingModalOpen = ref(false);
 
 const searchQuery = ref('');
 const debouncedSearch = ref('');
 const selectedProjectId = ref<string | null>(null);
+
 
 // Fetch projects for filtering
 const {
@@ -169,6 +179,32 @@ const clearFilters = () => {
   searchQuery.value = '';
   selectedProjectId.value = null;
 };
+
+// BIDDING
+const selectedTaskIdForBid = ref<string | null>(null);
+  const selectedTaskInfo = computed(() => {
+    return allTasks.value.find((task: ITask) => task.id === selectedTaskIdForBid.value);
+  });
+
+  console.log(selectedTaskInfo.value);
+
+const openBiddingModal = (taskId: string) => {
+  selectedTaskIdForBid.value = taskId;
+  isBiddingModalOpen.value = true;
+};
+
+const closeBiddingModal = () => {
+  isBiddingModalOpen.value = false;
+  selectedTaskIdForBid.value = null;
+};
+
+provide('biddingInfo', {
+  isAllowedToBid: isAllowedToBid,
+  isBiddingModalOpen: isBiddingModalOpen,
+  openBiddingModal,
+  closeBiddingModal,
+});
+
 </script>
 
 <template>
@@ -243,5 +279,22 @@ const clearFilters = () => {
         </div>
       </div>
     </div>
+
+    <!-- Bidding Modal -->
+    <Modal
+      :isOpen="isBiddingModalOpen"
+      @close="closeBiddingModal"
+    >
+      <Bid 
+        v-if="selectedTaskIdForBid"
+        @make-bid="(message: string) => console.log('Bid for task:', selectedTaskIdForBid, message)"
+        :isMakingBidPending="false" 
+        :task="{
+          name: selectedTaskInfo?.name,
+          skills: selectedTaskInfo?.skills,
+
+        }"
+      />
+    </Modal>
   </div>
 </template>

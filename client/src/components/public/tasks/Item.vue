@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, inject, computed, type ComputedRef, type Ref } from 'vue';
+import { OhVueIcon } from 'oh-vue-icons';
 
 interface ITask {
     id: string;
@@ -14,17 +15,31 @@ interface ITask {
     skills: string[];
 }
 
-defineProps<{
+
+const props = defineProps<{
     task: ITask;
-    isAllowedToBid: boolean;
 }>();
+
+const biddingInfo = inject<{
+    isAllowedToBid: ComputedRef<boolean> | boolean;
+    isBiddingModalOpen: Ref<boolean> | boolean;
+    openBiddingModal: (taskId: string) => void;
+    closeBiddingModal: () => void;
+}>('biddingInfo');
+
+const isAllowedToBid = computed(() => {
+  if (!biddingInfo) return false;
+  const value = biddingInfo.isAllowedToBid;
+  return typeof value === 'object' && 'value' in value ? value.value : value;
+});
+
+const openBiddingModal = () => biddingInfo?.openBiddingModal(props.task.id);
 
 const isDescriptionOpen = ref(false);
 
 const toggleDescription = () => {
     isDescriptionOpen.value = !isDescriptionOpen.value;
 };
-
 </script>
 
 <template>
@@ -100,6 +115,7 @@ const toggleDescription = () => {
                 </button>
                 <button
                     v-if="isAllowedToBid"
+                    @click="openBiddingModal"
                     class="cursor-pointer px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm flex items-center gap-2 whitespace-nowrap flex justify-center"
                 >
                     <span class="font-bold">Bid on Task</span>

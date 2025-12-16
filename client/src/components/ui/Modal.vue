@@ -32,7 +32,6 @@ const handleClose = () => {
       <div
         v-if="isOpen"
         class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-        @click="handleBackdropClick"
       >
         <Transition
           enter-active-class="transition-all duration-300"
