@@ -76,13 +76,13 @@ const handleChange = (event: Event) => {
     <div class="relative">
       <select
         :id="id"
-        :value="modelValue"
+        :value="modelValue ?? ''"
         @change="handleChange"
         :required="required"
         :disabled="disabled"
         :class="selectClass"
       >
-        <option v-if="!required" :value="null" disabled selected>
+        <option disabled selected value="">
           {{ placeholder }}
         </option>
         <option
