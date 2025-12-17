@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 import { Input } from '@/components/ui';
 import { AuthForm } from '@/components/public';
 import { useLogin } from '@/composables/useLogin';
@@ -8,6 +8,21 @@ import type { LoginDto } from '@/api/public/auth';
 const form = reactive<LoginDto>({
   email: '',
   password: '',
+});
+
+const isFormValid = computed(() => {
+  const email = form.email.trim();
+  const password = form.password.trim();
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  return Boolean(password) && isEmailValid;
+});
+
+const invalidEmailError = computed(() => {
+  if (form.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    return 'Invalid email address';
+  }
+  return '';
 });
 
 const { loginMutation, isPending, isError, errorMessage } = useLogin();
@@ -24,17 +39,22 @@ const handleLogin = () => {
   >
     <form @submit.prevent="handleLogin" class="space-y-6">
       <!-- Email Field -->
-      <Input
+      <div>
+        <Input
         id="email"
         label="Email Address"
-        preIcon="hi-mail"
-        type="email"
-        placeholder="Enter your email"
-        :modelValue="form.email"
-        @update:modelValue="form.email = $event"
-        :hasPreIcon="true"
-        :required="true"
-      />
+          preIcon="hi-mail"
+          type="email"
+          placeholder="Enter your email"
+          :modelValue="form.email"
+          @update:modelValue="form.email = $event"
+          :hasPreIcon="true"
+          :required="true"
+        />
+        <p v-if="invalidEmailError" class="mt-1 text-sm text-red-600 font-bold">
+          {{ invalidEmailError }}
+        </p>
+      </div>
       <!-- Password Field -->
       <Input
         id="password"
@@ -56,7 +76,7 @@ const handleLogin = () => {
       <!-- Submit Button -->
       <button
         type="submit"
-        :disabled="isPending"
+        :disabled="isPending || !isFormValid"
         class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         <span v-if="!isPending">Sign In</span>

@@ -25,11 +25,35 @@ const passwordMismatchError = computed(() => {
   return '';
 });
 
+const passwordLengthError = computed(() => {
+  if (form.password.trim() && form.password.trim().length < 8) {
+    return 'Password must be at least 8 characters long';
+  }
+  return '';
+});
+
+const invalidEmailError = computed(() => {
+  if (form.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    return 'Invalid email address';
+  }
+  return '';
+});
+
 const isFormValid = computed(() => {
-  return form.names.trim() && 
-         form.email.trim() && 
-         form.password && 
-         passwordsMatch.value;
+  const names = form.names.trim();
+  const email = form.email.trim();
+  const password = form.password.trim();
+  const passwordConfirmation = form.password_confirmation.trim();
+  const isPasswordValid = password.length >= 8;
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  return Boolean(names) && 
+         Boolean(email) && 
+         Boolean(password) && 
+         Boolean(passwordConfirmation) && 
+         isEmailValid &&
+         passwordsMatch.value &&
+         isPasswordValid;
 });
 
 const handleRegister = () => {
@@ -54,7 +78,7 @@ const handleRegister = () => {
     subtitle="Create an account to get started"
   >
     <form @submit.prevent="handleRegister" class="space-y-6">
-      <!-- Email Field -->
+      <!--  Field -->
       <Input
         id="names"
         label="Names"
@@ -67,18 +91,24 @@ const handleRegister = () => {
         :required="true"
       />
       <!-- Email Field -->
-      <Input
-        id="email"
-        label="Email Address"
-        preIcon="hi-mail"
-        type="email"
-        placeholder="Enter your email"
-        :modelValue="form.email"
-        @update:modelValue="form.email = $event"
-        :hasPreIcon="true"
-        :required="true"
-      />
+      <div>
+        <Input
+          id="email"
+          label="Email Address"
+          preIcon="hi-mail"
+          type="email"
+          placeholder="Enter your email"
+          :modelValue="form.email"
+          @update:modelValue="form.email = $event"
+          :hasPreIcon="true"
+          :required="true"
+        />
+        <p v-if="invalidEmailError" class="mt-1 text-sm text-red-600 font-bold">
+          {{ invalidEmailError }}
+        </p>
+      </div>
       <!-- Password Field -->
+      <div>
       <Input
         id="password"
         label="Password"
@@ -87,9 +117,13 @@ const handleRegister = () => {
         placeholder="Enter your password"
         :modelValue="form.password"
         @update:modelValue="form.password = $event"
-        :hasPreIcon="true"
-        :required="true"
-      />
+          :hasPreIcon="true"
+          :required="true"
+        />
+        <p v-if="passwordLengthError" class="mt-1 text-sm text-red-600 font-bold">
+          {{ passwordLengthError }}
+        </p>
+      </div>
       <!-- Password Confirmation Field -->
       <div>
         <Input
@@ -104,7 +138,7 @@ const handleRegister = () => {
           :required="true"
         />
         <!-- Password Mismatch Error -->
-        <p v-if="passwordMismatchError" class="mt-1 text-sm text-red-600">
+        <p v-if="passwordMismatchError" class="mt-1 text-sm text-red-600 font-bold">
           {{ passwordMismatchError }}
         </p>
       </div>
