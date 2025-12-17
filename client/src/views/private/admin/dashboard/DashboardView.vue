@@ -26,7 +26,7 @@
     queryFn: () => getRecentBids(),
   });
 
-  export interface IBid {
+  interface IBid {
     id: string;
     message: string;
     status: "PENDING" | "ACCEPTED" | "REJECTED";
@@ -45,7 +45,7 @@
     createdAt: string;
   }
 
-  export interface ITask {
+  interface ITask {
     id: string;
     name: string;
     status: "OPEN" | "ASSIGNED" | "COMPLETED";
@@ -59,7 +59,7 @@
     };
   }
 
-  export interface IWork {
+  interface IWork {
     id: string;
     task: {
         id: string;

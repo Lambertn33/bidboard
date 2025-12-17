@@ -2,7 +2,27 @@
 import { computed } from 'vue';
 import { getStartTimeInDays } from '@/reusables';
 
-import { IBid } from '@/views/private/admin/dashboard/DashboardView';
+interface IBidFreelancer {
+  id: string;
+  telephone: string;
+  user: {
+    id: string;
+    names: string;
+  };
+}
+
+interface IBid {
+  id: string;
+  message: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
+  task: {
+    id: string;
+    name: string;
+  };
+  freelancer: IBidFreelancer;
+  createdAt: string;
+}
+    
 
 const props = defineProps<{
     bid: IBid;

@@ -3,7 +3,26 @@ import { computed } from 'vue';
 import { OhVueIcon } from 'oh-vue-icons';
 import { getStartTimeInDays } from '@/reusables';
 
-import { IWork } from '@/views/private/admin/dashboard/DashboardView';
+interface IWork {
+    id: string;
+    task: {
+        id: string;
+        name: string;
+    };
+    freelancer: {
+        id: string;
+        telephone: string;
+        user: {
+            id: string;
+            names: string;
+        };
+    };
+    startDate: string;
+    endDate: string;
+    completionUrl: string | null;
+    status: "COMPLETED" | "IN_PROGRESS";
+    createdAt: string;
+  }
 
 const props = defineProps<{
     work: IWork;

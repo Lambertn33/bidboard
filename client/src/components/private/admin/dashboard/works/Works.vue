@@ -1,7 +1,27 @@
 <script setup lang="ts">
 import { OhVueIcon } from 'oh-vue-icons';
 import Work from './Work.vue';
-import { IWork } from '@/views/private/admin/dashboard/DashboardView';
+
+interface IWork {
+    id: string;
+    task: {
+        id: string;
+        name: string;
+    };
+    freelancer: {
+        id: string;
+        telephone: string;
+        user: {
+            id: string;
+            names: string;
+        };
+    };
+    startDate: string;
+    endDate: string;
+    completionUrl: string | null;
+    status: "COMPLETED" | "IN_PROGRESS";
+    createdAt: string;
+  }
 
 interface Props {
     works?: IWork[];
@@ -15,7 +35,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-    refetchRecentWorks: [];
+    (e: 'refetchRecentWorks'): void;
 }>();
 </script>
 
@@ -50,8 +70,7 @@ const emit = defineEmits<{
           {{ error instanceof Error ? error.message : 'An error occurred while loading recent works.' }}
         </p>
         <button
-          v-if="refetchRecentWorks"
-          @click="refetchRecentWorks"
+          @click="$emit('refetchRecentWorks')"
           class="px-3 py-1.5 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
         >
           <OhVueIcon name="co-reload" class="w-4 h-4" />

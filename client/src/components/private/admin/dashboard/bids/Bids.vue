@@ -2,7 +2,26 @@
 import { OhVueIcon } from 'oh-vue-icons';
 import Bid from './Bid.vue';
 
-import { IBid } from '@/views/private/admin/dashboard/DashboardView';
+interface IBidFreelancer {
+  id: string;
+  telephone: string;
+  user: {
+    id: string;
+    names: string;
+  };
+}
+
+interface IBid {
+  id: string;
+  message: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
+  task: {
+    id: string;
+    name: string;
+  };
+  freelancer: IBidFreelancer;
+  createdAt: string;
+}
 
 interface Props {
     bids?: IBid[];
@@ -16,7 +35,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-    refetchRecentBids: [];
+    (e: 'refetchRecentBids'): void;
 }>();
 </script>
 
@@ -53,8 +72,7 @@ const emit = defineEmits<{
           {{ error instanceof Error ? error.message : 'An error occurred while loading recent bids.' }}
         </p>
         <button
-          v-if="refetchRecentBids"
-          @click="refetchRecentBids"
+          @click="$emit('refetchRecentBids')"
           class="px-3 py-1.5 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
         >
           <OhVueIcon name="co-reload" class="w-4 h-4" />
