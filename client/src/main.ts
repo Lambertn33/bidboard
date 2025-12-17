@@ -51,7 +51,8 @@ import {
     IoShieldCheckmarkSharp,
     IoCloseCircleOutline,
     HiPhone,
-    MdMessageOutlined
+    MdMessageOutlined,
+    HiLogout
   } from 'oh-vue-icons/icons';      
 
 
@@ -97,7 +98,8 @@ addIcons(
   IoShieldCheckmarkSharp,
   IoCloseCircleOutline,
   HiPhone,
-  MdMessageOutlined
+  MdMessageOutlined,
+  HiLogout
 );
 
 createApp(App)
