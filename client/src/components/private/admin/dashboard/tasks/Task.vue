@@ -32,7 +32,7 @@ const getStatusColor = (status: string) => {
     <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
         <div class="flex-1">
             <div class="flex items-center gap-3">
-                <h3 class="font-medium text-gray-900">{{ task.name }} ldld</h3>
+                <h3 class="font-medium text-gray-900">{{ task.name }}</h3>
                 <span :class="['px-2 py-1 rounded-full text-xs font-medium', getStatusColor(task.status)]">
                     {{ task.status }}
                 </span>

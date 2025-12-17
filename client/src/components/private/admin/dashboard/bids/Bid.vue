@@ -43,34 +43,27 @@ const timeAgo = computed(() => getStartTimeInDays(props.bid.createdAt));
 <template>
     <div class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
         <div class="flex items-start justify-between">
-            <div class="flex-1">
+            <div class="flex-1 ">
                 <div class="flex items-center gap-3 mb-2">
-                      <h3 class="font-medium text-gray-900">{{ bid.task.name }}</h3>
+                      <h3 class="font-bold text-gray-900">{{ bid.task.name }}</h3>
                       <span :class="['px-2 py-1 rounded-full text-xs font-medium', getStatusColor(bid.status)]">
                         {{ bid.status }}
                       </span>
                 </div>
-                <p class="text-sm text-gray-600 mb-2">
-                    by 
+                <p class="text-sm text-gray-600 mb-2 flex items-center gap-2">
+                    <OhVueIcon name="hi-user" class="w-4 h-4" />
                     <span class="font-medium">
                         {{ bid.freelancer.user.names }}
                     </span>
                 </p>
-                <p class="text-sm text-gray-700 line-clamp-2">{{ bid.message }}</p>
-                <p class="text-xs text-gray-500 mt-2">{{ timeAgo }}</p>
-            </div>
-            <div class="ml-4 flex gap-2">
-                <button v-if="bid.status === 'PENDING'"
-                    class="px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
-                >
-                     Accept
-                </button>
-                <button
-                    v-if="bid.status === 'PENDING'"
-                    class="px-3 py-1.5 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
-                >
-                    Reject
-                </button>
+                <div class="flex items-center gap-2 border border-gray-200 rounded-lg p-2 bg-gray-200">
+                    <OhVueIcon name="md-message-outlined" class="w-4 h-4" />
+                    <p class="text-sm text-gray-700 line-clamp-2">{{ bid.message }}</p>
+                </div>
+                <div class="flex items-center gap-2 mt-2">
+                    <OhVueIcon name="hi-clock" class="w-4 h-4" />
+                    <p class="text-xs text-gray-500">{{ timeAgo }}</p>
+                </div>
             </div>
         </div>
     </div>

@@ -50,7 +50,8 @@ import {
     IoClose,
     IoShieldCheckmarkSharp,
     IoCloseCircleOutline,
-    HiPhone
+    HiPhone,
+    MdMessageOutlined
   } from 'oh-vue-icons/icons';      
 
 
@@ -95,7 +96,8 @@ addIcons(
   IoClose,
   IoShieldCheckmarkSharp,
   IoCloseCircleOutline,
-  HiPhone
+  HiPhone,
+  MdMessageOutlined
 );
 
 createApp(App)
