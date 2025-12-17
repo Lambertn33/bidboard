@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, reactive } from 'vue';
 import { OhVueIcon } from 'oh-vue-icons';
-import Table from '@/components/private/admin/bids/Table.vue';
+import { Table, AcceptBid } from '@/components/private/admin/bids';
 import { useFetchBids } from '@/composables/useFetchBids';
+import { Modal } from '@/components/ui';
 
 // Pagination state
 const currentPage = ref(1);
@@ -49,7 +50,45 @@ const goToNextPage = () => {
     currentPage.value++;
   }
 };
-  </script>
+
+// BIDS ACTIONS
+const isAcceptingBidModalOpen = ref(false);
+const selectedBidId = ref<string | null>(null);
+  
+const selectedBid = reactive<{
+  id: string;
+  message: string;
+  freelancerNames: string;
+  taskName: string;
+}>({
+  id: '',
+  message: '',
+  freelancerNames: '',
+  taskName: '',
+});
+
+const openAcceptBidModal = (bidId: string) => {
+ const bid = bids.value.find((b) => b.id === bidId);
+ if (bid) {
+  selectedBidId.value = bid.id;
+  selectedBid.id = bid.id;
+  selectedBid.message = bid.message;
+  selectedBid.freelancerNames = bid.freelancer?.user.names || '';
+  selectedBid.taskName = bid.task.name;
+  isAcceptingBidModalOpen.value = true;
+ }
+};
+
+const closeAcceptBidModal = () => {
+  isAcceptingBidModalOpen.value = false;
+  selectedBidId.value = null;
+  selectedBid.id = '';
+  selectedBid.message = '';
+  selectedBid.freelancerNames = '';
+  selectedBid.taskName = '';
+};
+
+</script>
   
   <template>
     <div class="min-h-screen bg-gray-50">
@@ -106,7 +145,19 @@ const goToNextPage = () => {
           @goToPreviousPage="goToPreviousPage"
           @goToNextPage="goToNextPage"
           @update:limit="(value: number) => (limit = value)"
+          @open-accepting-bid-modal="openAcceptBidModal"
         />
+        <!-- Guard render too, so the modal can never "flash" open due to transient truthy values -->
+        <Modal v-if="isAcceptingBidModalOpen" :isOpen="isAcceptingBidModalOpen" @close="closeAcceptBidModal">
+          <AcceptBid
+            :bidId="selectedBid.id"
+            :bidMessage="selectedBid.message"
+            :bidFreelancerName="selectedBid.freelancerNames"
+            :bidTaskName="selectedBid.taskName"
+            :isAcceptingBidPending="false"
+            @acceptBid="() => {}"
+          />
+        </Modal>
       </div>
     </div>
   </template>

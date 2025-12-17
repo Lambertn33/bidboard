@@ -4,3 +4,4 @@ export { default as TextArea } from './TextArea.vue';
 export { default as Select } from './Select.vue';
 export { default as Search } from './Search.vue';
 export { default as Pagination } from './Pagination.vue';
+export { default as DateInput } from './DateInput.vue';
