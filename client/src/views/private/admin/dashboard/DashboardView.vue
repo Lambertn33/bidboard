@@ -287,7 +287,7 @@
                 :tasks="recentTasks"
                 :loading="isRecentTasksLoading"
                 :error="recentTasksError"
-                :refetchRecentTasks="() => { refetchRecentTasks(); }"
+                @refetchRecentTasks="refetchRecentTasks()"
               />
             </div>
           </div>
@@ -309,7 +309,7 @@
                 :works="recentWorks"
                 :loading="isRecentWorksLoading"
                 :error="recentWorksError"
-                :refetchRecentWorks="() => { refetchRecentWorks(); }"
+                @refetchRecentWorks="refetchRecentWorks()"
               />
             </div>
           </div>
@@ -332,7 +332,7 @@
               :bids="recentBids"
               :loading="isRecentBidsLoading"
               :error="recentBidsError"
-              :refetchRecentBids="() => { refetchRecentBids(); }"
+              @refetchRecentBids="refetchRecentBids()"
             />
           </div>
         </div>

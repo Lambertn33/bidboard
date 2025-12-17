@@ -1,7 +1,17 @@
 <script setup lang="ts">
 import Task from './Task.vue';
 
-import { ITask } from '@/views/private/admin/dashboard/DashboardView';
+interface ITask {
+    id: string;
+    name: string;
+    status: "OPEN" | "ASSIGNED" | "COMPLETED";
+    project: {
+        id: string;
+        name: string;
+    };
+    price: number;
+    bids: number;
+  }
 
 interface Props {
     tasks?: ITask[];
@@ -14,8 +24,8 @@ const props = withDefaults(defineProps<Props>(), {
     error: null,
 });
 
-const emit = defineEmits<{
-    refetchRecentTasks: [];
+defineEmits<{
+    (e: 'refetchRecentTasks'): void;
 }>();
 </script>
 
@@ -50,8 +60,7 @@ const emit = defineEmits<{
           {{ error instanceof Error ? error.message : 'An error occurred while loading recent tasks.' }}
         </p>
         <button
-          v-if="refetchRecentTasks"
-          @click="refetchRecentTasks"
+          @click="$emit('refetchRecentTasks')"
           class="px-3 py-1.5 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
         >
           <OhVueIcon name="co-reload" class="w-4 h-4" />

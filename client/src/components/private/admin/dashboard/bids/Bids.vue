@@ -34,7 +34,7 @@ const props = withDefaults(defineProps<Props>(), {
     error: null,
 });
 
-const emit = defineEmits<{
+defineEmits<{
     (e: 'refetchRecentBids'): void;
 }>();
 </script>
