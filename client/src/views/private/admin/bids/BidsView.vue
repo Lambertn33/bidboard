@@ -78,6 +78,7 @@ const { mutate: acceptBidMutation, isPending: isAcceptingBidPending } = useMutat
   onSuccess: (response) => {
     showSuccessToast(response?.message || 'Bid accepted successfully');
     queryClient.invalidateQueries({ queryKey: ['bids'] });
+    queryClient.invalidateQueries({ queryKey: ['tasks'] });
     closeAcceptBidModal();
   },
   onError: (error) => {
