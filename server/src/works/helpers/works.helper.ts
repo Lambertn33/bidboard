@@ -48,10 +48,21 @@ export class WorksHelper {
                 select: {
                     id: true,
                     name: true,
-                    description: true,
                 },
             },
         };
+
+        if (role === Role.ADMIN) {
+            select.freelancer = {
+                select: {
+                    user: {
+                        select: {
+                            names: true,
+                        },
+                    },
+                },
+            };
+        }
 
        const [works, total] = await Promise.all([
         this.databaseService.work.findMany({

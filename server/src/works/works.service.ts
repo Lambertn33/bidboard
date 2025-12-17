@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { WorksHelper } from './helpers/works.helper';
 import { Role, TaskStatus, WorkStatus } from 'generated/prisma/client';
 import { DatabaseService } from '@/database/database.service';

@@ -55,3 +55,11 @@ export const getStartTimeInDays = (startDate: string): string => {
         return years === 1 ? '1 year ago' : `${years} years ago`;
     }
 };
+
+export  const formatDate = (date: string): string => {
+    return new Date(date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+    });
+};
