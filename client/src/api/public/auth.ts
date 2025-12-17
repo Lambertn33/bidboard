@@ -5,6 +5,7 @@ export interface RegisterDto {
   names: string;
   email: string;
   password: string;
+  telephone: string;
 }
 
 export interface LoginDto {

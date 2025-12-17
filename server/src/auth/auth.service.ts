@@ -42,7 +42,7 @@ export class AuthService {
         }
     }
 
-    async register (names: string, email: string, password: string) {
+    async register (names: string, email: string, password: string, telephone: string) {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -54,6 +54,14 @@ export class AuthService {
                     password: hashedPassword,
                     role: Role.FREELANCER,
                 },  
+            });
+
+            await this.databaseService.freelancer.create({
+                data: {
+                    userId: user.id,
+                    telephone,
+                    balance: 0,
+                },
             });
     
             const {access_token} = await this.login(email, password);

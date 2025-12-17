@@ -1,15 +1,21 @@
 <script setup lang="ts">
+  import { computed } from 'vue';
 interface AuthFormProps {
   title: string;
   subtitle: string;
+  width?: string;
 }
 
-defineProps<AuthFormProps>();
+const props = defineProps<AuthFormProps>();
+
+const formWidth = computed(() => {
+  return props.width ? `w-full ${props.width}` : 'max-w-md w-full';
+});
 </script>
 
 <template>
   <div class="min-h-screen bg-gray-200 flex items-center justify-center px-4 py-16">
-    <div class="max-w-md w-full">
+    <div :class="formWidth">
       <!-- Auth Card -->
       <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
         <!-- Header Section -->

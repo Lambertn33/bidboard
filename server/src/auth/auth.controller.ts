@@ -14,7 +14,7 @@ export class AuthController {
     if (user) {
       throw new BadRequestException('User already exists');
     }
-    return this.authService.register(body.names, body.email, body.password);
+    return this.authService.register(body.names, body.email, body.password, body.telephone);
   } 
 
   @Post('login')

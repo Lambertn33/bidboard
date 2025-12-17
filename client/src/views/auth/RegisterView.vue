@@ -8,6 +8,7 @@ import type { RegisterDto } from '@/api/public/auth';
 const form = reactive<RegisterDto & { password_confirmation: string }>({
   names: '',
   email: '',
+  telephone: '',
   password: '',
   password_confirmation: '',
 });
@@ -39,6 +40,13 @@ const invalidEmailError = computed(() => {
   return '';
 });
 
+const invalidTelephoneError = computed(() => {
+  if (form.telephone.trim() && !/^(\+2507)\d{8}$/.test(form.telephone)) {
+    return 'Invalid telephone number';
+  }
+  return '';
+});
+
 const isFormValid = computed(() => {
   const names = form.names.trim();
   const email = form.email.trim();
@@ -46,6 +54,7 @@ const isFormValid = computed(() => {
   const passwordConfirmation = form.password_confirmation.trim();
   const isPasswordValid = password.length >= 8;
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const isTelephoneValid = /^(\+2507)\d{8}$/.test(form.telephone);
 
   return Boolean(names) && 
          Boolean(email) && 
@@ -53,7 +62,8 @@ const isFormValid = computed(() => {
          Boolean(passwordConfirmation) && 
          isEmailValid &&
          passwordsMatch.value &&
-         isPasswordValid;
+         isPasswordValid &&
+         isTelephoneValid;
 });
 
 const handleRegister = () => {
@@ -66,6 +76,7 @@ const handleRegister = () => {
     names: form.names,
     email: form.email,
     password: form.password,
+    telephone: form.telephone,
   };
   
   registerMutation(registerData);
@@ -76,21 +87,42 @@ const handleRegister = () => {
   <AuthForm
     title="Welcome to TaskBid"
     subtitle="Create an account to get started"
+    width="max-w-xl"
   >
     <form @submit.prevent="handleRegister" class="space-y-6">
       <!--  Field -->
-      <Input
-        id="names"
-        label="Names"
-        preIcon="hi-user"
-        type="text"
-        placeholder="Enter your names"
-        :modelValue="form.names"
-        @update:modelValue="form.names = $event"
-        :hasPreIcon="true"
-        :required="true"
-      />
-      <!-- Email Field -->
+      <div class="flex flex-col sm:flex-row gap-3">
+          <div class="flex-1">
+              <Input
+              id="names"
+              label="Names"
+              preIcon="hi-user"
+              type="text"
+              placeholder="Enter your names"
+              :modelValue="form.names"
+              @update:modelValue="form.names = $event"
+              :hasPreIcon="true"
+              :required="true"
+            />
+          </div>
+        <!-- Telephone Field -->
+          <div class="flex-1">
+            <Input
+              id="telephone"
+              label="Telephone"
+              preIcon="hi-phone"
+              type="tel"
+              placeholder="Enter Telephone (+2507...)"
+              :modelValue="form.telephone"
+              @update:modelValue="form.telephone = $event"
+              :hasPreIcon="true"
+              :required="true"
+            />
+            <p v-if="invalidTelephoneError" class="mt-1 text-sm text-red-600 font-bold">
+              {{ invalidTelephoneError }}
+            </p>   
+          </div>
+      </div>
       <div>
         <Input
           id="email"
@@ -107,40 +139,42 @@ const handleRegister = () => {
           {{ invalidEmailError }}
         </p>
       </div>
-      <!-- Password Field -->
-      <div>
-      <Input
-        id="password"
-        label="Password"
-        preIcon="hi-lock-closed"
-        type="password"
-        placeholder="Enter your password"
-        :modelValue="form.password"
-        @update:modelValue="form.password = $event"
-          :hasPreIcon="true"
-          :required="true"
-        />
-        <p v-if="passwordLengthError" class="mt-1 text-sm text-red-600 font-bold">
-          {{ passwordLengthError }}
-        </p>
-      </div>
-      <!-- Password Confirmation Field -->
-      <div>
-        <Input
-          id="password_confirmation"
-          label="Password Confirmation"
+      <div class="flex flex-col sm:flex-row gap-3">
+        <!-- Password Field -->
+        <div class="flex-1">
+          <Input
+          id="password"
+          label="Password"
           preIcon="hi-lock-closed"
           type="password"
-          placeholder="Confirm your password"
-          :modelValue="form.password_confirmation"
-          @update:modelValue="form.password_confirmation = $event"
-          :hasPreIcon="true"
-          :required="true"
-        />
-        <!-- Password Mismatch Error -->
-        <p v-if="passwordMismatchError" class="mt-1 text-sm text-red-600 font-bold">
-          {{ passwordMismatchError }}
-        </p>
+          placeholder="Enter your password"
+          :modelValue="form.password"
+          @update:modelValue="form.password = $event"
+            :hasPreIcon="true"
+            :required="true"
+          />
+          <p v-if="passwordLengthError" class="mt-1 text-sm text-red-600 font-bold">
+            {{ passwordLengthError }}
+          </p>
+        </div>
+        <!-- Password Confirmation Field -->
+        <div class="flex-1">
+          <Input
+            id="password_confirmation"
+            label="Password Confirmation"
+            preIcon="hi-lock-closed"
+            type="password"
+            placeholder="Confirm your password"
+            :modelValue="form.password_confirmation"
+            @update:modelValue="form.password_confirmation = $event"
+            :hasPreIcon="true"
+            :required="true"
+          />
+          <!-- Password Mismatch Error -->
+          <p v-if="passwordMismatchError" class="mt-1 text-sm text-red-600 font-bold">
+            {{ passwordMismatchError }}
+          </p>
+        </div>
       </div>
       <!-- Error Message -->
       <div v-if="isError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm font-bold text-center">

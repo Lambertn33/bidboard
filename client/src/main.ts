@@ -49,7 +49,8 @@ import {
     HiExclamationCircle,
     IoClose,
     IoShieldCheckmarkSharp,
-    IoCloseCircleOutline
+    IoCloseCircleOutline,
+    HiPhone
   } from 'oh-vue-icons/icons';      
 
 
@@ -93,7 +94,8 @@ addIcons(
   HiExclamationCircle,
   IoClose,
   IoShieldCheckmarkSharp,
-  IoCloseCircleOutline
+  IoCloseCircleOutline,
+  HiPhone
 );
 
 createApp(App)
