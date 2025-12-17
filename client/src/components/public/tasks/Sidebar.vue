@@ -35,6 +35,7 @@ const handleRetry = () => emits('refetchProjects');
         <p class="text-[11px] uppercase tracking-[0.12em] text-slate-500 font-bold">Projects</p>
       </div>
       <button
+        v-if="projects.length > 0"
         class="text-sm text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
         @click="handleClear"
       >
