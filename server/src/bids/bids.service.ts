@@ -87,7 +87,7 @@ export class BidsService {
     async rejectBid(id: string) {
         const bid = await this.databaseService.bid.findUnique({
             where: { id },
-            select: { id: true, taskId: true, freelancerId: true },
+            select: { id: true, taskId: true, freelancerId: true, task: { select: { name: true } } },
         });
 
         if (!bid) {

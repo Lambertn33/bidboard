@@ -8,6 +8,8 @@ export interface User {
   email: string;
   role: UserRole;
   names: string;
+  telephone?: string;
+  balance?: number;
 }
 
 interface JwtPayload {
@@ -16,6 +18,8 @@ interface JwtPayload {
   email?: string;
   role?: UserRole;
   names?: string;
+  telephone?: string;
+  balance?: number;
   iat?: number;
   exp?: number;
 }
@@ -34,7 +38,6 @@ const isTokenExpired = (token: string): boolean => {
     const currentTime = Date.now();
     return currentTime >= expirationTime - 60000;
   } catch (error) {
-    console.error('Failed to decode token:', error);
     return true;
   }
 };
@@ -55,9 +58,10 @@ const decodeToken = (token: string): User | null => {
       email: decoded.email || '',
       role: decoded.role || 'FREELANCER',
       names: decoded.names || '',
+      telephone: decoded.telephone,
+      balance: decoded.balance,
     };
   } catch (error) {
-    console.error('Failed to decode token:', error);
     return null;
   }
 };

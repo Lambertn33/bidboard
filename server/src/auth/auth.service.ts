@@ -15,6 +15,9 @@ export class AuthService {
           where: {
             email,
           },
+          include: {
+            freelancer: true,
+          },
         });
     
         if (user && (await bcrypt.compare(password, user.password))) {
@@ -37,8 +40,21 @@ export class AuthService {
         if (!user) {
             throw new UnauthorizedException('Invalid credentials');
         }
+        
+        const tokenPayload: any = {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+            names: user.names,
+        };
+
+        // Include freelancer data if user is a freelancer
+        if (user.role === Role.FREELANCER && user.freelancer) {
+            tokenPayload.telephone = user.freelancer.telephone;
+            tokenPayload.balance = user.freelancer.balance;
+        }
         return {
-            access_token: this.jwtService.sign({ id: user.id, email: user.email, role: user.role, names: user.names }),
+            access_token: this.jwtService.sign(tokenPayload),
         }
     }
 

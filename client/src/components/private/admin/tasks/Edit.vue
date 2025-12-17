@@ -30,7 +30,6 @@
       taskToEdit: ITask;
     }>();
 
-    console.log(props.projects)
 
     const skillInput = ref('');
     
