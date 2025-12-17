@@ -242,6 +242,29 @@ const handleMakeBid = (message: string) => {
   makeBidMutation(message);
 };
 
+// DISABLED MESSAGE
+const disabledMessage = computed(() => {
+  if (existingBidForSelectedTask.value && existingBidForSelectedTask.value.status !== 'ACCEPTED') {
+    if (existingBidForSelectedTask.value.status === 'PENDING') {
+      return 'Your bid is pending review. Please wait for the task owner to review your bid.';
+    } else if (existingBidForSelectedTask.value.status === 'REJECTED') {
+      return 'Your bid has been rejected. Please try again.';
+    }
+  }
+  return undefined;
+});
+
+const disabledReasonClassName = computed(() => {
+  if (existingBidForSelectedTask.value && existingBidForSelectedTask.value.status !== 'ACCEPTED') {
+    if (existingBidForSelectedTask.value.status === 'PENDING') {
+      return 'bg-amber-50 border-amber-200 text-amber-700';
+    } else if (existingBidForSelectedTask.value.status === 'REJECTED') {
+      return 'bg-red-50 border-red-200 text-red-700';
+    }
+  }
+  return '';
+});
+
 </script>
 
 <template>
@@ -327,7 +350,8 @@ const handleMakeBid = (message: string) => {
         @make-bid="handleMakeBid"
         :isMakingBidPending="isMakingBidPending"
         :disabled="!!existingBidForSelectedTask"
-        :disabledReason="existingBidForSelectedTask ? `You already bid on this task (status: ${existingBidForSelectedTask.status}).` : undefined"
+        :disabledReason="disabledMessage"
+        :disabledReasonClassName="disabledReasonClassName"
         :task="{
           name: selectedTaskInfo?.name,
           skills: selectedTaskInfo?.skills,

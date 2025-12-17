@@ -40,6 +40,7 @@
       hasNextPage: boolean;
       limit: number;
       formatDate: (date: string) => string;
+      isRejectingBidPending: boolean;
     }>();
     
     const emits = defineEmits<{
@@ -50,6 +51,7 @@
       (e: 'open-editing-modal', projectId: string): void;
       (e: 'open-accepting-bid-modal', bidId: string): void;
       (e: 'open-viewing-bid-modal', bidId: string): void;
+      (e: 'reject-bid', bidId: string): void;
     }>();
     
     const goToPage = (page: number) => emits('goToPage', page);
@@ -58,6 +60,8 @@
     const updateLimit = (value: number) => emits('update:limit', value);
     const openAcceptingBidModal = (bidId: string) => emits('open-accepting-bid-modal', bidId);
     const openViewingBidModal = (bidId: string) => emits('open-viewing-bid-modal', bidId);
+    const rejectBid = (bidId: string) => emits('reject-bid', bidId);
+
     const getBidStatusColor = (status: string) => {
         const colors: Record<string, string> = {
             PENDING: 'bg-yellow-50 text-yellow-700 border border-yellow-200',
@@ -129,7 +133,7 @@
                     <button v-if="bid.status === 'PENDING'" class="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer" @click="openAcceptingBidModal(bid.id)">
                       <OhVueIcon name="io-shield-checkmark-sharp" class="h-5 w-5 text-green-500" />
                     </button>
-                    <button v-if="bid.status === 'PENDING'" class="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer">
+                    <button v-if="bid.status === 'PENDING'" class="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer" @click="rejectBid(bid.id)">
                       <OhVueIcon name="io-close-circle-outline" class="h-5 w-5 text-red-500" />
                     </button>
                   </div>

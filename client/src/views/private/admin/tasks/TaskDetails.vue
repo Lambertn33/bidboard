@@ -26,6 +26,9 @@ const totalBids = computed(() => task.value?.bids.length ?? 0);
 const pendingBidsCount = computed(
   () => task.value?.bids.filter((b) => b.status === 'PENDING').length ?? 0,
 );
+const rejectedBidsCount = computed(
+  () => task.value?.bids.filter((b) => b.status === 'REJECTED').length ?? 0,
+);
 </script>
 
 <template>
@@ -91,7 +94,7 @@ const pendingBidsCount = computed(
         </div>
 
         <!-- Right Column: Stats -->
-        <DetailsStats v-if="task" :totalBids="totalBids" :pendingBidsCount="pendingBidsCount" :taskStatus="task.status" />
+        <DetailsStats v-if="task" :totalBids="totalBids" :pendingBidsCount="pendingBidsCount" :rejectedBidsCount="rejectedBidsCount" :taskStatus="task.status" />
       </div>
 
       <!-- Fallback for no data -->

@@ -14,6 +14,7 @@
       };
       disabled?: boolean;
       disabledReason?: string;
+      disabledReasonClassName?: string;
     }>();
 
     const form = ref<{
@@ -47,7 +48,7 @@
               <span>{{ skill }}</span>
             </div>
         </div>
-        <div v-if="disabled" class="mt-4 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+        <div v-if="disabled" class="mt-4 text-sm  border rounded-lg px-4 py-3" :class="disabledReasonClassName">
           {{ disabledReason || 'You cannot make a bid for this task.' }}
         </div>
 

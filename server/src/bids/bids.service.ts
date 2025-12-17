@@ -101,7 +101,7 @@ export class BidsService {
         });
 
         return {
-            message: `Bid has been rejected for task ${bid.taskId}`,
+            message: `Bid has been rejected for task ${bid.task.name}`,
             data: bid,
         };
     }

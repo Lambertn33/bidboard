@@ -3,6 +3,7 @@
     defineProps<{
         totalBids: number;
         pendingBidsCount: number;
+        rejectedBidsCount: number;
         taskStatus: 'OPEN' | 'ASSIGNED' | 'COMPLETED';
     }>();
 
@@ -26,10 +27,16 @@
                 <p class="text-sm text-gray-500 mb-1">Total Bids</p>
                 <p class="text-2xl font-bold text-gray-900">{{ totalBids }}</p>
               </div>
-              <div>
+              <div v-if="taskStatus === 'OPEN'">
                 <p class="text-sm text-gray-500 mb-1">Pending Bids</p>
                 <p class="text-2xl font-bold text-yellow-600">
                   {{ pendingBidsCount }}
+                </p>
+              </div>
+              <div v-if="taskStatus === 'OPEN'">
+                <p class="text-sm text-gray-500 mb-1">Rejected Bids</p>
+                <p class="text-2xl font-bold text-red-600">
+                  {{ rejectedBidsCount }}
                 </p>
               </div>
               <div>

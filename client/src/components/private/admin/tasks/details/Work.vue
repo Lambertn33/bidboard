@@ -1,7 +1,7 @@
 <script lang="ts" setup>
     import { computed } from 'vue';
     import type { TaskWork } from '@/composables/useFetchTask';
-import { getStartTimeInDays } from '@/reusables';
+    import { getStartTimeInDays } from '@/reusables';
 
     const props = defineProps<{
         work: TaskWork;
@@ -16,9 +16,7 @@ import { getStartTimeInDays } from '@/reusables';
     };
 
     const formattedStatus = computed(() => props.work.status === 'IN_PROGRESS' ? 'In Progress' : 'Completed');
-
     const timeAgo = computed(() => getStartTimeInDays(props.work.startDate));
-
     const endDate = computed(() => getStartTimeInDays(props.work.endDate));
 </script>
 

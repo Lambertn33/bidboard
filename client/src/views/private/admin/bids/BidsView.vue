@@ -3,7 +3,7 @@ import { ref, computed, watch, reactive } from 'vue';
 import { OhVueIcon } from 'oh-vue-icons';
 import { Table, AcceptBid, Item } from '@/components/private/admin/bids';
 import { useFetchBids } from '@/composables/useFetchBids';
-import { acceptBid } from '@/api/private/admin/bids';
+import { acceptBid, rejectBid } from '@/api/private/admin/bids';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { useToast } from '@/composables/useToast';
 import { Modal } from '@/components/ui';
@@ -86,8 +86,20 @@ const { mutate: acceptBidMutation, isPending: isAcceptingBidPending } = useMutat
   },
 });
 
+const { mutate: rejectBidMutation, isPending: isRejectingBidPending } = useMutation({
+  mutationFn: (bidId: string) => rejectBid(bidId),
+  onSuccess: (response) => {
+    showSuccessToast(response?.message || 'Bid rejected successfully');
+    queryClient.invalidateQueries({ queryKey: ['bids'] });
+  },
+});
+
 const handleAcceptBid = (endDate: string) => {
   acceptBidMutation( endDate );
+};
+
+const handleRejectBid = (bidId: string) => {
+  rejectBidMutation(bidId);
 };
 
 const openAcceptBidModal = (bidId: string) => {
@@ -185,12 +197,14 @@ const closeViewingBidModal = () => {
           :has-next-page="hasNextPage"
           :limit="limit"
           :formatDate="(d: string) => d"
+          :isRejectingBidPending="isRejectingBidPending"
           @goToPage="goToPage"
           @goToPreviousPage="goToPreviousPage"
           @goToNextPage="goToNextPage"
           @update:limit="(value: number) => (limit = value)"
           @open-accepting-bid-modal="openAcceptBidModal"
           @open-viewing-bid-modal="openViewingBidModal"
+          @reject-bid="handleRejectBid"
         />
         <!-- Guard render too, so the modal can never "flash" open due to transient truthy values -->
         <Modal v-if="isAcceptingBidModalOpen" :isOpen="isAcceptingBidModalOpen" @close="closeAcceptBidModal">
