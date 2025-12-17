@@ -49,6 +49,7 @@
       (e: 'update:limit', value: number): void;
       (e: 'open-editing-modal', projectId: string): void;
       (e: 'open-accepting-bid-modal', bidId: string): void;
+      (e: 'open-viewing-bid-modal', bidId: string): void;
     }>();
     
     const goToPage = (page: number) => emits('goToPage', page);
@@ -56,6 +57,7 @@
     const goToNextPage = () => emits('goToNextPage');
     const updateLimit = (value: number) => emits('update:limit', value);
     const openAcceptingBidModal = (bidId: string) => emits('open-accepting-bid-modal', bidId);
+    const openViewingBidModal = (bidId: string) => emits('open-viewing-bid-modal', bidId);
     const getBidStatusColor = (status: string) => {
         const colors: Record<string, string> = {
             PENDING: 'bg-yellow-50 text-yellow-700 border border-yellow-200',
@@ -121,7 +123,7 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div class="flex items-center justify-end gap-3">
-                    <router-link to="" class="text-blue-600 hover:text-blue-900 transition-colors">
+                    <router-link to="" class="text-blue-600 hover:text-blue-900 transition-colors" @click="openViewingBidModal(bid.id)">
                       <OhVueIcon name="hi-eye" class="h-5 w-5" />
                     </router-link>
                     <button v-if="bid.status === 'PENDING'" class="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer" @click="openAcceptingBidModal(bid.id)">

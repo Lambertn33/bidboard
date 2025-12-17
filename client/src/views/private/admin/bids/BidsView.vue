@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { ref, computed, watch, reactive } from 'vue';
 import { OhVueIcon } from 'oh-vue-icons';
-import { Table, AcceptBid } from '@/components/private/admin/bids';
+import { Table, AcceptBid, Item } from '@/components/private/admin/bids';
 import { useFetchBids } from '@/composables/useFetchBids';
+import { acceptBid } from '@/api/private/admin/bids';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useToast } from '@/composables/useToast';
 import { Modal } from '@/components/ui';
 
+const { success: showSuccessToast, error: showErrorToast } = useToast();
+const queryClient = useQueryClient();
 // Pagination state
 const currentPage = ref(1);
 const limit = ref(10);
@@ -53,6 +58,7 @@ const goToNextPage = () => {
 
 // BIDS ACTIONS
 const isAcceptingBidModalOpen = ref(false);
+const isViewingBidModalOpen = ref(false);
 const selectedBidId = ref<string | null>(null);
   
 const selectedBid = reactive<{
@@ -67,6 +73,22 @@ const selectedBid = reactive<{
   taskName: '',
 });
 
+const { mutate: acceptBidMutation, isPending: isAcceptingBidPending } = useMutation({
+  mutationFn: (endDate: string) => acceptBid(selectedBidId.value as string, endDate),
+  onSuccess: (response) => {
+    showSuccessToast(response?.message || 'Bid accepted successfully');
+    queryClient.invalidateQueries({ queryKey: ['bids'] });
+    closeAcceptBidModal();
+  },
+  onError: (error) => {
+    showErrorToast(error?.message || 'Failed to accept bid');
+  },
+});
+
+const handleAcceptBid = (endDate: string) => {
+  acceptBidMutation( endDate );
+};
+
 const openAcceptBidModal = (bidId: string) => {
  const bid = bids.value.find((b) => b.id === bidId);
  if (bid) {
@@ -79,8 +101,29 @@ const openAcceptBidModal = (bidId: string) => {
  }
 };
 
+const openViewingBidModal = (bidId: string) => {
+  const bid = bids.value.find((b) => b.id === bidId);
+  if (bid) {
+    selectedBidId.value = bid.id;
+    selectedBid.id = bid.id;
+    selectedBid.message = bid.message;
+    selectedBid.freelancerNames = bid.freelancer?.user.names || '';
+    selectedBid.taskName = bid.task.name;
+    isViewingBidModalOpen.value = true;
+  }
+};
+
 const closeAcceptBidModal = () => {
   isAcceptingBidModalOpen.value = false;
+  selectedBidId.value = null;
+  selectedBid.id = '';
+  selectedBid.message = '';
+  selectedBid.freelancerNames = '';
+  selectedBid.taskName = '';
+};
+
+const closeViewingBidModal = () => {
+  isViewingBidModalOpen.value = false;
   selectedBidId.value = null;
   selectedBid.id = '';
   selectedBid.message = '';
@@ -146,6 +189,7 @@ const closeAcceptBidModal = () => {
           @goToNextPage="goToNextPage"
           @update:limit="(value: number) => (limit = value)"
           @open-accepting-bid-modal="openAcceptBidModal"
+          @open-viewing-bid-modal="openViewingBidModal"
         />
         <!-- Guard render too, so the modal can never "flash" open due to transient truthy values -->
         <Modal v-if="isAcceptingBidModalOpen" :isOpen="isAcceptingBidModalOpen" @close="closeAcceptBidModal">
@@ -154,8 +198,16 @@ const closeAcceptBidModal = () => {
             :bidMessage="selectedBid.message"
             :bidFreelancerName="selectedBid.freelancerNames"
             :bidTaskName="selectedBid.taskName"
-            :isAcceptingBidPending="false"
-            @acceptBid="() => {}"
+            :isAcceptingBidPending="isAcceptingBidPending"
+            @acceptBid="handleAcceptBid"
+          />
+        </Modal>
+        <Modal v-if="isViewingBidModalOpen" :isOpen="isViewingBidModalOpen" @close="closeViewingBidModal">
+          <Item
+            :bidId="selectedBid.id"
+            :bidMessage="selectedBid.message"
+            :bidFreelancerName="selectedBid.freelancerNames"
+            :bidTaskName="selectedBid.taskName"
           />
         </Modal>
       </div>

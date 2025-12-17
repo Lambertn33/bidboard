@@ -4,7 +4,7 @@
     import {DateInput} from "@/components/ui";
 
     const emit = defineEmits<{
-      (e: 'acceptBid', payload: { bidId: string; endDate: string }): void;
+      (e: 'acceptBid', endDate: string): void;
     }>();
     
     const form = ref<{
@@ -28,21 +28,11 @@
     
     
     const handleSubmit = () => {
-      emit('acceptBid', {
-        bidId: props.bidId,
-        endDate: form.value.endDate,
-      });
+      emit('acceptBid', form.value.endDate);
       // Don't reset here - wait for success from parent
     };
     
-    const handleReset = () => {
-      form.value = { endDate: '' };
-    };
     
-    // Expose reset method to parent component
-    defineExpose({
-      reset: handleReset,
-    });
     </script>
     
     <template>
@@ -87,13 +77,6 @@
               class="inline-flex justify-center px-5 py-3 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
             >
               {{ isAcceptingBidPending ? 'Please wait...' : 'Accept Bid' }}
-            </button>
-            <button
-              type="button"
-              class="inline-flex justify-center px-4 py-3 rounded-lg text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
-              @click="handleReset"
-            >
-              Clear
             </button>
           </div>
         </form>

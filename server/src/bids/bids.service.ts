@@ -60,7 +60,7 @@ export class BidsService {
     async acceptBid(id: string, endDate: string) {
         const bid = await this.databaseService.bid.findUnique({
             where: { id },
-            select: { id: true, taskId: true, freelancerId: true },
+            select: { id: true, taskId: true, freelancerId: true, task: { select: { name: true } } },
         });
 
         if (!bid) {
@@ -79,7 +79,7 @@ export class BidsService {
         await this.bidsHelper._rejectAllOtherBidsForTask(bid.taskId, id);
 
         return {
-            message: `Bid has been accepted for task ${bid.taskId}`,
+            message: `Bid has been accepted for task ${bid.task.name}`,
             data: bid,
         };
     }
