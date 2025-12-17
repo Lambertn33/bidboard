@@ -111,6 +111,9 @@ export class TasksHelper {
                 select: {
                     id: true,
                     completionUrl: true,
+                    status: true,
+                    startDate: true,
+                    endDate: true,
                     freelancer: {
                         select: {
                             id: true,

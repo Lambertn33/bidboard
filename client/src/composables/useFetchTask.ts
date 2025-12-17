@@ -20,6 +20,8 @@ import { getTaskDetails } from '@/api/private/common/tasks';
     completionUrl: string;
     freelancer: TaskFreelancer;
     status: 'IN_PROGRESS' | 'COMPLETED';
+    startDate: string;
+    endDate: string;
   }
   
   export interface TaskBid {
