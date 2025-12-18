@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { OhVueIcon } from 'oh-vue-icons';
-import { formatDate, getStartTimeInDays } from '@/reusables';
+import { formatDate } from '@/reusables';
 
 const props = defineProps<{
   paymentAmount: number;
@@ -17,7 +16,6 @@ const formattedAmount = computed(() => {
 });
 
 const formattedDate = computed(() => formatDate(props.paymentUpdatedAt));
-const dateAgo = computed(() => getStartTimeInDays(props.paymentUpdatedAt));
 
 const getPaymentStatusColor = (status: string) => {
   const colors: Record<string, string> = {
