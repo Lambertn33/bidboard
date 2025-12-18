@@ -162,7 +162,7 @@ const redirectAdminFromHome = (
 ) => {
   if (isAuthenticated() && isAdmin()) {
     // Admin is authenticated - redirect to dashboard
-    next('/protected/dashboard');
+    next('/admin/dashboard');
   } else {
     // Not admin or not authenticated - allow access to home
     next();

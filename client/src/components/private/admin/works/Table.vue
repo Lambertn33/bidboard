@@ -125,7 +125,7 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div class="flex items-center justify-end gap-3">
-                    <router-link to="" class="text-blue-600 hover:text-blue-900 transition-colors" @click="">
+                    <router-link :to="`/admin/works/${work.id}`" class="text-blue-600 hover:text-blue-900 transition-colors">
                       <OhVueIcon name="hi-eye" class="h-5 w-5" />
                     </router-link>
                   </div>
