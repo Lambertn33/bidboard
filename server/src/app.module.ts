@@ -8,9 +8,10 @@ import { TasksModule } from './tasks/tasks.module';
 import { BidsModule } from './bids/bids.module';
 import { WorksModule } from './works/works.module';
 import { DashboardModule as AdminDashboardModule } from './admin/dashboard/dashboard.module';
+import { SessionsModule } from './sessions/sessions.module';
 
 @Module({
-  imports: [AuthModule, DatabaseModule, ProjectsModule, TasksModule, BidsModule, WorksModule, AdminDashboardModule],
+  imports: [AuthModule, DatabaseModule, ProjectsModule, TasksModule, BidsModule, WorksModule, AdminDashboardModule, SessionsModule],
   controllers: [AppController],
   providers: [AppService],
 })

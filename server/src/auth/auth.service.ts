@@ -1,13 +1,15 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { DatabaseService } from '../database/database.service';
 import * as bcrypt from 'bcryptjs';
 import { Role } from 'generated/prisma/client';
+import { SessionsService } from '@/sessions/sessions.service';
 
 @Injectable()
 export class AuthService {
     constructor(private readonly jwtService: JwtService,
-        private readonly databaseService: DatabaseService
+        private readonly databaseService: DatabaseService,
+        private readonly sessionsService: SessionsService
     ) {}
 
     async validateUser(email: string, password: string) {
@@ -39,13 +41,15 @@ export class AuthService {
         const user = await this.validateUser(email, password);
         if (!user) {
             throw new UnauthorizedException('Invalid credentials');
-        }
-        
+        }        
+        const session = await this.sessionsService.createOrRefreshSession(user.id);
+
         const tokenPayload: any = {
             id: user.id,
             email: user.email,
             role: user.role,
             names: user.names,
+            sessionId: session.id,
         };
 
         // Include freelancer data if user is a freelancer
@@ -53,6 +57,8 @@ export class AuthService {
             tokenPayload.telephone = user.freelancer.telephone;
             tokenPayload.balance = user.freelancer.balance;
         }
+
+
         return {
             access_token: this.jwtService.sign(tokenPayload),
         }
@@ -91,5 +97,21 @@ export class AuthService {
         } catch (error) {
             throw new BadRequestException('Failed to register user', error);
         }
+    }
+
+    async logout(sessionId: string) {
+        // Check if session exists before deleting
+        const session = await this.databaseService.session.findUnique({
+            where: { id: sessionId },
+        });
+        
+        if (!session) {
+            throw new NotFoundException('Session not found or already expired');
+        }
+        
+        await this.sessionsService.deleteSession(sessionId);
+        return {
+            message: 'User logged out successfully',
+        };
     }
 }

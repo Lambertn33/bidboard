@@ -1,8 +1,10 @@
-import { BadRequestException, Controller, Post } from '@nestjs/common';
+import { BadRequestException, Controller, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Body } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { LogoutDto } from './dto/logout.dto';
+import { JwtGuard } from './jwt.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -20,5 +22,11 @@ export class AuthController {
   @Post('login')
   async login(@Body() body: LoginDto) {
     return this.authService.login(body.email, body.password);
+  }
+
+  @Post('logout')
+  @UseGuards(JwtGuard)
+  async logout(@Body() body: LogoutDto) {
+    return this.authService.logout(body.sessionId);
   }
 }

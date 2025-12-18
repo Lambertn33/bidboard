@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
 import { useAuth } from '@/composables/useAuth';
+import { useLogout } from '@/composables/useLogout';
 import { OhVueIcon } from 'oh-vue-icons';
 import { Logo, NavLinks, UserDropdown, MobileNav } from '@/components/public/navbar';
 
-const router = useRouter();
-const { isAuthenticated, logout: logoutUser } = useAuth();
+const { isAuthenticated } = useAuth();
+const { logoutMutation } = useLogout();
 const isMobileMenuOpen = ref(false);
 
 const handleLogout = () => {
-  logoutUser();
-  router.push('/');
+  logoutMutation();
   isMobileMenuOpen.value = false;
 };
 

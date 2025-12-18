@@ -10,6 +10,7 @@ export interface User {
   names: string;
   telephone?: string;
   balance?: number;
+  sessionId?: string;
 }
 
 interface JwtPayload {
@@ -20,13 +21,14 @@ interface JwtPayload {
   names?: string;
   telephone?: string;
   balance?: number;
+  sessionId?: string;
   iat?: number;
   exp?: number;
 }
 
 const TOKEN_KEY = 'token';
 const USER_KEY = 'user';
-
+const SESSION_ID_KEY = 'sessionId';
 // Check if token is expired
 const isTokenExpired = (token: string): boolean => {
   try {
@@ -60,6 +62,7 @@ const decodeToken = (token: string): User | null => {
       names: decoded.names || '',
       telephone: decoded.telephone,
       balance: decoded.balance,
+      sessionId: decoded.sessionId,
     };
   } catch (error) {
     return null;
@@ -68,25 +71,28 @@ const decodeToken = (token: string): User | null => {
 
 const loadStoredAuth = () => {
   const token = localStorage.getItem(TOKEN_KEY);
-  if (!token) return null;
+  const sessionId = localStorage.getItem(SESSION_ID_KEY);
+  if (!token || !sessionId) return null;
 
   const user = decodeToken(token);
   if (!user) {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(SESSION_ID_KEY);
     return null;
   }
 
-  return { token, user };
+  return { token, user, sessionId };
 };
 
 const token = ref<string | null>(null);
 const user = ref<User | null>(null);
-
+const sessionId = ref<string | null>(null);
 const stored = loadStoredAuth();
 if (stored) {
   token.value = stored.token;
   user.value = stored.user;
+  sessionId.value = stored.sessionId;
 }
 
 watch(token, (newToken) => {
@@ -96,10 +102,12 @@ watch(token, (newToken) => {
     if (decoded) {
       user.value = decoded;
       localStorage.setItem(USER_KEY, JSON.stringify(decoded));
+      localStorage.setItem(SESSION_ID_KEY, decoded.sessionId || '');
     }
   } else {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(SESSION_ID_KEY);
     user.value = null;
   }
 });
@@ -130,6 +138,7 @@ export const useAuth = () => {
   const logout = () => {
     token.value = null;
     user.value = null;
+    sessionId.value = null;
   };
 
   const setUser = (userData: User) => {
@@ -139,7 +148,7 @@ export const useAuth = () => {
   return {
     token: computed(() => token.value),
     user: computed(() => user.value),
-    
+    sessionId: computed(() => sessionId.value),
     isAuthenticated,
     isAdmin,
     isFreelancer,
