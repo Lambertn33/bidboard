@@ -24,8 +24,9 @@ const getStatusColor = (status: string) => {
 
 <template>
   <div class="bg-white border-b border-gray-200 sticky top-16 z-10">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <router-link
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex items-center justify-between">
+      <div>
+        <router-link
         to="/admin/works"
         class="flex items-center gap-2 text-gray-600 mb-4 transition-colors cursor-pointer hover:text-blue-600"
       >
@@ -57,6 +58,13 @@ const getStatusColor = (status: string) => {
           </p>
         </div>
       </div>
+      </div>
+      <button
+      v-if="workStatus === 'COMPLETED'"
+        class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 cursor-pointer transition-colors"
+      >
+        Mark as Completed and Pay Freelancer
+      </button>
     </div>
   </div>
 </template>

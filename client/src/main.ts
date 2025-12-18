@@ -52,7 +52,8 @@ import {
     IoCloseCircleOutline,
     HiPhone,
     MdMessageOutlined,
-    HiLogout
+    HiLogout,
+    BiBriefcaseFill
   } from 'oh-vue-icons/icons';      
 
 
@@ -99,7 +100,8 @@ addIcons(
   IoCloseCircleOutline,
   HiPhone,
   MdMessageOutlined,
-  HiLogout
+  HiLogout,
+  BiBriefcaseFill
 );
 
 createApp(App)
