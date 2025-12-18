@@ -10,6 +10,7 @@ import { HomeView,
   AdminProtectedTaskDetailsView,
   AdminProtectedBidsView, 
   AdminProtectedWorksView,
+  AdminProtectedWorkDetailsView,
   AdminProtectedDashboardView,
   AdminProtectedProjectDetailsView,
  }
@@ -226,6 +227,11 @@ const router = createRouter({
         {
           path: 'works',
           component: AdminProtectedWorksView,
+        },
+        {
+          path: 'works/:id',
+          component: AdminProtectedWorkDetailsView,
+          beforeEnter: requireAdmin,
         },
         {
           path: 'dashboard',

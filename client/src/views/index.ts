@@ -12,5 +12,8 @@ export {default as AdminProtectedTasksView} from './private/admin/tasks/TasksVie
 export {default as AdminProtectedTaskDetailsView} from './private/admin/tasks/TaskDetails.vue';
 
 export {default as AdminProtectedBidsView} from './private/admin/bids/BidsView.vue';
+
 export {default as AdminProtectedWorksView} from './private/admin/works/WorksView.vue';
+export {default as AdminProtectedWorkDetailsView} from './private/admin/works/WorkDetails.vue';
+
 export {default as AdminProtectedDashboardView} from './private/admin/dashboard/DashboardView.vue';
