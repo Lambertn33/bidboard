@@ -14,6 +14,9 @@
           names: string;
         };
       } | null;
+      payment: {
+        status: "UNPAID" | "PAID";
+      };
       startDate: string;
       endDate: string;
       completionUrl: string | null;
@@ -52,6 +55,14 @@
         };
         return colors[status as keyof typeof colors] || 'bg-yellow-50 text-yellow-700 border border-yellow-200';
     };
+
+    const getPaymentStatusColor = (status: string) => {
+        const colors: Record<string, string> = {
+            UNPAID: 'bg-red-50 text-red-700 border border-red-200',
+            PAID: 'bg-green-50 text-green-700 border border-green-200',
+        };
+        return colors[status as keyof typeof colors] || 'bg-red-50 text-red-700 border border-red-200';
+    };
     </script>
     
     <template>
@@ -74,6 +85,9 @@
                     </th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Work End Date
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Payment Status
                     </th>
                     <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
@@ -121,6 +135,11 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <span class="px-2 py-1 rounded-full text-xs font-medium">
                             {{ formatDate(work.endDate) }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <span class="px-2 py-1 rounded-full text-xs font-medium" :class="getPaymentStatusColor(work.payment.status)">
+                            {{ work.payment.status }}
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

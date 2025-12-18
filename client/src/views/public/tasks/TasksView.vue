@@ -248,7 +248,7 @@ const disabledMessage = computed(() => {
     if (existingBidForSelectedTask.value.status === 'PENDING') {
       return 'Your bid is pending review. Please wait for the task owner to review your bid.';
     } else if (existingBidForSelectedTask.value.status === 'REJECTED') {
-      return 'Your bid has been rejected. Please try again.';
+      return 'Your bid has been rejected. You cannot make a bid for this task again.';
     }
   }
   return undefined;

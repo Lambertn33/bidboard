@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { DetailsHeader, DetailsLoading, DetailsError, Details, Freelancer } from '@/components/private/admin/works';
+import { DetailsHeader, DetailsLoading, DetailsError, Details, Freelancer, Payment } from '@/components/private/admin/works';
 
 import { useFetchWork } from '@/composables/useFetchWork';
 import { useRoute } from 'vue-router';
@@ -10,8 +10,6 @@ const route = useRoute();
 const { isPending, isError, workData, errorMessage, refetch } = useFetchWork(route.params.id as string);
 
 const work = computed(() => workData.value);
-
-
 </script>
 
 <template>
@@ -44,8 +42,16 @@ const work = computed(() => workData.value);
        :workTaskDescription="work.task.description"
        />
 
-        <!-- Right Column: Freelancer & Stats -->
+        <!-- Right Column: Freelancer & Payment -->
         <div class="space-y-6">
+          <!-- Payment Information Card -->
+          <Payment
+            v-if="work.payment"
+            :paymentAmount="work.payment.amount"
+            :paymentStatus="work.payment.status"
+            :paymentUpdatedAt="work.payment.updatedAt"
+          />
+
           <!-- Freelancer Information Card -->
           <Freelancer
             v-if="work.freelancer"

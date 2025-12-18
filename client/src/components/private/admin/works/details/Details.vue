@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { formatDate, getStartTimeInDays } from '@/reusables';
 import { computed } from 'vue';
+import { OhVueIcon } from 'oh-vue-icons';
 
     const props = defineProps<{
         workStatus: "IN_PROGRESS" | "COMPLETED";

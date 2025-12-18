@@ -14,10 +14,15 @@ interface IWorkTask {
   name: string;
 }
 
+interface IWorkPayment {
+  status: "UNPAID" | "PAID";
+}
+
 interface IWork {
   id: string;
   freelancer: IWorkFreelancer | null;
   task: IWorkTask;
+  payment: IWorkPayment;
   completionUrl: string | null;
   startDate: string;
   endDate: string;

@@ -165,7 +165,7 @@ export class BidsHelper {
 
     // ADMIN HELPERS
     async _createWorkAndUpdateTaskToAssigned(taskId: string, freelancerId: string, endDate: string) {
-        await this.databaseService.work.create({
+        const work = await this.databaseService.work.create({
             data: {
                 taskId,
                 freelancerId,
@@ -175,6 +175,18 @@ export class BidsHelper {
         await this.databaseService.task.update({
             where: { id: taskId },
             data: { status: TaskStatus.ASSIGNED },
+        });
+
+        return work;
+    }
+
+    async _createWorkPayment(workId: string, amount: number, freelancerId: string) {
+        await this.databaseService.payment.create({
+            data: {
+                workId,
+                amount,
+                freelancerId,
+            },
         });
     }
 

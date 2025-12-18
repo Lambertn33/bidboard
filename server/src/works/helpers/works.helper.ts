@@ -50,6 +50,13 @@ export class WorksHelper {
                     name: true,
                 },
             },
+            payment: {
+                select: {
+                    amount: true,
+                    status: true,
+                    updatedAt: true,
+                },
+            },
         };
 
         if (role === Role.ADMIN) {
@@ -97,6 +104,13 @@ export class WorksHelper {
                     id: true,
                     name: true,
                     description: true,
+                },
+            },
+            payment: {
+                select: {
+                    amount: true,
+                    status: true,
+                    updatedAt: true,
                 },
             },
         };

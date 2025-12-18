@@ -1,9 +1,11 @@
 <script setup lang="ts">
-    defineProps<{
-        freelancerName: string;
-        freelancerEmail: string;
-        freelancerTelephone: string;
-    }>();
+import { OhVueIcon } from 'oh-vue-icons';
+
+defineProps<{
+  freelancerName: string;
+  freelancerEmail: string;
+  freelancerTelephone: string;
+}>();
 </script>
 
 <template>

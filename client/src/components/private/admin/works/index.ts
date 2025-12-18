@@ -5,3 +5,4 @@ export {default as DetailsLoading } from "./details/Loading.vue";
 export {default as DetailsError } from "./details/Error.vue";
 export {default as Details } from "./details/Details.vue";
 export {default as Freelancer } from "./details/Freelancer.vue";
+export {default as Payment } from "./details/Payment.vue";

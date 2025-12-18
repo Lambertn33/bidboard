@@ -60,7 +60,7 @@ export class BidsService {
     async acceptBid(id: string, endDate: string) {
         const bid = await this.databaseService.bid.findUnique({
             where: { id },
-            select: { id: true, taskId: true, freelancerId: true, task: { select: { name: true } } },
+            select: { id: true, taskId: true, freelancerId: true, task: { select: { name: true, price: true } } },
         });
 
         if (!bid) {
@@ -75,7 +75,8 @@ export class BidsService {
         });
 
         // Create work and reject all other bids for the task
-        await this.bidsHelper._createWorkAndUpdateTaskToAssigned(bid.taskId, bid.freelancerId, endDate);
+        const work = await this.bidsHelper._createWorkAndUpdateTaskToAssigned(bid.taskId, bid.freelancerId, endDate);
+        await this.bidsHelper._createWorkPayment(work.id, bid.task.price, bid.freelancerId);
         await this.bidsHelper._rejectAllOtherBidsForTask(bid.taskId, id);
 
         return {

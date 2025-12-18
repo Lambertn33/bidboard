@@ -20,6 +20,12 @@ import { getWorkDetails } from '@/api/private/common/works';
     name: string;
     description: string;
   }
+
+  export interface WorkPayment {
+    amount: number;
+    status: "UNPAID" | "PAID";
+    updatedAt: string;
+  }
   
   export interface WorkData {
     id: string;
@@ -29,6 +35,7 @@ import { getWorkDetails } from '@/api/private/common/works';
     startDate: string;
     endDate: string;
     task: WorkTask;
+    payment: WorkPayment;
   }
 
   export interface IWorkResponse {
