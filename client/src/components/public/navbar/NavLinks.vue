@@ -37,7 +37,6 @@ const navigationLinks = computed<NavLink[]>(() => {
   if (isFreelancer.value) {
     return [
       { path: '/tasks', label: 'Tasks' },
-      { path: '/freelancer/tasks', label: ' My Assigned Tasks' },
       { path: '/freelancer/bids', label: ' My Bids' },
       { path: '/freelancer/works', label: ' My Works' },
     ];

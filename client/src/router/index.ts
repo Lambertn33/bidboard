@@ -13,6 +13,7 @@ import { HomeView,
   AdminProtectedWorkDetailsView,
   AdminProtectedDashboardView,
   AdminProtectedProjectDetailsView,
+  FreelancerProtectedBidsView,
  }
 from '@/views';
 
@@ -237,6 +238,17 @@ const router = createRouter({
           path: 'dashboard',
           component: AdminProtectedDashboardView,
           beforeEnter: requireAdmin,
+        },
+      ],
+    },
+    {
+      path: '/freelancer',
+      beforeEnter: requireAuth,
+      children: [
+        {
+          path: 'bids',
+          component: FreelancerProtectedBidsView,
+          beforeEnter: requireFreelancer,
         },
       ],
     },

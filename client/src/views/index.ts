@@ -17,3 +17,5 @@ export {default as AdminProtectedWorksView} from './private/admin/works/WorksVie
 export {default as AdminProtectedWorkDetailsView} from './private/admin/works/WorkDetails.vue';
 
 export {default as AdminProtectedDashboardView} from './private/admin/dashboard/DashboardView.vue';
+
+export {default as FreelancerProtectedBidsView} from './private/freelancer/bids/BidsView.vue';
