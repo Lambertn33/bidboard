@@ -10,7 +10,8 @@ const props = defineProps<{
   workCompletionUrl: string | null;
   workTaskName: string;
   workTaskDescription: string;
-  canSubmitWork: boolean;
+  // Freelancer-specific props
+  canSubmitWork?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -44,7 +45,6 @@ const getStatusColor = (status: string) => {
   };
   return colors[status] || 'bg-gray-50 text-gray-700 border border-gray-200';
 };
-
 </script>
 
 <template>
@@ -88,18 +88,21 @@ const getStatusColor = (status: string) => {
             <span class="text-sm">{{ workCompletionUrl }}</span>
           </a>
         </div>
-        <div v-else class="pt-4 border-t border-gray-200 flex items-center justify-between">
-           <div>
+        <div v-else class="pt-4 border-t border-gray-200" :class="{ 'flex items-center justify-between': canSubmitWork }">
+          <div>
             <p class="text-sm font-medium text-gray-500 mb-1">Completion URL</p>
             <p class="text-sm text-gray-400 italic">Not yet provided</p>
-           </div>
-           <div v-if="canSubmitWork" class="flex flex-col items-center gap-1">
+          </div>
+          <div v-if="canSubmitWork" class="flex flex-col items-center gap-1">
             <span class="text-sm text-gray-500">Work Completed?</span>
-             <button @click="emit('openSubmitWorkModal')" class="inline-flex items-center gap-2 cursor-pointer text-blue-600 hover:text-blue-700 transition-colors break-all">
+            <button
+              @click="emit('openSubmitWorkModal')"
+              class="inline-flex items-center gap-2 cursor-pointer text-blue-600 hover:text-blue-700 transition-colors break-all"
+            >
               <OhVueIcon name="hi-link" class="h-4 w-4 flex-shrink-0" />
               <span class="text-sm">Submit Work</span>
-             </button>
-           </div>
+            </button>
+          </div>
         </div>
       </div>
     </div>

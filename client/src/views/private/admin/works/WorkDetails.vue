@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { DetailsHeader, DetailsLoading, DetailsError, Details, Freelancer, Payment } from '@/components/private/admin/works';
-
+import { DetailsHeader, DetailsLoading, DetailsError, Details, Freelancer, Payment } from '@/components/private/common/works';
 import { useFetchWork } from '@/composables/useFetchWork';
 import { payWork as payWorkApi } from '@/api/private/admin/works';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
@@ -44,16 +43,18 @@ const payWork = () => {
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Header -->
-     <DetailsHeader 
+    <DetailsHeader 
       v-if="work && !isPending && !isError"
       :isPending="isPending"
       :taskName="work!.task!.name"
       :taskDescription="work!.task!.description"
       :workStatus="work!.status"
-      @payWork="payWork"
+      backLink="/admin/works"
+      :canPayWork="true"
       :isPayingWorkPending="isPayingWorkPending"
       :paymentStatus="work!.payment!.status"
-     />
+      @payWork="payWork"
+    />
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Loading State -->

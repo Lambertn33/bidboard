@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { DetailsHeader, DetailsLoading, DetailsError, Details, Payment, Submit } from '@/components/private/freelancer/works';
+import { DetailsHeader, DetailsLoading, DetailsError, Details, Payment, Submit } from '@/components/private/common/works';
 import { useFetchWork } from '@/composables/useFetchWork';
 import { submitWork as submitWorkApi } from '@/api/private/freelancer/works';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { Modal } from '@/components/ui';
 import { useRoute } from 'vue-router';
-import {useAuth} from '@/composables/useAuth';
+import { useAuth } from '@/composables/useAuth';
 import { useToast } from '@/composables/useToast';
 
 const { user, refreshUser } = useAuth();
@@ -19,11 +19,11 @@ const isFreelancer = computed(() => user.value?.role === 'FREELANCER');
 
 const route = useRoute();
 
-const canSubmitWork = computed(() => isFreelancer.value && work.value?.status === 'IN_PROGRESS');
-
 const { isPending, isError, workData, errorMessage, refetch } = useFetchWork(route.params.id as string);
 
 const work = computed(() => workData.value);
+
+const canSubmitWork = computed(() => isFreelancer.value && work.value?.status === 'IN_PROGRESS');
 
 // Refresh user balance when payment status changes to PAID
 watch(
@@ -72,6 +72,7 @@ const submitWork = (completionUrl: string) => {
       :taskName="work!.task!.name"
       :taskDescription="work!.task!.description"
       :workStatus="work!.status"
+      backLink="/freelancer/works"
     />
     
     <!-- Main Content -->
