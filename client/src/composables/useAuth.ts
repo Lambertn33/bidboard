@@ -145,6 +145,26 @@ export const useAuth = () => {
     user.value = userData;
   };
 
+  const refreshUser = async () => {
+    try {
+      const { getProfile } = await import('@/api/private/common/auth');
+      const profile = await getProfile();
+      
+      // Update user data
+      if (user.value) {
+        user.value = {
+          ...user.value,
+          balance: profile.balance,
+          telephone: profile.telephone,
+        };
+        // Update localStorage
+        localStorage.setItem(USER_KEY, JSON.stringify(user.value));
+      }
+    } catch (error) {
+      console.error('Failed to refresh user profile:', error);
+    }
+  };
+
   return {
     token: computed(() => token.value),
     user: computed(() => user.value),
@@ -156,6 +176,7 @@ export const useAuth = () => {
     login,
     logout,
     setUser,
+    refreshUser,
     checkTokenExpiration,
   };
 };

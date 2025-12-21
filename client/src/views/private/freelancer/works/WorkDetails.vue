@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { DetailsHeader, DetailsLoading, DetailsError, Details, Payment, Submit } from '@/components/private/freelancer/works';
 import { useFetchWork } from '@/composables/useFetchWork';
 import { submitWork as submitWorkApi } from '@/api/private/freelancer/works';
@@ -9,7 +9,7 @@ import { useRoute } from 'vue-router';
 import {useAuth} from '@/composables/useAuth';
 import { useToast } from '@/composables/useToast';
 
-const { user } = useAuth();
+const { user, refreshUser } = useAuth();
 
 const queryClient = useQueryClient();
 
@@ -24,6 +24,16 @@ const canSubmitWork = computed(() => isFreelancer.value && work.value?.status ==
 const { isPending, isError, workData, errorMessage, refetch } = useFetchWork(route.params.id as string);
 
 const work = computed(() => workData.value);
+
+// Refresh user balance when payment status changes to PAID
+watch(
+  () => work.value?.payment?.status,
+  (newStatus) => {
+    if (newStatus === 'PAID') {
+      refreshUser();
+    }
+  }
+);
 
 const isSubmitWorkModalOpen = ref(false);
 

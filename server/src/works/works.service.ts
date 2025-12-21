@@ -67,7 +67,7 @@ export class WorksService {
         }
 
         await this.worksHelper._increaseFreelancerBalance(work.freelancerId, work.task.price);
-
+        await this.worksHelper._updateWorkPayment(work.id, work.task.price);
         await this.databaseService.work.update({
             where: { id },
             data: { status: WorkStatus.COMPLETED },

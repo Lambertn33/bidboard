@@ -1,8 +1,16 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { OhVueIcon } from 'oh-vue-icons';
 import { Table } from '@/components/private/freelancer/works';
 import { useFetchWorks } from '@/composables/useFetchWorks';
+import { useAuth } from '@/composables/useAuth';
+
+const { refreshUser } = useAuth();
+
+// Refresh user balance when component mounts
+onMounted(() => {
+  refreshUser();
+});
 
 const currentPage = ref(1);
 const limit = ref(10);

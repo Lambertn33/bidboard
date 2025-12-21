@@ -3,13 +3,42 @@ import { computed } from 'vue';
 import { DetailsHeader, DetailsLoading, DetailsError, Details, Freelancer, Payment } from '@/components/private/admin/works';
 
 import { useFetchWork } from '@/composables/useFetchWork';
+import { payWork as payWorkApi } from '@/api/private/admin/works';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { useRoute } from 'vue-router';
+import { useToast } from '@/composables/useToast';
+import { useAuth } from '@/composables/useAuth';
+
+const { success: showSuccessToast, error: showErrorToast } = useToast();
+const queryClient = useQueryClient();
+const { refreshUser } = useAuth();
 
 const route = useRoute();
 
 const { isPending, isError, workData, errorMessage, refetch } = useFetchWork(route.params.id as string);
 
 const work = computed(() => workData.value);
+
+const { mutate: payWorkMutation, isPending: isPayingWorkPending } = useMutation({
+  mutationFn: () => payWorkApi(route.params.id as string),
+  onSuccess: async (response) => {
+    queryClient.invalidateQueries({ queryKey: ['work', route.params.id] });
+    queryClient.invalidateQueries({ queryKey: ['works'] });
+    // Refresh user balance if the work was paid to a freelancer
+    if (work.value?.freelancer) {
+      await refreshUser();
+    }
+    showSuccessToast(response?.message || 'Work paid successfully');
+  },
+  onError: (error) => {
+    showErrorToast(error?.message || 'Failed to pay work. Please try again.');
+  },
+});
+
+const payWork = () => {
+  payWorkMutation();
+};
+
 </script>
 
 <template>
@@ -21,6 +50,9 @@ const work = computed(() => workData.value);
       :taskName="work!.task!.name"
       :taskDescription="work!.task!.description"
       :workStatus="work!.status"
+      @payWork="payWork"
+      :isPayingWorkPending="isPayingWorkPending"
+      :paymentStatus="work!.payment!.status"
      />
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

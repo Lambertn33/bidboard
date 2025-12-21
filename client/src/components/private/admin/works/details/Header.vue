@@ -7,6 +7,12 @@ const props = defineProps<{
   taskName: string;
   taskDescription: string;
   workStatus: "IN_PROGRESS" | "COMPLETED";
+  isPayingWorkPending: boolean;
+  paymentStatus: "UNPAID" | "PAID";
+}>();
+
+const emit = defineEmits<{
+  (e: 'payWork'): void;
 }>();
 
 const formattedStatus = computed(() => {
@@ -60,10 +66,11 @@ const getStatusColor = (status: string) => {
       </div>
       </div>
       <button
-      v-if="workStatus === 'COMPLETED'"
+      @click="emit('payWork')"
+      v-if="workStatus === 'COMPLETED' && paymentStatus === 'UNPAID'"
         class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 cursor-pointer transition-colors"
       >
-        Mark as Completed and Pay Freelancer
+        {{ isPayingWorkPending ? 'Paying...' : 'Mark as Completed and Pay Freelancer' }}
       </button>
     </div>
   </div>

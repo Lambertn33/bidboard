@@ -1,4 +1,4 @@
-import { Role, WorkStatus } from "generated/prisma/client";
+import { PaymentStatus, Role, WorkStatus } from "generated/prisma/client";
 import { DatabaseService } from "@/database/database.service";
 import { Injectable } from "@nestjs/common";
 
@@ -141,6 +141,13 @@ export class WorksHelper {
         await this.databaseService.freelancer.update({
             where: { id: freelancerId },
             data: { balance: { increment: amount } },
+        });
+    }
+
+    async _updateWorkPayment(workId: string, amount: number) {
+        await this.databaseService.payment.update({
+            where: { workId },
+            data: { amount, status: PaymentStatus.PAID, updatedAt: new Date() },
         });
     }
 }   

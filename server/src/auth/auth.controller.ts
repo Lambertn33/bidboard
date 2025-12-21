@@ -1,10 +1,11 @@
-import { BadRequestException, Controller, Post, UseGuards } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Body } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { LogoutDto } from './dto/logout.dto';
 import { JwtGuard } from './jwt.guard';
+import { CurrentUser } from './current-user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -28,5 +29,11 @@ export class AuthController {
   @UseGuards(JwtGuard)
   async logout(@Body() body: LogoutDto) {
     return this.authService.logout(body.sessionId);
+  }
+
+  @Get('me')
+  @UseGuards(JwtGuard)
+  async getProfile(@CurrentUser() user: { id: string }) {
+    return this.authService.getProfile(user.id);
   }
 }

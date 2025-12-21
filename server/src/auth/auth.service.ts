@@ -114,4 +114,34 @@ export class AuthService {
             message: 'User logged out successfully',
         };
     }
+
+    async getProfile(userId: string) {
+        const user = await this.databaseService.user.findUnique({
+            where: { id: userId },
+            include: {
+                freelancer: true,
+            },
+        });
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        const { password, ...userWithoutPassword } = user;
+
+        const profile: any = {
+            id: userWithoutPassword.id,
+            email: userWithoutPassword.email,
+            role: userWithoutPassword.role,
+            names: userWithoutPassword.names,
+        };
+
+        // Include freelancer data if user is a freelancer
+        if (userWithoutPassword.role === Role.FREELANCER && userWithoutPassword.freelancer) {
+            profile.telephone = userWithoutPassword.freelancer.telephone;
+            profile.balance = userWithoutPassword.freelancer.balance;
+        }
+
+        return profile;
+    }
 }
