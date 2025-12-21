@@ -2,11 +2,18 @@
 import { computed, ref } from 'vue';
 import { DetailsHeader, DetailsLoading, DetailsError, Details, Payment, Submit } from '@/components/private/freelancer/works';
 import { useFetchWork } from '@/composables/useFetchWork';
+import { submitWork as submitWorkApi } from '@/api/private/freelancer/works';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { Modal } from '@/components/ui';
 import { useRoute } from 'vue-router';
 import {useAuth} from '@/composables/useAuth';
+import { useToast } from '@/composables/useToast';
 
 const { user } = useAuth();
+
+const queryClient = useQueryClient();
+
+const { success: showSuccessToast, error: showErrorToast } = useToast();
 
 const isFreelancer = computed(() => user.value?.role === 'FREELANCER');
 
@@ -26,6 +33,23 @@ const openSubmitWorkModal = () => {
 
 const closeSubmitWorkModal = () => {
   isSubmitWorkModalOpen.value = false;
+};
+
+const { mutate: submitWorkMutation, isPending: isSubmittingWorkPending } = useMutation({
+  mutationFn: (completionUrl: string) => submitWorkApi(route.params.id as string, completionUrl),
+  onSuccess: (response) => {
+    showSuccessToast(response?.message || 'Work submitted successfully');
+    queryClient.invalidateQueries({ queryKey: ['work', route.params.id] });
+    queryClient.invalidateQueries({ queryKey: ['works'] });
+    closeSubmitWorkModal();
+  },
+  onError: (error) => {
+    showErrorToast(error?.message || 'Failed to submit work. Please try again.');
+  },
+});
+
+const submitWork = (completionUrl: string) => {
+  submitWorkMutation(completionUrl);
 };
 </script>
 
@@ -79,7 +103,7 @@ const closeSubmitWorkModal = () => {
     </div>
   </div>
   <Modal :isOpen="isSubmitWorkModalOpen" @close="closeSubmitWorkModal">
-    <Submit :isSubmittingWorkPending="false" @submitWork="() => {}" />
+    <Submit :isSubmittingWorkPending="isSubmittingWorkPending" @submitWork="submitWork" />
   </Modal>
 </template>
 

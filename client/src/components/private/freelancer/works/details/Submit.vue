@@ -4,7 +4,7 @@
 
     
     const emit = defineEmits<{
-      (e: 'submitWork', workCompletionUrl: string): void;
+      (e: 'submitWork', completionUrl: string): void;
     }>();
     
     const props = defineProps<{
@@ -12,15 +12,15 @@
     }>();
     
     const form = ref<{
-    workCompletionUrl: string;
+    completionUrl: string;
     }>({
-      workCompletionUrl: '',
+      completionUrl: '',
     });
     
-    const isSubmitDisabled = computed(() => !form.value.workCompletionUrl.trim());
+    const isSubmitDisabled = computed(() => !form.value.completionUrl.trim());
     
     const handleSubmit = () => {
-      emit('submitWork', form.value.workCompletionUrl.trim());
+      emit('submitWork', form.value.completionUrl.trim());
     };
 
     </script>
@@ -35,15 +35,15 @@
     
         <form class="space-y-5" @submit.prevent="handleSubmit">
             <Input
-              id="work-completion-url"
+              id="completion-url"
               label="Completion URL"
               type="url"
               placeholder="Enter completion URL"
-              :modelValue="form.workCompletionUrl"
+              :modelValue="form.completionUrl"
               :required="true"
               :hasPreIcon="true"
               preIcon="hi-link"
-              @update:modelValue="(value: string) => (form.workCompletionUrl = value)"
+              @update:modelValue="(value: string) => (form.completionUrl = value)"
             />
           <div class="flex items-center gap-3 pt-2">
             <button
