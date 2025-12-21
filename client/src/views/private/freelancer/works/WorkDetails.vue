@@ -1,14 +1,32 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { DetailsHeader, DetailsLoading, DetailsError, Details, Payment } from '@/components/private/freelancer/works';
+import { computed, ref } from 'vue';
+import { DetailsHeader, DetailsLoading, DetailsError, Details, Payment, Submit } from '@/components/private/freelancer/works';
 import { useFetchWork } from '@/composables/useFetchWork';
+import { Modal } from '@/components/ui';
 import { useRoute } from 'vue-router';
+import {useAuth} from '@/composables/useAuth';
+
+const { user } = useAuth();
+
+const isFreelancer = computed(() => user.value?.role === 'FREELANCER');
 
 const route = useRoute();
+
+const canSubmitWork = computed(() => isFreelancer.value && work.value?.status === 'IN_PROGRESS');
 
 const { isPending, isError, workData, errorMessage, refetch } = useFetchWork(route.params.id as string);
 
 const work = computed(() => workData.value);
+
+const isSubmitWorkModalOpen = ref(false);
+
+const openSubmitWorkModal = () => {
+  isSubmitWorkModalOpen.value = true;
+};
+
+const closeSubmitWorkModal = () => {
+  isSubmitWorkModalOpen.value = false;
+};
 </script>
 
 <template>
@@ -40,6 +58,8 @@ const work = computed(() => workData.value);
           :workCompletionUrl="work.completionUrl"
           :workTaskName="work.task.name"
           :workTaskDescription="work.task.description"
+          :canSubmitWork="canSubmitWork"
+          @openSubmitWorkModal="openSubmitWorkModal"
         />
 
         <!-- Right Column: Payment -->
@@ -58,5 +78,8 @@ const work = computed(() => workData.value);
       <div v-else class="text-center text-gray-600">No work data available.</div>
     </div>
   </div>
+  <Modal :isOpen="isSubmitWorkModalOpen" @close="closeSubmitWorkModal">
+    <Submit :isSubmittingWorkPending="false" @submitWork="() => {}" />
+  </Modal>
 </template>
 
