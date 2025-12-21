@@ -16,6 +16,8 @@ interface IWorkTask {
 
 interface IWorkPayment {
   status: "UNPAID" | "PAID";
+  amount?: number;
+  updatedAt?: string;
 }
 
 interface IWork {
@@ -30,8 +32,8 @@ interface IWork {
 }
 
 export interface IWorksResponse {
-  data: IWork[];
-  meta: {
+  data: IWork[] | IWork;
+  meta?: {
     total: number;
     currentPage: number;
     limit: number;
@@ -72,11 +74,25 @@ export const useFetchWorks = (params: UseFetchWorksParams = {}) => {
   });
 
   // Computed properties from API response
-  const works = computed(() => (data.value as IWorksResponse | undefined)?.data ?? []);
+  // Handle both array response (admin) and single object response (freelancer)
+  const works = computed(() => {
+    const responseData = (data.value as IWorksResponse | undefined)?.data;
+    if (!responseData) return [];
+    
+    // If it's a single object (freelancer), convert to array
+    if (!Array.isArray(responseData)) {
+      return [responseData];
+    }
+    
+    // If it's an array (admin), return as is
+    return responseData;
+  });
+
   const meta = computed(() => {
     const responseMeta = (data.value as IWorksResponse | undefined)?.meta;
     if (responseMeta) return responseMeta;
     
+    // Default meta for single object responses (freelancer)
     return {
       total: works.value.length,
       currentPage: currentPageValue.value ?? 1,

@@ -14,7 +14,9 @@ import { HomeView,
   AdminProtectedDashboardView,
   AdminProtectedProjectDetailsView,
   FreelancerProtectedBidsView,
- }
+  FreelancerProtectedWorksView,
+  FreelancerProtectedWorkDetailsView,
+}
 from '@/views';
 
 // Helper functions to check auth state (for use in router guards)
@@ -248,6 +250,16 @@ const router = createRouter({
         {
           path: 'bids',
           component: FreelancerProtectedBidsView,
+          beforeEnter: requireFreelancer,
+        },
+        {
+          path: 'works',
+          component: FreelancerProtectedWorksView,
+          beforeEnter: requireFreelancer,
+        },
+        {
+          path: 'works/:id',
+          component: FreelancerProtectedWorkDetailsView,
           beforeEnter: requireFreelancer,
         },
       ],

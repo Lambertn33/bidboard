@@ -30,7 +30,7 @@ import { getWorkDetails } from '@/api/private/common/works';
   export interface WorkData {
     id: string;
     completionUrl: string | null;
-    freelancer: WorkFreelancer;
+    freelancer?: WorkFreelancer;
     status: 'IN_PROGRESS' | 'COMPLETED';
     startDate: string;
     endDate: string;
