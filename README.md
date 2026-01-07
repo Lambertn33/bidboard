@@ -1,6 +1,6 @@
-# TaskBid
+# Bidboard
 
-TaskBid is a full-stack marketplace platform that enables administrators to post paid micro-tasks and allows freelancers to bid, complete work, and track their earnings. Built with NestJS backend, Vue 3 frontend, MySQL database via Prisma 7, and Docker-based infrastructure.
+Bidboard / Taskbid is a full-stack marketplace platform that enables administrators to post paid micro-tasks and allows freelancers to bid, complete work, and track their earnings. Built with NestJS backend, Vue 3 frontend, MySQL database via Prisma 7, and Docker-based infrastructure.
 
 ## Features
 
